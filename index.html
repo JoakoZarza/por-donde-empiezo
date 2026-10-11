@@ -2,7 +2,17 @@
 <html lang="es-AR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      `viewport-fit=cover` es lo que hace que existan las variables
+      `env(safe-area-inset-*)`: sin esto, el botón «Listo» queda debajo de la barra
+      de gestos en un iPhone. El zoom nunca se deshabilita.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#171633" />
+    <meta name="description" content="No tenés que ordenar todo, solo lo siguiente." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/iconos/icono-192.png" />
+    <link rel="apple-touch-icon" href="/iconos/icono-192.png" />
     <title>Por dónde empiezo</title>
   </head>
   <body>
