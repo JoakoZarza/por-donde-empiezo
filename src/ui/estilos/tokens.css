@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+/*
+  Tokens de «Luz de velador».
+
+  Los valores de color están fijados por el plan visual aprobado, en
+  docs/superpowers/specs/2026-10-10-por-donde-empiezo-plan-visual.md, y hay un
+  test que verifica los seis uno por uno: cambiar acá sin cambiar el documento
+  rompe la suite a propósito.
+*/
+@theme {
+  /* Paleta. El ámbar es un recurso escaso: el paso actual y el progreso, nada más. */
+  --color-noche: #171633;
+  --color-pared: #232246;
+  --color-hueso: #F1EEF9;
+  --color-humo: #A8A4C6;
+  --color-velador: #F2B455;
+  --color-menta: #7FC8AE;
+
+  /* El borde de la tarjeta no es un séptimo color: se deriva del hueso. */
+  --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+
+  /* Tipografía: dos familias con roles que no se pisan. */
+  --font-interfaz: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-verbo: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+
+  /* Escala tipográfica */
+  --texto-paso: clamp(2.5rem, 13vw, 4.5rem);
+  --texto-titulo: 1.75rem;
+  --texto-boton: 1.25rem;
+  --texto-cuerpo: 1.0625rem;
+  --texto-menudo: 0.9375rem;
+
+  /* Radios y sombras: concéntricos, y la sombra en dos capas (ambiente + directa). */
+  --radio-tarjeta: 20px;
+  --radio-control: 14px;
+  --sombra-tarjeta: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 32px -12px rgb(9 8 24 / 0.85);
+
+  /* Área táctil mínima. Es una regla de AGENTS.md, no un número decorativo. */
+  --toque-minimo: 44px;
+
+  /* Duración del único momento animado de la app: el viaje de la luz. */
+  --viaje-luz: 240ms;
+}
+
+:root {
+  /* Notch y barra de gestos. Sin esto, el botón «Listo» queda debajo de la barra. */
+  --safe-arriba: env(safe-area-inset-top, 0px);
+  --safe-abajo: env(safe-area-inset-bottom, 0px);
+  --safe-izquierda: env(safe-area-inset-left, 0px);
+  --safe-derecha: env(safe-area-inset-right, 0px);
+}

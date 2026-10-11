@@ -1,0 +1,85 @@
+/*
+  Base del sistema. Acá viven las reglas de AGENTS.md que no son de un componente:
+  foco visible, gestos del celular, safe areas, números tabulares y movimiento reducido.
+*/
+
+html {
+  color-scheme: dark;
+  background-color: var(--color-noche);
+  /* Sin esto, iOS resalta cada toque con un rectángulo azul ajeno al diseño. */
+  -webkit-tap-highlight-color: rgb(242 180 85 / 0.18);
+  /* Elimina el retraso y el zoom por doble toque en los controles. */
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-interfaz);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.5;
+  color: var(--color-hueso);
+  background-color: var(--color-noche);
+  -webkit-font-smoothing: antialiased;
+  padding: var(--safe-arriba) var(--safe-derecha) var(--safe-abajo) var(--safe-izquierda);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-verbo);
+  font-weight: 600;
+  /* Evita viudas y huérfanas en títulos de una o dos palabras. */
+  text-wrap: balance;
+}
+
+/* El foco nunca se quita sin reemplazo: es una regla obligatoria. */
+:focus-visible {
+  outline: 2px solid var(--color-velador);
+  outline-offset: 2px;
+  border-radius: var(--radio-control);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/*
+  Números que cambian mientras se miran —el temporizador, el contador de
+  progreso— no deben bailar. Es la regla de tabular-nums aplicada acá.
+*/
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+  iOS hace zoom solo al enfocar una entrada de menos de 16px. Se resuelve con
+  tamaño, nunca deshabilitando el zoom del navegador.
+*/
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 17px;
+  color: inherit;
+}
+
+button {
+  min-height: var(--toque-minimo);
+  touch-action: manipulation;
+  /* Propiedades explícitas: `transition: all` está prohibido. */
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
