@@ -64,8 +64,14 @@ export function generarPlan(entrada: EntradaPlan, ahora: string, idPlan: string)
   )
 
   if (disponibles.length === 0) {
+    // El motivo cambia el mensaje: culpar a la persona por no haber tildado nada
+    // cuando en realidad ya hizo todo es desconcertante y falso.
+    const yaEstabanHechas =
+      entrada.tareas.length > 0 && entrada.tareas.every((tarea) => yaHechas.has(tarea.id))
     advertencias.push(
-      'no hay ninguna tarea para hacer con lo que hay: revisá las tareas incluidas y las herramientas que tenés cargadas',
+      yaEstabanHechas
+        ? 'ya hiciste todas las tareas de estos ambientes: reiniciá uno para volver a empezar'
+        : 'no hay ninguna tarea para hacer con lo que hay: revisá las tareas incluidas y las herramientas que tenés cargadas',
     )
     return armarPlan(entrada, ahora, idPlan, [], 0, advertencias)
   }

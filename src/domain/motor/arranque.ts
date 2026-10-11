@@ -85,8 +85,13 @@ export function elegirPasoDeArranque(
   })[0]
   if (!masCorta) return null
 
+  const conDependenciasPendientes = (pendientesDe.get(masCorta.id)?.size ?? 0) > 0
+  const motivo = conDependenciasPendientes
+    ? 'ninguna tarea sin dependencias pendientes'
+    : `ninguna tarea de 2 minutos sin dependencias en ${masCorta.ambienteId}`
+
   return {
     tarea: masCorta,
-    advertencia: `ninguna tarea de 2 minutos sin dependencias en ${masCorta.ambienteId}: se usa la más corta, de ${masCorta.duracionMin} minutos`,
+    advertencia: `${motivo}: se usa la más corta, de ${masCorta.duracionMin} minutos`,
   }
 }

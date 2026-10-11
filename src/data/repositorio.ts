@@ -23,6 +23,12 @@ export interface Repositorio {
   /** Ids de las tareas hechas en el ciclo actual del ambiente. */
   listarHechas(ambienteId: string): Promise<string[]>
   marcarHecha(tareaId: string, hechoEn: string): Promise<void>
+  /**
+   * Abre un ciclo nuevo para el ambiente: sus tareas vuelven a estar pendientes.
+   * No toca ningún total histórico. Es la acción «Arrancar de nuevo este
+   * ambiente» de la especificación, sección 4.2.
+   */
+  limpiarHechas(ambienteId: string): Promise<void>
 
   guardarPlan(plan: Plan): Promise<void>
   obtenerPlan(planId: string): Promise<Plan | null>

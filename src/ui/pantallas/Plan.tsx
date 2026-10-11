@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import type { Ambiente, Tarea } from '../../domain/tipos'
@@ -108,6 +108,9 @@ export default function Plan() {
           </p>
         ))}
         <div className="pantalla__pie">
+          <Link className="boton-secundario" to="/">
+            Volver al principio
+          </Link>
           <button type="button" className="boton-principal" onClick={() => navegar('/sesion/nueva')}>
             Seguir con más tiempo
           </button>

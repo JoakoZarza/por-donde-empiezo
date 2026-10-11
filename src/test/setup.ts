@@ -9,6 +9,16 @@ import 'fake-indexeddb/auto'
 import '@testing-library/jest-dom/vitest'
 import { afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
+import { configure } from '@testing-library/react'
+
+/*
+  El timeout por defecto de las consultas asíncronas es de un segundo, y la suite
+  completa —con IndexedDB real y varios workers— lo pasa de largo en las máquinas
+  lentas: los tests fallaban por tiempo, no por comportamiento. Se sube el techo
+  en vez de bajar la cantidad de aserciones: un test que falla por reloj no dice
+  nada sobre el código.
+*/
+configure({ asyncUtilTimeout: 5000 })
 
 /*
   La limpieza automática de Testing Library se registra sola solo si existe un

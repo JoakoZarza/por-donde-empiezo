@@ -91,6 +91,12 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
       await base.hechas.put({ tareaId, ambienteId: tarea.ambienteId, hechoEn })
     },
 
+    async limpiarHechas(ambienteId) {
+      // Solo las marcas del ciclo: los totales históricos viven en otra tabla y no
+      // se tocan. Nada de lo que la persona ganó se pierde.
+      await base.hechas.where('ambienteId').equals(ambienteId).delete()
+    },
+
     async guardarPlan(plan) {
       await base.planes.put(plan)
     },

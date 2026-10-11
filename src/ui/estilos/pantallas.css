@@ -294,6 +294,13 @@
   font-weight: 600;
   line-height: 1;
   color: var(--color-hueso);
+  /* Un nombre largo escrito por la persona no puede empujar «Listo» fuera de la
+     pantalla ni desbordar en horizontal. Se recorta a tres líneas. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .paso__objeto {

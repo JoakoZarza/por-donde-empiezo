@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test } from 'vitest'
@@ -52,9 +52,12 @@ test('de elegir ambientes a tildar el primer paso, sin escribir ninguna direcci�
   // 3. Desde acá tiene que poder seguir sola: si no hay botón, el flujo está cortado.
   await usuario.click(screen.getByRole('button', { name: /cuánto tiempo/i }))
 
-  // 4. Elegir el tiempo y armar el plan.
+  // 4. Elegir el tiempo y armar el plan. El botón se habilita recién cuando la
+  // pantalla terminó de mirar si quedan tareas pendientes: hay que esperarlo.
   await usuario.click(await screen.findByRole('radio', { name: /20 minutos/i }))
-  await usuario.click(screen.getByRole('button', { name: 'Armá el plan' }))
+  const armar = screen.getByRole('button', { name: 'Armá el plan' })
+  await waitFor(() => expect(armar).toBeEnabled())
+  await usuario.click(armar)
 
   // 5. El plan muestra un solo paso, y el primero dura dos minutos.
   const articulo = await screen.findByRole('article')
@@ -62,6 +65,9 @@ test('de elegir ambientes a tildar el primer paso, sin escribir ninguna direcci�
 
   // 6. Tildar el primer paso lo deja registrado en el plan guardado.
   await usuario.click(screen.getByRole('button', { name: 'Listo' }))
+  // Si la pantalla hubiera fallado al guardar, mostraría un aviso: se comprueba
+  // antes de mirar la base, para saber si el problema es el guardado o la lectura.
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect((await repo.ultimoPlan())?.pasos[0]?.estado).toBe('hecho')
 })
 
@@ -73,7 +79,14 @@ test('el plan sobrevive a recargar la página', async () => {
   await usuario.click(screen.getByRole('button', { name: /armá las tareas/i }))
   await usuario.click(await screen.findByRole('button', { name: /cuánto tiempo/i }))
   await usuario.click(await screen.findByRole('radio', { name: /20 minutos/i }))
-  await usuario.click(screen.getByRole('button', { name: 'Armá el plan' }))
+  const armar = screen.getByRole('button', { name: 'Armá el plan' })
+  await waitFor(() => expect(armar).toBeEnabled())
+  await usuario.click(armar)
+  // El guardado ocurre dentro del manejador del clic, y `click` no espera a las
+  // promesas del manejador: hay que esperar a que el plan exista antes de leerlo.
+  await waitFor(async () => {
+    expect(await repo.ultimoPlan()).not.toBeNull()
+  })
   const plan = await repo.ultimoPlan()
 
   // Se desmonta todo y se vuelve a montar directo en la dirección del plan: es lo

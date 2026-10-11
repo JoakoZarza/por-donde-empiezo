@@ -17,6 +17,7 @@ export default function PrimeraVez() {
   const elegirAmbientes = useSesion((estado) => estado.elegirAmbientes)
   const [elegidos, setElegidos] = useState<string[]>([])
   const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useTitulo('¿Qué querés ordenar?')
 
@@ -28,9 +29,13 @@ export default function PrimeraVez() {
 
   async function avanzar(): Promise<void> {
     setGuardando(true)
+    setError(null)
     try {
       const primerAmbiente = await elegirAmbientes(elegidos)
       if (primerAmbiente) navegar(`/armar/${primerAmbiente}`)
+    } catch {
+      // Sin esto, la primera pantalla era la única que fallaba en silencio.
+      setError('No pudimos guardar tus ambientes. Probá de nuevo.')
     } finally {
       setGuardando(false)
     }
@@ -62,6 +67,11 @@ export default function PrimeraVez() {
 
       <div className="pantalla__pie">
         {elegidos.length === 0 && <p className="menudo">Elegí al menos un ambiente.</p>}
+        {error && (
+          <p className="alerta" role="alert">
+            {error}
+          </p>
+        )}
         <button
           type="button"
           className="boton-principal"

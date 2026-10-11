@@ -83,8 +83,13 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
       .filter((ambiente) => ids.includes(ambiente.id))
       .sort((a, b) => a.ordenRecorrido - b.ordenRecorrido)
 
+    const yaGuardados = new Set((await repo.listarAmbientes()).map((ambiente) => ambiente.id))
+
     for (const ambiente of elegidos) {
       await repo.guardarAmbiente(ambiente)
+      // Solo se siembra la primera vez. Si la persona ya había destildado tareas de
+      // este ambiente, volver a elegirlo no puede resucitarlas.
+      if (yaGuardados.has(ambiente.id)) continue
       for (const tarea of tareasDeAmbiente(ambiente.id)) {
         await repo.guardarTarea(tarea)
       }
@@ -95,7 +100,10 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
   },
 
   abrirPlan(plan) {
-    set({ planActual: plan, pasoActual: 0 })
+    // Se retoma en el primer paso PENDIENTE, no en el primero: al recargar la
+    // página el plan ya tiene pasos hechos, y volver al paso 1 los haría rehacer.
+    const primeroPendiente = plan.pasos.findIndex((paso) => paso.estado === 'pendiente')
+    set({ planActual: plan, pasoActual: primeroPendiente === -1 ? plan.pasos.length : primeroPendiente })
   },
 
   paso() {
