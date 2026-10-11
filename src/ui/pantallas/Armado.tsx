@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { ambientePorId, objetoPorId, objetosDeAmbiente, tareasDeAmbiente } from '../../domain/catalogo'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
-import type { Tarea } from '../../domain/tipos'
+import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
   El armado del ambiente.
@@ -20,9 +20,11 @@ const GRUPO_PROPIAS = 'propias'
 
 export default function Armado() {
   const { ambienteId = '' } = useParams()
+  const navegar = useNavigate()
   const repositorio = useSesion((estado) => estado.repositorio)
   const [conocidas, setConocidas] = useState<Tarea[]>([])
   const [incluidas, setIncluidas] = useState<string[]>([])
+  const [siguiente, setSiguiente] = useState<Ambiente | null>(null)
   const [propia, setPropia] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -51,6 +53,15 @@ export default function Armado() {
       for (const tarea of [...delCatalogo, ...guardadas]) porId.set(tarea.id, tarea)
       setConocidas([...porId.values()])
       setIncluidas(guardadas.map((tarea) => tarea.id))
+
+      // Los ambientes que faltan armar, en orden de recorrido.
+      const pendientes = (await repositorio.listarAmbientes())
+        .filter(
+          (otro) =>
+            otro.id !== ambienteId && otro.ordenRecorrido > (ambiente?.ordenRecorrido ?? Number.MAX_SAFE_INTEGER),
+        )
+        .sort((a, b) => a.ordenRecorrido - b.ordenRecorrido)
+      if (vigente) setSiguiente(pendientes[0] ?? null)
     }
 
     void cargar()
@@ -190,6 +201,30 @@ export default function Armado() {
         <button type="button" className="boton-secundario" onClick={() => void agregar()}>
           Agregar
         </button>
+
+        {/*
+          Sin estos botones el flujo queda cortado: se puede armar el ambiente pero
+          no hay forma de llegar a la pantalla del tiempo sin escribir la dirección
+          a mano. Lo destapó la prueba de flujo completo, no los tests de pantalla.
+        */}
+        {siguiente ? (
+          <>
+            <button type="button" className="boton-secundario" onClick={() => navegar('/sesion/nueva')}>
+              Listo, ¿cuánto tiempo tengo?
+            </button>
+            <button
+              type="button"
+              className="boton-principal"
+              onClick={() => navegar(`/armar/${siguiente.id}`)}
+            >
+              Seguir con {siguiente.nombre.toLowerCase()}
+            </button>
+          </>
+        ) : (
+          <button type="button" className="boton-principal" onClick={() => navegar('/sesion/nueva')}>
+            Listo, ¿cuánto tiempo tengo?
+          </button>
+        )}
       </div>
     </main>
   )
