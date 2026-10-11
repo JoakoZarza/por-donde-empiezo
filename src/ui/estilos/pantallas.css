@@ -336,3 +336,30 @@
   font-size: var(--texto-titulo);
   color: var(--color-hueso);
 }
+
+/*
+  Música: dos enlaces comunes que abren la app que la persona ya tiene. Un `<a>` es
+  inline por defecto, así que `min-height` no le aplica: sin `display: flex` el
+  blanco de toque queda por debajo de los 44 px que exige AGENTS.md.
+*/
+.musica {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.musica li {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.musica a {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
