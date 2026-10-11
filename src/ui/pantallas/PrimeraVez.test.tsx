@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, test } from 'vitest'
 import PrimeraVez from './PrimeraVez'
 import { useSesion } from '../estado/sesion'
+import { tareasDeAmbiente } from '../../domain/catalogo'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
 import type { Repositorio } from '../../data/repositorio'
 
@@ -77,11 +78,18 @@ test('al avanzar guarda el ambiente elegido y todas sus tareas', async () => {
   await usuario.click(screen.getByRole('checkbox', { name: /cocina/i }))
   await usuario.click(screen.getByRole('button', { name: /armá las tareas/i }))
 
-  await waitFor(async () => {
-    expect((await repo.listarAmbientes()).map((a) => a.id)).toEqual(['cocina'])
+  /*
+    Se espera al store, no al repositorio. El ambiente se guarda ANTES que sus
+    tareas, así que esperar a `listarAmbientes` daba por terminado algo que
+    todavía estaba en curso: el test leía 1 tarea, o 2, según cómo cayera la
+    carrera. El store actualiza `ambientes` recién cuando terminó de guardar todo.
+  */
+  await waitFor(() => {
+    expect(useSesion.getState().ambientes.map((ambiente) => ambiente.id)).toEqual(['cocina'])
   })
+
   const tareas = await repo.listarTareas('cocina')
-  expect(tareas.length).toBeGreaterThanOrEqual(5)
+  expect(tareas).toHaveLength(tareasDeAmbiente('cocina').length)
   expect(tareas.every((t) => t.esDelCatalogo)).toBe(true)
 })
 

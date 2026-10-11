@@ -65,22 +65,24 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
   pasoActual: 0,
 
   async cargar() {
-    set({ ambientes: await repositorio.listarAmbientes() })
+    const { repositorio: repo } = get()
+    set({ ambientes: await repo.listarAmbientes() })
   },
 
   async elegirAmbientes(ids) {
+    const { repositorio: repo } = get()
     const elegidos = CATALOGO.ambientes
       .filter((ambiente) => ids.includes(ambiente.id))
       .sort((a, b) => a.ordenRecorrido - b.ordenRecorrido)
 
     for (const ambiente of elegidos) {
-      await repositorio.guardarAmbiente(ambiente)
+      await repo.guardarAmbiente(ambiente)
       for (const tarea of tareasDeAmbiente(ambiente.id)) {
-        await repositorio.guardarTarea(tarea)
+        await repo.guardarTarea(tarea)
       }
     }
 
-    set({ ambientes: await repositorio.listarAmbientes() })
+    set({ ambientes: await repo.listarAmbientes() })
     return elegidos[0]?.id ?? null
   },
 
