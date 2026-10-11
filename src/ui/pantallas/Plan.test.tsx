@@ -84,7 +84,7 @@ test('el verbo del paso va primero, como título de la tarjeta', async () => {
   const articulo = await screen.findByRole('article')
   const primera = await tareaDe(plan.pasos[0]!.tareaId)
   expect(articulo).toHaveTextContent(primera.accion)
-  expect(screen.getByRole('heading', { name: primera.accion })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: new RegExp(primera.accion, 'i') })).toBeInTheDocument()
 })
 
 test('«Listo» avanza al paso siguiente', async () => {
@@ -96,7 +96,7 @@ test('«Listo» avanza al paso siguiente', async () => {
   const segunda = await tareaDe(plan.pasos[1]!.tareaId)
   await usuario.click(screen.getByRole('button', { name: 'Listo' }))
 
-  expect(await screen.findByRole('heading', { name: segunda.accion })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: new RegExp(segunda.accion, 'i') })).toBeInTheDocument()
 })
 
 test('anuncia el paso nuevo con aria-live, porque la pantalla cambia sin navegar', async () => {

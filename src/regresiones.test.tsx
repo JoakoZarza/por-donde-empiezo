@@ -118,7 +118,7 @@ test('I1: al recargar, el plan arranca en el primer paso pendiente', async () =>
   montar('/plan/plan-recarga')
 
   const segundo = tareas.find((t) => t.id === plan.pasos[1]!.tareaId)!
-  expect(await screen.findByRole('heading', { name: segundo.accion })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: new RegExp(segundo.accion, 'i') })).toBeInTheDocument()
 })
 
 test('I4: volver a elegir un ambiente no revive las tareas que se habían destildado', async () => {

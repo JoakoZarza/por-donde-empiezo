@@ -178,8 +178,16 @@ export default function Plan() {
 
         {tarea && (
           <article className="paso">
-            <h2 className="paso__accion">{tarea.accion}</h2>
-            {tarea.descripcion && <p className="paso__objeto">{tarea.descripcion}</p>}
+            {/*
+              El verbo y el objeto van en la MISMA frase. Separados en dos renglones
+              se leían como dos pedazos —«Limpiá» arriba, «la mesa» abajo— y no como
+              la instrucción que son. La jerarquía se mantiene por tamaño y color,
+              no partiendo la frase.
+            */}
+            <h2 className="paso__accion">
+              {tarea.accion}
+              {tarea.descripcion && <span className="paso__objeto"> {tarea.descripcion}</span>}
+            </h2>
             <p className="menudo">
               {ambiente?.nombre ?? 'Casa'} · {tarea.duracionMin}&nbsp;min
             </p>

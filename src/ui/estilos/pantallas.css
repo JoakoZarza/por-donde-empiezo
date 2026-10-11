@@ -271,7 +271,12 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  justify-content: flex-end;
+  /*
+    Centrada: con la tarjeta pegada abajo, el hueco de arriba quedaba tan grande que
+    se leía como que algo no había cargado. Así el aire se reparte y la tarjeta
+    queda en el tercio inferior, al alcance del pulgar.
+  */
+  justify-content: center;
 }
 
 .lampara {
@@ -279,7 +284,7 @@
   inset: 0;
   pointer-events: none;
   background: radial-gradient(
-    circle at 50% 62%,
+    circle at 50% 54%,
     rgb(242 180 85 / 0.16) 0%,
     rgb(242 180 85 / 0.05) 30%,
     transparent 66%
