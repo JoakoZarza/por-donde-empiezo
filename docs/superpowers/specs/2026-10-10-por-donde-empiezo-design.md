@@ -465,7 +465,7 @@ Todo el stack es gratuito y no requiere tarjeta de crédito.
   reportarse).
 - Determinismo: se ejecuta el mismo caso 100 veces y se compara el resultado.
 
-**Catálogo** — valida las cuatro obligaciones de integridad de la sección 5.4.
+**Catálogo** — valida las cinco obligaciones de integridad de la sección 5.4.
 
 **Repositorio** — guardar, leer, actualizar y borrar en la implementación local; migración de
 datos locales a la nube y fusión según las reglas de la sección 6.3.
@@ -473,11 +473,19 @@ datos locales a la nube y fusión según las reglas de la sección 6.3.
 ### 11.2 Verificación manual, en dispositivo
 
 Cada entregable se verifica en un navegador móvil real (Chrome en Android y Safari en iOS) antes
-de darse por terminado:
-- Ancho de 360 px sin scroll horizontal.
-- Todas las áreas táctiles de 44 px o más.
+de darse por terminado. La lista completa de reglas de interfaz que se revisan está en
+`AGENTS.md`, en la raíz del repositorio. El mínimo por entregable:
+
+- Ancho de 360&nbsp;px sin scroll horizontal.
+- Todas las áreas táctiles de 44&nbsp;px o más, incluidos los controles secundarios.
 - La app se instala y arranca sin conexión.
 - El paso actual se lee de un vistazo, con el pulgar, sin zoom.
+- Safe areas: el botón "Listo" no queda tapado por la barra de gestos ni por el notch.
+- El botón Atrás del celular no rompe una sesión en curso y restaura la posición de scroll.
+- El temporizador no baila mientras corre (números tabulares).
+- Con el lector de pantalla activo, al tocar "Listo" se anuncia el paso nuevo.
+- Escribir en un campo de texto no dispara el zoom automático de iOS.
+- Cada pantalla se ve bien en sus cuatro estados: vacía, con pocos datos, llena y con error.
 
 ---
 
@@ -488,7 +496,7 @@ en un teléfono real.
 
 1. **El motor y el plan.** Catálogo inicial, motor de orden, armado del ambiente, arranque de
    sesión y pantalla del plan. Sin cuentas, sin historial. Al terminar, ya sirve para su propósito
-   principal: decirte por dónde empezar.
+   principal: decirte por dónde empezar. **Empieza por el plan visual de la sección 13.3.**
 2. **Sesiones e historial.** Cierre de sesión, registro, totales acumulados y pantalla de historial.
 3. **La casa y los logros.** Plano que se ilumina, estados por ambiente, catálogo de logros,
    incluido *"Volviste"*, y la pantalla de regreso después de una ausencia.
@@ -496,9 +504,71 @@ en un teléfono real.
 5. **Cuenta y sincronización.** Google y email + contraseña, migración de lo local, fusión, y la
    tarea programada que evita la pausa del plan gratuito.
 
+**Definición de terminado, común a los cinco entregables.** Ninguno se da por terminado sin:
+
+- Los tests automáticos de la sección 11.1 en verde.
+- La lista de verificación en dispositivo de la sección 11.2, revisada en un teléfono real.
+- Los cuatro estados de cada pantalla nueva, revisados a propósito.
+- Una revisión contra `AGENTS.md`, incluida su tabla de excepciones.
+
 ---
 
-## 13. Riesgos y mitigaciones
+## 13. Estándares de interfaz
+
+Las reglas de interfaz de este proyecto viven en **`AGENTS.md`**, en la raíz del repositorio, y
+son obligatorias. Ese archivo contiene dos partes:
+
+1. Las **Web Interface Guidelines** de Vercel Labs (licencia MIT, Copyright © 2025 Vercel Labs),
+   reproducidas íntegras y sin cambios: teclado y foco, tamaños táctiles, formularios, estado y
+   navegación, feedback, gestos, animación, layout, contenido y accesibilidad, rendimiento, modo
+   oscuro y diseño. Origen: <https://github.com/vercel-labs/web-interface-guidelines>, rama `main`,
+   consultado el 2026-10-10.
+2. Una sección propia de este proyecto que agrega, concreta o exceptúa reglas, y que **gana**
+   cuando hay conflicto.
+
+### 13.1 Las decisiones que tomamos sobre la guía
+
+| Punto | Decisión | Motivo |
+|---|---|---|
+| Contraste | **WCAG 2.2 AA como piso obligatorio**; APCA como criterio de diseño para afinar | WCAG es verificable con herramientas y es el estándar exigible; APCA todavía no tiene soporte generalizado |
+| Zoom del navegador | **Nunca se deshabilita** | El README de la guía sugería `maximum-scale=1`, pero su propio `AGENTS.md` lo prohíbe y viola WCAG 1.4.4. Hay una contradicción real dentro del repositorio de origen, y se resuelve a favor de la accesibilidad |
+| Sección "Vercel-specific" (Title Case en botones, `&` en vez de "and") | **No se adopta** | Es marca de Vercel; en español el Title Case y el `&` serían errores |
+| Pautas de Next.js e hidratación | **No aplican** | Es una SPA con React y Vite |
+| Herramientas de diseño | Los skills globales de diseño de la máquina se usan para el criterio visual | No viven en el repositorio: si no están instalados, `AGENTS.md` alcanza para construir correctamente |
+
+### 13.2 Doce reglas propias que la guía no cubría
+
+Huecos que la guía reveló en esta especificación, y que ahora son obligatorios:
+
+1. Safe areas del notch y de la barra de gestos con `env(safe-area-inset-*)`.
+2. Números tabulares en el temporizador del contrarreloj.
+3. Fechas, horas y números con `Intl` (`Intl.RelativeTimeFormat` para el "hace 12 días" del historial).
+4. Entradas de texto con `font-size` ≥ 16&nbsp;px.
+5. `touch-action: manipulation` y `-webkit-tap-highlight-color`.
+6. Estado en la URL, con Back/Forward que no rompe la sesión en curso y restaura el scroll.
+7. `aria-live="polite"` al cambiar el paso actual.
+8. `overscroll-behavior` que no rompe el gesto de recargar tirando hacia abajo.
+9. Los cuatro estados (vacío, escaso, lleno, error) diseñados en cada pantalla.
+10. Virtualizar listas de más de 50&nbsp;ítems.
+11. Comillas tipográficas, el carácter `…` y espacios duros en las unidades.
+12. `transition: all` prohibido.
+
+### 13.3 Plan visual obligatorio antes del primer componente
+
+La interfaz no se improvisa. Antes de escribir el primer componente visual se define un plan
+acotado y se agrega a este documento para que se apruebe:
+
+- Una paleta de 4 a 6 colores con nombre y sus valores.
+- Las tipografías y el rol de cada una.
+- El concepto de layout, con descripciones y esquemas.
+- Los principios que hacen que esto se vea como *esta* app y no como una plantilla genérica.
+
+Es el primer paso del entregable 1 (sección 12), y ningún componente se escribe antes de que el
+plan esté aprobado.
+
+---
+
+## 14. Riesgos y mitigaciones
 
 | Riesgo | Mitigación |
 |---|---|
@@ -509,10 +579,11 @@ en un teléfono real.
 | Fricción de registro. | La cuenta es opcional y se pide solo para sincronizar; nunca para usar una función. |
 | La gamificación se convierte en presión. | Principio 2 de la sección 1.3: ningún número baja por no usar la app. Nada en rojo. Ninguna racha. |
 | Alcance grande para una fase 1. | Cinco entregables verticales, cada uno usable por sí solo. |
+| La guía de interfaz de origen cambia bajo nuestros pies. | Está copiada en el repositorio, con su commit de referencia y su licencia. Actualizarla es una decisión explícita, no algo que pasa solo. |
 
 ---
 
-## 14. Decisiones tomadas por delegación
+## 15. Decisiones tomadas por delegación
 
 El usuario delegó explícitamente el criterio de orden ("prefiero confiar en tu criterio"). Se
 resolvió **no elegir por él**: los tres criterios legítimos conviven como tres modos sobre un
@@ -521,8 +592,9 @@ una decisión del usuario.
 
 ---
 
-## 15. Historial de revisiones
+## 16. Historial de revisiones
 
 | Fecha | Cambio |
 |---|---|
 | 2026-10-10 | Versión inicial aprobada en conversación. |
+| 2026-10-10 | Se adopta `AGENTS.md` con las Web Interface Guidelines de Vercel Labs (MIT). Se agrega la sección 13 (Estándares de interfaz), se amplía la verificación en dispositivo (11.2), se agrega la definición de terminado (12) y se corrigen las obligaciones del catálogo de cuatro a cinco. |
