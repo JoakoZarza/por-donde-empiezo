@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Por dónde empiezo - Armado del ambiente</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+  :root {
+    --color-noche: #171633;
+    --color-pared: #232246;
+    --color-hueso: #F1EEF9;
+    --color-humo: #A8A4C6;
+    --color-velador: #F2B455;
+    --color-menta: #7FC8AE;
+    --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+  }
+
+  body {
+    background-color: var(--color-noche);
+    color: var(--color-hueso);
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .font-brand {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 600;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  .tap-target-56 {
+    min-height: 56px;
+  }
+
+  .tabular-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pb-safe {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+</style>
+</head>
+<body class="min-h-screen antialiased selection:bg-[var(--color-velador)] selection:text-[var(--color-noche)]">
+<div class="relative mx-auto flex min-h-screen max-w-md flex-col justify-between overflow-x-hidden bg-[var(--color-noche)] pb-36">
+<!-- Encabezado sutil: "Por dónde empiezo" -->
+<header class="flex justify-between items-center w-full px-5 py-3 max-w-md mx-auto pt-safe">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--color-velador)] text-[22px] select-none" data-icon="bedtime">bedtime</span>
+<span class="font-brand text-[20px] text-[var(--color-velador)] tracking-tight">Por dónde empiezo</span>
+</div>
+<button aria-label="Más opciones" class="text-[var(--color-humo)] hover:text-[var(--color-hueso)] flex items-center justify-center p-1.5 rounded-full transition-colors active:scale-95" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<!-- Contenido principal: Armado del ambiente — Cocina -->
+<main class="flex-1 px-5 pt-2">
+<div class="mb-5">
+<div class="flex items-center gap-1.5 text-[var(--color-humo)] mb-1">
+<span class="material-symbols-outlined text-[var(--color-velador)] text-[16px]" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<p class="text-[11px] font-medium tracking-wider uppercase opacity-90">Armado del ambiente</p>
+</div>
+<h1 class="text-[28px] font-semibold text-[var(--color-hueso)] tracking-tight leading-tight">
+      Cocina
+    </h1>
+<p class="text-[14px] text-[var(--color-humo)] mt-1.5 leading-relaxed">
+      Elegí qué querés abarcar hoy sin apuro. Hacelo a tu ritmo, paso a paso.
+    </p>
+</div>
+<!-- Grupos de tareas por objeto -->
+<section aria-label="Grupos de tareas" class="space-y-3.5">
+<!-- Grupo: Mesada -->
+<article class="rounded-2xl bg-[var(--color-pared)] p-4 border border-[var(--color-borde)] space-y-2.5">
+<header class="flex items-center justify-between pb-2 border-b border-[var(--color-borde)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--color-velador)] text-[19px]" data-icon="countertops">countertops</span>
+<h2 class="text-[15px] font-semibold text-[var(--color-hueso)]">Mesada</h2>
+</div>
+<span class="text-[11px] text-[var(--color-menta)] bg-[var(--color-menta)]/15 px-2.5 py-0.5 rounded-full font-medium">
+          2 listas
+        </span>
+</header>
+<div class="space-y-1">
+<!-- Tarea 1 -->
+<label class="tap-target-56 flex items-center justify-between gap-3 px-2 rounded-xl hover:bg-[var(--color-noche)]/30 transition-colors cursor-pointer select-none">
+<div class="flex items-center gap-3 min-w-0 flex-1">
+<input aria-label="Guardar los platos secos del escurridor" checked="" class="sr-only peer" type="checkbox"/>
+<div class="h-6 w-6 rounded-md bg-[var(--color-menta)]/20 border border-[var(--color-menta)] flex items-center justify-center shrink-0 transition-all peer-checked:bg-[var(--color-menta)]/20 peer-checked:border-[var(--color-menta)]">
+<span class="material-symbols-outlined text-[var(--color-menta)] text-[18px] font-bold" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[14px] text-[var(--color-hueso)] truncate opacity-90">
+              Guardar los platos secos del escurridor
+            </span>
+</div>
+<span class="tabular-num text-[12px] text-[var(--color-humo)] shrink-0 bg-[var(--color-noche)]/60 px-2 py-1 rounded-md">
+            3 min
+          </span>
+</label>
+<!-- Tarea 2: Demuestra recorte prolijo a 2 líneas -->
+<label class="tap-target-56 flex items-center justify-between gap-3 px-2 rounded-xl hover:bg-[var(--color-noche)]/30 transition-colors cursor-pointer select-none">
+<div class="flex items-center gap-3 min-w-0 flex-1 py-1">
+<input aria-label="Tirar restos de comida, paquetes vacíos y pasar rejilla húmeda por toda la mesada…" checked="" class="sr-only peer" type="checkbox"/>
+<div class="h-6 w-6 rounded-md bg-[var(--color-menta)]/20 border border-[var(--color-menta)] flex items-center justify-center shrink-0 transition-all peer-checked:bg-[var(--color-menta)]/20 peer-checked:border-[var(--color-menta)]">
+<span class="material-symbols-outlined text-[var(--color-menta)] text-[18px] font-bold" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[14px] text-[var(--color-hueso)] line-clamp-2 leading-snug opacity-90">
+              Tirar restos de comida, paquetes vacíos y pasar rejilla húmeda por toda la mesada…
+            </span>
+</div>
+<span class="tabular-num text-[12px] text-[var(--color-humo)] shrink-0 self-center bg-[var(--color-noche)]/60 px-2 py-1 rounded-md ml-1">
+            4 min
+          </span>
+</label>
+</div>
+</article>
+<!-- Grupo: Hornallas -->
+<article class="rounded-2xl bg-[var(--color-pared)] p-4 border border-[var(--color-borde)] space-y-2.5">
+<header class="flex items-center justify-between pb-2 border-b border-[var(--color-borde)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--color-velador)] text-[19px]" data-icon="skillet">skillet</span>
+<h2 class="text-[15px] font-semibold text-[var(--color-hueso)]">Hornallas</h2>
+</div>
+<span class="text-[11px] text-[var(--color-menta)] bg-[var(--color-menta)]/15 px-2.5 py-0.5 rounded-full font-medium">
+          1 lista
+        </span>
+</header>
+<div class="space-y-1">
+<!-- Tarea 3 -->
+<label class="tap-target-56 flex items-center justify-between gap-3 px-2 rounded-xl hover:bg-[var(--color-noche)]/30 transition-colors cursor-pointer select-none">
+<div class="flex items-center gap-3 min-w-0 flex-1">
+<input aria-label="Limpiar grasa superficial y rejillas" checked="" class="sr-only peer" type="checkbox"/>
+<div class="h-6 w-6 rounded-md bg-[var(--color-menta)]/20 border border-[var(--color-menta)] flex items-center justify-center shrink-0 transition-all peer-checked:bg-[var(--color-menta)]/20 peer-checked:border-[var(--color-menta)]">
+<span class="material-symbols-outlined text-[var(--color-menta)] text-[18px] font-bold" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[14px] text-[var(--color-hueso)] truncate opacity-90">
+              Limpiar grasa superficial y rejillas
+            </span>
+</div>
+<span class="tabular-num text-[12px] text-[var(--color-humo)] shrink-0 bg-[var(--color-noche)]/60 px-2 py-1 rounded-md">
+            6 min
+          </span>
+</label>
+</div>
+</article>
+<!-- Grupo: Piso -->
+<article class="rounded-2xl bg-[var(--color-pared)] p-4 border border-[var(--color-borde)] space-y-2.5">
+<header class="flex items-center justify-between pb-2 border-b border-[var(--color-borde)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--color-velador)] text-[19px]" data-icon="cleaning_services">cleaning_services</span>
+<h2 class="text-[15px] font-semibold text-[var(--color-hueso)]">Piso</h2>
+</div>
+<span class="text-[11px] text-[var(--color-humo)] bg-[var(--color-noche)]/70 px-2.5 py-0.5 rounded-full font-medium">
+          Pendiente
+        </span>
+</header>
+<div class="space-y-1">
+<!-- Tarea 4 (Pendiente) -->
+<label class="tap-target-56 flex items-center justify-between gap-3 px-2 rounded-xl hover:bg-[var(--color-noche)]/30 transition-colors cursor-pointer select-none group">
+<div class="flex items-center gap-3 min-w-0 flex-1">
+<input aria-label="Barrer migas y pasar trapo rápido" class="sr-only peer" type="checkbox"/>
+<div class="h-6 w-6 rounded-md bg-[var(--color-noche)]/70 border border-[var(--color-borde)] flex items-center justify-center shrink-0 transition-all peer-checked:bg-[var(--color-menta)]/20 peer-checked:border-[var(--color-menta)]">
+<span class="material-symbols-outlined text-[var(--color-menta)] text-[18px] font-bold opacity-0 peer-checked:opacity-100 transition-opacity" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[14px] text-[var(--color-hueso)] truncate group-hover:text-[var(--color-velador)] transition-colors">
+              Barrer migas y pasar trapo rápido
+            </span>
+</div>
+<span class="tabular-num text-[12px] text-[var(--color-humo)] shrink-0 bg-[var(--color-noche)]/60 px-2 py-1 rounded-md">
+            5 min
+          </span>
+</label>
+</div>
+</article>
+<!-- Campo de texto limpio con placeholder «Ej. Vaciar tacho de residuos» y botón «Agregar» -->
+<section aria-label="Agregar nueva tarea" class="pt-1">
+<form class="flex items-center gap-2" onsubmit="event.preventDefault();">
+<input class="w-full bg-[var(--color-pared)] text-[var(--color-hueso)] placeholder:text-[var(--color-humo)]/60 rounded-xl px-3.5 py-2.5 border border-[var(--color-borde)] focus:outline-none focus:border-[var(--color-velador)] transition-colors text-[14px]" placeholder="Ej. Vaciar tacho de residuos" type="text"/>
+<button class="h-[42px] px-4 bg-[var(--color-pared)] hover:bg-[var(--color-pared)]/80 text-[var(--color-velador)] font-medium rounded-xl flex items-center justify-center gap-1 shrink-0 border border-[var(--color-borde)] active:scale-95 transition-transform text-[14px]" type="submit">
+<span class="material-symbols-outlined text-[17px]" data-icon="add">add</span>
+<span>Agregar</span>
+</button>
+</form>
+<p class="text-[12px] text-[var(--color-humo)] px-1 mt-1.5">
+        Podés sumar otra cosa chiquita si sentís ganas.
+      </p>
+</section>
+</section>
+</main>
+<!-- Tercio inferior: Botón principal «Continuar con el tiempo» -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-[var(--color-noche)] border-t border-[var(--color-borde)] pt-3 pb-safe pointer-events-none">
+<div class="max-w-md mx-auto px-5 pointer-events-auto">
+<button class="w-full min-h-[52px] bg-[var(--color-velador)] text-[var(--color-noche)] font-semibold rounded-xl flex items-center justify-center gap-2 px-5 hover:brightness-105 active:scale-[0.98] transition-all" type="button">
+<span class="text-[16px] font-medium tracking-tight">Continuar con el tiempo</span>
+<span class="material-symbols-outlined text-[var(--color-noche)] text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="text-center text-[12px] text-[var(--color-humo)] mt-2 pb-1 tabular-num">
+      Tiempo estimado acumulado: <span class="font-medium text-[var(--color-velador)]">18 min</span>
+</p>
+</div>
+</div>
+</div>
+<script>
+  // Feedback sutil para los checkboxes
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const textSpan = e.target.closest('label').querySelector('.text-\\[14px\\]');
+      if (textSpan) {
+        if (e.target.checked) {
+          textSpan.classList.add('opacity-90');
+        } else {
+          textSpan.classList.remove('opacity-90');
+        }
+      }
+    });
+  });
+</script>
+</body></html>

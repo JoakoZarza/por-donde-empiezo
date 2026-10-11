@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Por dónde empiezo - Cierre de sesión</title>
+<!-- Google Fonts: Bricolage Grotesque (600) & Instrument Sans (400, 500, 600, 700) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    :root {
+      --color-noche: #171633;
+      --color-pared: #232246;
+      --color-hueso: #F1EEF9;
+      --color-humo: #A8A4C6;
+      --color-velador: #F2B455;
+      --color-menta: #7FC8AE;
+      --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+    }
+
+    body {
+      background-color: var(--color-noche);
+      color: var(--color-hueso);
+      font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .font-brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+    }
+
+    .tabular-numbers {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
+    .velador-card-glow {
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 16px 40px -16px rgb(9 8 24 / 0.9);
+      border: 1px solid color-mix(in oklab, var(--color-velador) 22%, transparent);
+    }
+
+    .velador-button-shadow {
+      box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), 0 10px 25px -8px color-mix(in oklab, var(--color-velador) 40%, transparent);
+    }
+
+    .dormant-border {
+      border: 1px solid var(--color-borde);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex items-center justify-center selection:bg-[#F2B455] selection:text-[#171633] p-0 m-0">
+<!-- Mobile Screen Container: 390px x 844px with Safe Area Handling -->
+<div class="relative w-full max-w-[390px] min-h-[844px] h-[844px] bg-[#171633] flex flex-col justify-between px-6 pt-7 pb-8 box-border overflow-hidden">
+<!-- Ambient gentle glow in the background for "Luz de velador" warmth -->
+<div aria-hidden="true" class="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#F2B455]/[0.07] blur-3xl pointer-events-none"></div>
+<!-- Header: Encabezado discreto con Bricolage Grotesque (600) -->
+<header class="w-full flex items-center justify-between pt-1 pb-4 z-10">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-[#F2B455] shadow-[0_0_8px_#F2B455]"></span>
+<span class="font-brand text-lg tracking-tight text-[#F1EEF9]">Por dónde empiezo</span>
+</div>
+<button aria-label="Opciones" class="text-[#A8A4C6] hover:text-[#F1EEF9] transition-colors p-1 rounded-full active:scale-95" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<!-- Center Stage: Espacio amplio, tranquilo, baja activación mental y sensación de alivio -->
+<main class="flex-1 flex flex-col justify-center my-auto z-10 py-4">
+<!-- Velador Stage Card -->
+<section class="bg-[#232246] rounded-2xl p-6 velador-card-glow relative overflow-hidden">
+<!-- Subtle nocturnal halo interior -->
+<div aria-hidden="true" class="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-[#F2B455]/10 blur-xl pointer-events-none"></div>
+<!-- Pill de estado sereno -->
+<div class="inline-flex items-center space-x-2 bg-[#171633]/70 px-3 py-1 rounded-full dormant-border mb-5">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7FC8AE]"></span>
+<span class="text-xs font-medium text-[#A8A4C6] tracking-wide">Pausa de noche</span>
+</div>
+<!-- Título principal -->
+<h1 class="text-[26px] leading-[32px] font-semibold text-[#F1EEF9] tracking-tight mb-3">
+          Terminaste lo que te propusiste
+        </h1>
+<!-- Mensaje empático en español rioplatense -->
+<p class="text-[15px] leading-[22px] text-[#A8A4C6] mb-6">
+          El objetivo era arrancar y ya diste el paso más difícil.
+        </p>
+<!-- Métrica destacada en color menta con tabular-nums -->
+<div class="bg-[#171633]/50 rounded-xl p-3.5 flex items-center justify-between border border-[#7FC8AE]/20">
+<div class="flex items-center space-x-2.5">
+<span class="material-symbols-outlined text-[#7FC8AE] text-xl" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium text-[#F1EEF9]">Resumen de la sesión</span>
+</div>
+<div>
+<span class="tabular-numbers text-sm font-semibold text-[#7FC8AE] tracking-tight">
+              Hiciste 7 de 12 tareas planeadas
+            </span>
+</div>
+</div>
+</section>
+<!-- Mensaje de calma -->
+<p class="text-center text-xs text-[#A8A4C6]/75 mt-6 px-4 leading-relaxed">
+        Lo que quedó en pausa no se pierde. Mañana retomamos con calma.
+      </p>
+</main>
+<!-- Lower Third: Ergonomic Thumb Zone (Tercio inferior con dos botones confortables) -->
+<footer class="w-full flex flex-col space-y-3 z-10 pt-2 pb-1">
+<!-- 1. Botón secundario: «Seguir un rato más» (superficie --color-pared y borde discreto) -->
+<button class="w-full h-14 rounded-xl bg-[#232246] text-[#F1EEF9] text-base font-medium dormant-border flex items-center justify-center space-x-2 active:scale-[0.98] transition-all hover:bg-[#28274f] focus:outline-none" type="button">
+<span class="material-symbols-outlined text-lg text-[#A8A4C6]" data-icon="schedule">schedule</span>
+<span>Seguir un rato más</span>
+</button>
+<!-- 2. Botón principal: «Listo por hoy» (fondo ámbar --color-velador y texto noche --color-noche) -->
+<button class="w-full h-14 rounded-xl bg-[#F2B455] text-[#171633] text-base font-semibold velador-button-shadow flex items-center justify-center space-x-2 active:scale-[0.98] transition-all hover:brightness-105 focus:outline-none" type="button">
+<span class="material-symbols-outlined text-xl text-[#171633]" data-icon="bedtime" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span>Listo por hoy</span>
+</button>
+</footer>
+</div>
+</body></html>

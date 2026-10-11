@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Por dónde empiezo - Selección de ambientes</title>
+<!-- Google Fonts: Instrument Sans & Bricolage Grotesque -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&amp;family=Instrument+Sans:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    :root {
+      --color-noche: #171633;
+      --color-pared: #232246;
+      --color-hueso: #F1EEF9;
+      --color-humo: #A8A4C6;
+      --color-velador: #F2B455;
+      --color-menta: #7FC8AE;
+      --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+    }
+
+    body {
+      background-color: var(--color-noche);
+      color: var(--color-hueso);
+      font-family: 'Instrument Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+    }
+
+    .velador-glow {
+      box-shadow: 0 0 20px -3px rgba(242, 180, 85, 0.22), 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .action-shadow {
+      box-shadow: 0 4px 20px -4px rgba(242, 180, 85, 0.35), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-shadow {
+      box-shadow: 0 -8px 24px -6px rgba(10, 9, 26, 0.85);
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-[#F2B455] selection:text-[#171633]">
+<!-- Mobile Container (390px max, responsive iOS shell) -->
+<div class="w-full max-w-[390px] mx-auto min-h-screen flex flex-col justify-between relative px-5 pb-32">
+<!-- Top Bar -->
+<header class="flex justify-between items-center w-full pt-8 pb-3">
+<div class="flex items-center gap-2">
+<span class="font-brand text-[20px] tracking-tight text-[#F2B455] leading-none">Por dónde empiezo</span>
+</div>
+<button aria-label="Más opciones" class="w-9 h-9 rounded-[14px] flex items-center justify-center text-[#A8A4C6] hover:text-[#F1EEF9] transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col pt-3">
+<!-- Section Header -->
+<section class="mb-5">
+<span class="text-[11px] tracking-[0.08em] font-semibold text-[#A8A4C6] uppercase block mb-1">Sin apuro</span>
+<h1 class="text-[1.75rem] leading-[2.1rem] font-semibold text-[#F1EEF9] tracking-tight">
+          ¿Qué querés ordenar?
+        </h1>
+<p class="text-[13px] leading-[18px] text-[#A8A4C6] mt-1.5 font-normal">
+          Elegí los rincones que más te pesan. Te guiamos paso a paso con uno a la vez.
+        </p>
+</section>
+<!-- 8 Ambientes en grilla de 2 columnas (h-14 / 56px, tarjetas con border-radius 20px) -->
+<section aria-label="Selección de ambientes" class="grid grid-cols-2 gap-2.5" id="rooms-grid">
+<!-- 1. Cocina (Seleccionada) -->
+<button aria-checked="true" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#232246] border border-[#F2B455] velador-glow" data-room="Cocina" data-selected="true" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#F1EEF9]">Cocina</span>
+<span class="check-icon flex items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 2. Baño -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Baño" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Baño</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 3. Dormitorio (Seleccionada) -->
+<button aria-checked="true" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#232246] border border-[#F2B455] velador-glow" data-room="Dormitorio" data-selected="true" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#F1EEF9]">Dormitorio</span>
+<span class="check-icon flex items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 4. Living -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Living" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Living</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 5. Lavadero -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Lavadero" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Lavadero</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 6. Balcón -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Balcón" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Balcón</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 7. Escritorio -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Escritorio" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Escritorio</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+<!-- 8. Garage -->
+<button aria-checked="false" class="room-card h-14 px-4 rounded-[20px] flex items-center justify-between text-left transition-all duration-200 select-none bg-[#1d1c3a] border border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)] hover:border-[#F1EEF9]/25" data-room="Garage" data-selected="false" role="checkbox" type="button">
+<span class="text-[15px] font-medium text-[#A8A4C6]">Garage</span>
+<span class="check-icon hidden items-center justify-center text-[#7FC8AE]">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'wght' 600;">check</span>
+</span>
+</button>
+</section>
+<!-- Atmospheric Reassurance note (clean, understated) -->
+<div class="mt-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-[14px] bg-[#1d1c3a]/70 border border-[color-mix(in_oklab,var(--color-hueso)_10%,transparent)]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#F2B455] shrink-0"></span>
+<span class="text-[12px] leading-tight text-[#A8A4C6]">No tenés que terminar todo hoy. Con arrancar diez minutos ya alcanza.</span>
+</div>
+</main>
+<!-- Anchored Thumb-Zone (Lower 35%) -->
+<div class="fixed bottom-16 left-0 right-0 z-40 px-5 max-w-[390px] mx-auto pointer-events-none">
+<div class="pointer-events-auto bg-gradient-to-t from-[#171633] via-[#171633]/95 to-transparent pt-4 pb-2">
+<!-- Status Counter string -->
+<div class="flex items-center justify-between mb-2 px-1">
+<span class="text-[13px] font-medium text-[#A8A4C6]" id="counter-label">
+            2 ambientes seleccionados
+          </span>
+<span class="text-[12px] font-medium text-[#7FC8AE] flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7FC8AE]"></span>
+            Listo para empezar
+          </span>
+</div>
+<!-- Primary Action Button: "Armá las tareas" -->
+<button class="w-full h-14 bg-[#F2B455] text-[#171633] font-semibold text-[17px] rounded-[14px] action-shadow flex items-center justify-center gap-2 active:scale-[0.98] active:bg-[#e0a44a] transition-all duration-150" id="btn-arma-tareas" type="button">
+<span>Armá las tareas</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Minimalist, iOS safe-area aware) -->
+<nav aria-label="Navegación principal" class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-2 pb-safe max-w-[390px] mx-auto bg-[#191835] border-t border-[color-mix(in_oklab,var(--color-hueso)_8%,transparent)] rounded-t-[20px] nav-shadow">
+<!-- Ahora -->
+<button class="flex flex-col items-center justify-center text-[#A8A4C6] hover:text-[#F1EEF9] px-4 py-1.5 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[22px]" data-icon="radio_button_checked">radio_button_checked</span>
+<span class="text-[11px] font-medium mt-1">Ahora</span>
+</button>
+<!-- Active: Espacios -->
+<button aria-current="page" class="flex flex-col items-center justify-center bg-[#282745] text-[#F2B455] rounded-[14px] px-5 py-1.5 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[22px]" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="text-[11px] font-semibold mt-1">Espacios</span>
+</button>
+<!-- Pausas -->
+<button class="flex flex-col items-center justify-center text-[#A8A4C6] hover:text-[#F1EEF9] px-4 py-1.5 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[22px]" data-icon="bedtime">bedtime</span>
+<span class="text-[11px] font-medium mt-1">Pausas</span>
+</button>
+</nav>
+</div>
+<!-- Interactive Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const roomCards = document.querySelectorAll('.room-card');
+      const counterLabel = document.getElementById('counter-label');
+      const actionButton = document.getElementById('btn-arma-tareas');
+
+      function updateCounter() {
+        const selected = document.querySelectorAll('.room-card[data-selected="true"]');
+        const count = selected.length;
+
+        if (count === 0) {
+          counterLabel.textContent = 'Elegí al menos un ambiente';
+          counterLabel.classList.remove('text-[#A8A4C6]');
+          counterLabel.classList.add('text-[#F1EEF9]/60');
+          actionButton.classList.add('opacity-40', 'pointer-events-none');
+        } else if (count === 1) {
+          counterLabel.textContent = '1 ambiente seleccionado';
+          counterLabel.classList.remove('text-[#F1EEF9]/60');
+          counterLabel.classList.add('text-[#A8A4C6]');
+          actionButton.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          counterLabel.textContent = `${count} ambientes seleccionados`;
+          counterLabel.classList.remove('text-[#F1EEF9]/60');
+          counterLabel.classList.add('text-[#A8A4C6]');
+          actionButton.classList.remove('opacity-40', 'pointer-events-none');
+        }
+      }
+
+      roomCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const isSelected = card.getAttribute('data-selected') === 'true';
+          const title = card.querySelector('span:first-child');
+          const checkIcon = card.querySelector('.check-icon');
+
+          if (isSelected) {
+            // Deselect
+            card.setAttribute('data-selected', 'false');
+            card.setAttribute('aria-checked', 'false');
+            card.classList.remove('bg-[#232246]', 'border-[#F2B455]', 'velador-glow');
+            card.classList.add('bg-[#1d1c3a]', 'border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)]');
+            title.classList.remove('text-[#F1EEF9]');
+            title.classList.add('text-[#A8A4C6]');
+            checkIcon.classList.add('hidden');
+            checkIcon.classList.remove('flex');
+          } else {
+            // Select
+            card.setAttribute('data-selected', 'true');
+            card.setAttribute('aria-checked', 'true');
+            card.classList.add('bg-[#232246]', 'border-[#F2B455]', 'velador-glow');
+            card.classList.remove('bg-[#1d1c3a]', 'border-[color-mix(in_oklab,var(--color-hueso)_12%,transparent)]');
+            title.classList.add('text-[#F1EEF9]');
+            title.classList.remove('text-[#A8A4C6]');
+            checkIcon.classList.remove('hidden');
+            checkIcon.classList.add('flex');
+          }
+
+          updateCounter();
+        });
+      });
+    });
+  </script>
+</body></html>

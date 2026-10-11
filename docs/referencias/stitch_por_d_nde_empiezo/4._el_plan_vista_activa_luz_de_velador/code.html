@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Por dónde empiezo - El plan</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          noche: "var(--color-noche)",
+          pared: "var(--color-pared)",
+          hueso: "var(--color-hueso)",
+          humo: "var(--color-humo)",
+          velador: "var(--color-velador)",
+          menta: "var(--color-menta)",
+          borde: "var(--color-borde)",
+        },
+        fontFamily: {
+          bricolage: ["'Bricolage Grotesque'", "sans-serif"],
+          sans: ["'Instrument Sans'", "sans-serif"],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    --color-noche: #171633;
+    --color-pared: #232246;
+    --color-hueso: #F1EEF9;
+    --color-humo: #A8A4C6;
+    --color-velador: #F2B455;
+    --color-menta: #7FC8AE;
+    --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+  }
+
+  body {
+    background-color: var(--color-noche);
+    color: var(--color-hueso);
+    font-family: 'Instrument Sans', sans-serif;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  /* Luz tenue de velador en el cuarto a oscuras */
+  .velador-lamp-glow {
+    background: radial-gradient(circle 320px at 50% 80%, rgba(242, 180, 85, 0.14) 0%, rgba(242, 180, 85, 0.04) 50%, rgba(23, 22, 51, 0) 80%);
+  }
+
+  .card-lamp-shadow {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 16px 36px -12px rgba(10, 9, 26, 0.75);
+    border: 1px solid var(--color-borde);
+  }
+
+  .btn-velador-glow {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 20px rgba(242, 180, 85, 0.22);
+  }
+
+  .clamp-verb-original {
+    font-size: clamp(2.5rem, 13vw, 4.5rem);
+    line-height: 0.96;
+  }
+
+  .tabular-numbers {
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-velador selection:text-noche overflow-x-hidden relative">
+<!-- RESPLANDOR VELADOR DE FONDO (SIMULANDO LUZ DE VELADOR DETRÁS DE LA TARJETA) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none velador-lamp-glow z-0"></div>
+<!-- CONTENEDOR PRINCIPAL MÓVIL (PANTALLA 4: EL PLAN) -->
+<div class="relative z-10 w-full max-w-md mx-auto min-h-screen flex flex-col justify-between px-5 pt-3 pb-6">
+<!-- CABECERA SUPERIOR: TÍTULO EN BRICOLAGE GROTESQUE (600), BARRA Y CONTADOR TABULAR -->
+<header class="w-full">
+<nav aria-label="Navegación superior" class="flex justify-between items-center w-full py-2 pt-safe">
+<button aria-label="Modo noche" class="flex items-center justify-center p-2 rounded-lg text-velador hover:opacity-80 transition-opacity active:scale-95" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="bedtime">bedtime</span>
+</button>
+<h1 class="font-bricolage font-semibold text-[20px] text-velador tracking-tight">
+        Por dónde empiezo
+      </h1>
+<button aria-label="Más opciones" class="flex items-center justify-center p-2 rounded-lg text-humo hover:text-hueso transition-colors active:scale-95" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</nav>
+<!-- BARRA DE PROGRESO DE 2 PX EN COLOR ÁMBAR (--color-velador) Y CONTADOR TABULAR -->
+<div class="w-full mt-3">
+<div class="w-full h-[2px] bg-pared rounded-full overflow-hidden">
+<div class="h-full bg-velador transition-all duration-500 ease-out" style="width: 33.33%;"></div>
+</div>
+<div class="flex justify-between items-center mt-2.5 px-0.5 text-[13px]">
+<span class="text-humo">Paso actual</span>
+<span class="tabular-numbers text-velador font-medium">3 de 9</span>
+</div>
+</div>
+</header>
+<!-- EL MEDIO DE LA PANTALLA INTENCIONALMENTE DESPEJADO / EN PENUMBRA -->
+<main class="flex-1 flex items-center justify-center pointer-events-none select-none py-8">
+<div class="w-1.5 h-1.5 rounded-full bg-velador opacity-15 blur-[1px]"></div>
+</main>
+<!-- TERCIO INFERIOR: AL ALCANCE DEL PULGAR CON SAFE AREA -->
+<section aria-label="Paso activo y acciones" class="w-full flex flex-col gap-3 pb-safe">
+<!-- TARJETA DEL PASO ACTIVO ("LA LÁMPARA") -->
+<article class="w-full bg-pared rounded-[20px] p-6 card-lamp-shadow flex flex-col justify-between transition-transform duration-200">
+<div>
+<!-- Metadata con espacio duro: «Cocina · 6 min» -->
+<div class="flex items-center gap-1.5 text-menta text-[14px] font-medium tracking-normal mb-2.5">
+<span class="material-symbols-outlined text-[17px] text-menta" data-icon="countertops">countertops</span>
+<span>Cocina · 6 min</span>
+</div>
+<!-- Verbo protagónico en Bricolage Grotesque (600) + objeto en Instrument Sans -->
+<div class="flex flex-wrap items-baseline gap-x-3 mb-4">
+<h2 class="clamp-verb-original font-bricolage font-semibold text-velador tracking-tight">
+            Trapeá
+          </h2>
+<span class="text-[26px] text-hueso font-normal leading-none tracking-normal">
+            el piso
+          </span>
+</div>
+</div>
+<!-- Nota: «Vas a necesitar trapo» -->
+<div class="flex items-center gap-2 pt-3 border-t border-[var(--color-borde)]">
+<span class="material-symbols-outlined text-menta text-[18px]" data-icon="lightbulb">lightbulb</span>
+<p class="text-[13px] text-humo">
+          Vas a necesitar trapo
+        </p>
+</div>
+</article>
+<!-- BOTÓN «LISTO» A ANCHO COMPLETO Y 76 PX DE ALTO EN ÁMBAR CON TEXTO NOCHE -->
+<button class="w-full h-[76px] bg-velador text-noche rounded-[14px] btn-velador-glow flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.98] active:brightness-95 font-semibold text-[20px] focus:outline-none" type="button">
+<span>Listo</span>
+<span class="material-symbols-outlined text-[24px] font-bold" data-icon="check" style="font-variation-settings: 'FILL' 1, 'wght' 600;">check</span>
+</button>
+<!-- TRES ACCIONES DISCRETAS DE 44 PX DE ALTO: SALTEAR, NO PUEDO AHORA, REORDENAR -->
+<nav aria-label="Opciones secundarias" class="w-full grid grid-cols-3 gap-2">
+<button class="h-[44px] px-2 rounded-xl text-humo hover:text-hueso text-[13px] font-medium flex items-center justify-center transition-colors duration-150 active:scale-95 bg-transparent border border-[var(--color-borde)]" type="button">
+        Saltear
+      </button>
+<button class="h-[44px] px-2 rounded-xl text-humo hover:text-hueso text-[13px] font-medium flex items-center justify-center transition-colors duration-150 active:scale-95 bg-transparent border border-[var(--color-borde)] text-center leading-tight" type="button">
+        No puedo ahora
+      </button>
+<button class="h-[44px] px-2 rounded-xl text-humo hover:text-hueso text-[13px] font-medium flex items-center justify-center transition-colors duration-150 active:scale-95 bg-transparent border border-[var(--color-borde)]" type="button">
+        Reordenar
+      </button>
+</nav>
+<!-- ESTADO DE TIEMPO INSUFICIENTE: TARJETA SUTIL CON ENLACE A PLAN COMPLETO -->
+<aside class="w-full mt-0.5 p-3.5 rounded-xl bg-[#14132c] border border-[var(--color-borde)] flex items-center justify-between gap-3">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-menta text-[18px] shrink-0 mt-0.5" data-icon="bedtime">bedtime</span>
+<p class="text-[13px] text-humo leading-snug">
+          No te alcanza el tiempo para nada útil. Necesitás al menos 12 minutos.
+        </p>
+</div>
+<button class="shrink-0 text-[12px] font-medium text-velador hover:underline py-1 px-1.5 focus:outline-none transition-opacity" type="button">
+        Ver el plan completo
+      </button>
+</aside>
+</section>
+</div>
+</body></html>

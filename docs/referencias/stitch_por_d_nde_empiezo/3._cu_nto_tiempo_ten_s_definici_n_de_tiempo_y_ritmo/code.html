@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Por dónde empiezo - ¿Cuánto tiempo tenés?</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+  :root {
+    --color-noche: #171633;
+    --color-pared: #232246;
+    --color-hueso: #F1EEF9;
+    --color-humo: #A8A4C6;
+    --color-velador: #F2B455;
+    --color-menta: #7FC8AE;
+    --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
+  }
+
+  body {
+    background-color: var(--color-noche);
+    color: var(--color-hueso);
+    font-family: 'Instrument Sans', sans-serif;
+  }
+
+  .font-brand {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 600;
+  }
+
+  .card-pared {
+    background-color: var(--color-pared);
+    border: 1px solid var(--color-borde);
+    border-radius: 20px;
+  }
+
+  .card-selected {
+    background-color: var(--color-pared);
+    border: 1px solid var(--color-velador);
+    box-shadow: 0 0 20px -4px rgba(242, 180, 85, 0.22);
+    border-radius: 20px;
+  }
+
+  .btn-velador {
+    background-color: var(--color-velador);
+    color: var(--color-noche);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 24px -8px rgba(242, 180, 85, 0.35);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-[#F2B455] selection:text-[#171633]">
+<!-- Main View Container: Mobile Frame 390px x 844px centered -->
+<div class="relative w-full max-w-[390px] mx-auto min-h-screen flex flex-col justify-between pb-32">
+<!-- Content Container -->
+<div class="w-full flex flex-col">
+<!-- Header -->
+<header class="flex justify-between items-center w-full px-5 py-4 pt-safe">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#F2B455] text-2xl" data-icon="bedtime">bedtime</span>
+<span class="font-brand text-[21px] tracking-tight text-[#F1EEF9]">Por dónde empiezo</span>
+</div>
+<button aria-label="Opciones" class="text-[#A8A4C6] hover:text-[#F1EEF9] transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center active:scale-95" type="button">
+<span class="material-symbols-outlined text-2xl" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="px-5 flex flex-col space-y-6 pt-1">
+<!-- Title & Context -->
+<section class="space-y-1.5">
+<p class="text-[12px] font-medium tracking-wider uppercase text-[#A8A4C6]/80">PASO 3 DE 4 · El ritmo de hoy</p>
+<h1 class="text-[28px] font-bold text-[#F1EEF9] tracking-tight leading-tight">¿Cuánto tiempo tenés?</h1>
+<p class="text-[15px] text-[#A8A4C6] leading-relaxed">Elegí sin culpa. Si te cansás antes, lo cortás y listo.</p>
+</section>
+<!-- Duración estimada -->
+<section class="space-y-3">
+<div class="flex items-center justify-between text-[14px]">
+<span class="font-medium text-[#A8A4C6]">Duración estimada</span>
+<span class="text-[#F2B455] font-medium text-[13px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]" data-icon="lightbulb">lightbulb</span>
+            Poco es mejor que nada
+          </span>
+</div>
+<!-- Grid 2x2: 10, 20, 30, 60 -->
+<div class="grid grid-cols-2 gap-3">
+<!-- 10 min -->
+<button class="card-pared p-4 text-left flex flex-col justify-between h-[96px] min-h-[44px] transition-all active:scale-[0.98] hover:border-[#F1EEF9]/20" type="button">
+<span class="text-[13px] text-[#A8A4C6]">Un tirón corto</span>
+<div class="flex items-baseline gap-1.5">
+<span class="text-[26px] font-bold text-[#F1EEF9] tabular-nums leading-none">10</span>
+<span class="text-[14px] text-[#A8A4C6]">minutos</span>
+</div>
+</button>
+<!-- 20 min (Seleccionada) -->
+<button class="card-selected p-4 text-left flex flex-col justify-between h-[96px] min-h-[44px] transition-all active:scale-[0.98] relative" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="text-[13px] text-[#F2B455] font-medium">Recomendado</span>
+<div class="w-5 h-5 rounded-full bg-[#7FC8AE]/20 border border-[#7FC8AE] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#7FC8AE] text-sm font-bold" data-icon="check">check</span>
+</div>
+</div>
+<div class="flex items-baseline gap-1.5">
+<span class="text-[26px] font-bold text-[#F2B455] tabular-nums leading-none">20</span>
+<span class="text-[14px] text-[#F2B455]/80">minutos</span>
+</div>
+</button>
+<!-- 30 min -->
+<button class="card-pared p-4 text-left flex flex-col justify-between h-[96px] min-h-[44px] transition-all active:scale-[0.98] hover:border-[#F1EEF9]/20" type="button">
+<span class="text-[13px] text-[#A8A4C6]">Con calma</span>
+<div class="flex items-baseline gap-1.5">
+<span class="text-[26px] font-bold text-[#F1EEF9] tabular-nums leading-none">30</span>
+<span class="text-[14px] text-[#A8A4C6]">minutos</span>
+</div>
+</button>
+<!-- 60 min -->
+<button class="card-pared p-4 text-left flex flex-col justify-between h-[96px] min-h-[44px] transition-all active:scale-[0.98] hover:border-[#F1EEF9]/20" type="button">
+<span class="text-[13px] text-[#A8A4C6]">A fondo</span>
+<div class="flex items-baseline gap-1.5">
+<span class="text-[26px] font-bold text-[#F1EEF9] tabular-nums leading-none">60</span>
+<span class="text-[14px] text-[#A8A4C6]">minutos</span>
+</div>
+</button>
+</div>
+<!-- 5ta Ficha: Sin límite -->
+<button class="w-full card-pared px-4 py-3.5 text-left flex items-center justify-between min-h-[56px] transition-all active:scale-[0.99] hover:border-[#F1EEF9]/20" type="button">
+<div>
+<div class="text-[16px] font-semibold text-[#F1EEF9] leading-snug">Sin límite</div>
+<div class="text-[13px] text-[#A8A4C6]">Hasta donde llegués hoy, sin presión</div>
+</div>
+<span class="material-symbols-outlined text-[#A8A4C6] text-2xl" data-icon="all_inclusive">all_inclusive</span>
+</button>
+</section>
+<!-- Modo de orden -->
+<section class="space-y-3">
+<span class="block text-[14px] font-medium text-[#A8A4C6]">Modo de orden</span>
+<div class="flex flex-col space-y-2.5">
+<!-- 1. Arrancar ya (Preseleccionada) -->
+<div class="card-selected p-4 cursor-pointer transition-all active:scale-[0.99]">
+<div class="flex items-start justify-between gap-3">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[16px] font-semibold text-[#F2B455]">Arrancar ya</span>
+<span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#171633] text-[#7FC8AE] border border-[#7FC8AE]/40">Micro-paso</span>
+</div>
+<p class="text-[15px] text-[#F1EEF9] leading-relaxed">
+                  Arrancás con una microtarea de 2 minutos para destrabar la inercia.
+                </p>
+</div>
+<div class="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#F2B455] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#171633] text-sm font-bold" data-icon="check">check</span>
+</div>
+</div>
+</div>
+<!-- 2. Ambiente por ambiente -->
+<div class="card-pared p-4 cursor-pointer transition-all active:scale-[0.99] hover:border-[#F1EEF9]/20">
+<div class="flex items-start justify-between gap-3">
+<div class="space-y-1">
+<span class="text-[16px] font-semibold text-[#F1EEF9]">Ambiente por ambiente</span>
+<p class="text-[15px] text-[#A8A4C6] leading-relaxed">
+                  Cerrás un espacio por completo antes de pasar al siguiente.
+                </p>
+</div>
+<div class="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full border border-[var(--color-borde)]"></div>
+</div>
+</div>
+<!-- 3. Puesta a punto -->
+<div class="card-pared p-4 cursor-pointer transition-all active:scale-[0.99] hover:border-[#F1EEF9]/20">
+<div class="flex items-start justify-between gap-3">
+<div class="space-y-1">
+<span class="text-[16px] font-semibold text-[#F1EEF9]">Puesta a punto</span>
+<p class="text-[15px] text-[#A8A4C6] leading-relaxed">
+                  Solo lo visible y urgente para dejar la casa presentable.
+                </p>
+</div>
+<div class="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full border border-[var(--color-borde)]"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Pinned Footer Area -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#171633] via-[#171633]/95 to-transparent pt-6 pb-6 px-5 pointer-events-none">
+<div class="max-w-[390px] mx-auto flex flex-col gap-2.5 pointer-events-auto">
+<!-- Botón Principal -->
+<button class="btn-velador w-full min-h-[50px] flex items-center justify-center gap-2 font-semibold text-[17px] active:scale-[0.98] transition-transform" type="button">
+<span>Armá el plan</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<!-- Botón Secundario -->
+<button class="w-full py-2 min-h-[44px] text-center text-[14px] text-[#A8A4C6] hover:text-[#F1EEF9] transition-colors" type="button">
+        Hacer algo más fácil por hoy
+      </button>
+</div>
+</footer>
+</div>
+</body></html>
