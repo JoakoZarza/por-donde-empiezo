@@ -14,7 +14,8 @@ function leer(ruta: string): string {
   return readFileSync(ruta, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 }
 
-const todaLaHoja = () => leer('src/ui/estilos/tokens.css') + leer('src/ui/estilos/base.css')
+const todaLaHoja = () =>
+  leer('src/ui/estilos/tokens.css') + leer('src/ui/estilos/base.css') + leer('src/ui/estilos/pantallas.css')
 const html = () => leer('index.html')
 
 test('define al menos cuatro colores con nombre', () => {

@@ -1,0 +1,126 @@
+/*
+  Piezas compartidas por las pantallas.
+
+  Van en CSS propio y no en utilidades de Tailwind porque el sistema de tokens usa
+  los prefijos en castellano (`--texto-*`, `--radio-*`), que no son los que Tailwind
+  espera para generar utilidades. Preferimos un puñado de clases con nombre a
+  renombrar los tokens aprobados.
+*/
+
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 2rem 1.25rem calc(var(--safe-abajo) + 1.5rem);
+}
+
+.pantalla__titulo {
+  margin: 0;
+  font-family: var(--font-verbo);
+  font-size: var(--texto-titulo);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.pantalla__pie {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.menudo {
+  margin: 0;
+  font-size: var(--texto-menudo);
+  color: var(--color-humo);
+}
+
+/* Fichas: elegir ambientes, tiempo o modo. */
+.fichas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fichas--una-columna {
+  grid-template-columns: 1fr;
+}
+
+.ficha {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0 1rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-control);
+  background-color: var(--color-noche);
+  cursor: pointer;
+}
+
+.ficha--elegida {
+  border-color: var(--color-velador);
+  background-color: var(--color-pared);
+}
+
+/* La casilla queda accesible y enfocable, pero la ficha entera es el blanco de toque. */
+.ficha__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.ficha:has(.ficha__entrada:focus-visible) {
+  outline: 2px solid var(--color-velador);
+  outline-offset: 2px;
+}
+
+.ficha__marca {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-humo);
+  border-radius: 50%;
+}
+
+.ficha--elegida .ficha__marca {
+  border-color: var(--color-menta);
+  background-color: var(--color-menta);
+}
+
+.ficha__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.ficha__texto strong {
+  font-weight: 600;
+}
+
+/* Acción principal: el ámbar es escaso, así que esto es lo único que brilla. */
+.boton-principal {
+  width: 100%;
+  min-height: 64px;
+  border: 0;
+  border-radius: var(--radio-control);
+  background-color: var(--color-velador);
+  color: var(--color-noche);
+  font-size: var(--texto-boton);
+  font-weight: 600;
+}
+
+.boton-principal:disabled {
+  background-color: var(--color-pared);
+  color: var(--color-humo);
+  cursor: not-allowed;
+}

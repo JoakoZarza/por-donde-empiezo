@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './ui/estilos/tokens.css'
 import './ui/estilos/base.css'
+import './ui/estilos/pantallas.css'
 import App from './App'
 
 const contenedor = document.getElementById('root')

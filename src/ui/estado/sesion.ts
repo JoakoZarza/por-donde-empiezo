@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { CATALOGO, tareasDeAmbiente } from '../../domain/catalogo'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
 import type { Repositorio } from '../../data/repositorio'
 import type { Ambiente, Paso, Plan } from '../../domain/tipos'
@@ -21,6 +22,11 @@ interface EstadoSesion {
   planActual: Plan | null
   pasoActual: number
   cargar(): Promise<void>
+  /**
+   * Guarda los ambientes elegidos con sus tareas del catálogo, y devuelve el id
+   * del primero del recorrido para que la pantalla sepa a dónde ir.
+   */
+  elegirAmbientes(ids: string[]): Promise<string | null>
   abrirPlan(plan: Plan): void
   /** El paso en curso, o nulo si no hay plan o ya se terminó. */
   paso(): Paso | null
@@ -60,6 +66,22 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
 
   async cargar() {
     set({ ambientes: await repositorio.listarAmbientes() })
+  },
+
+  async elegirAmbientes(ids) {
+    const elegidos = CATALOGO.ambientes
+      .filter((ambiente) => ids.includes(ambiente.id))
+      .sort((a, b) => a.ordenRecorrido - b.ordenRecorrido)
+
+    for (const ambiente of elegidos) {
+      await repositorio.guardarAmbiente(ambiente)
+      for (const tarea of tareasDeAmbiente(ambiente.id)) {
+        await repositorio.guardarTarea(tarea)
+      }
+    }
+
+    set({ ambientes: await repositorio.listarAmbientes() })
+    return elegidos[0]?.id ?? null
   },
 
   abrirPlan(plan) {
