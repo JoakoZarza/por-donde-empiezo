@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { generarPlan } from '../../domain/motor/generarPlan'
 import { opcionesDeMusica } from '../musica'
+import { nuevoId } from '../id'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import type { Modo, Tarea } from '../../domain/tipos'
@@ -117,7 +118,7 @@ export default function ArranqueSesion() {
 
       const { herramientasDisponibles } = await repositorio.preferencias()
       const minutos = TIEMPOS.find((opcion) => opcion.valor === tiempo)?.minutos ?? null
-      const idPlan = crypto.randomUUID()
+      const idPlan = nuevoId()
 
       const { plan } = generarPlan(
         { ambientes, tareas, hechasEnCiclo, presupuestoMin: minutos, modo, herramientasDisponibles },

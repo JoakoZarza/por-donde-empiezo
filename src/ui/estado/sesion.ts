@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { CATALOGO, tareasDeAmbiente } from '../../domain/catalogo'
 import { generarPlan } from '../../domain/motor/generarPlan'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
+import { nuevoId } from '../id'
 import type { Repositorio } from '../../data/repositorio'
 import type { Ambiente, Paso, Plan, Tarea } from '../../domain/tipos'
 
@@ -137,7 +138,7 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
 
     const { herramientasDisponibles } = await repo.preferencias()
     const minutos = planActual.presupuestoSegundos === null ? null : planActual.presupuestoSegundos / 60
-    const idPlan = crypto.randomUUID()
+    const idPlan = nuevoId()
 
     const { plan } = generarPlan(
       {

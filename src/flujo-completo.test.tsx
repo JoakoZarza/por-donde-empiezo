@@ -68,7 +68,10 @@ test('de elegir ambientes a tildar el primer paso, sin escribir ninguna direcci�
   // Si la pantalla hubiera fallado al guardar, mostraría un aviso: se comprueba
   // antes de mirar la base, para saber si el problema es el guardado o la lectura.
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  expect((await repo.ultimoPlan())?.pasos[0]?.estado).toBe('hecho')
+  // El guardado es asíncrono y el clic no espera a las promesas del manejador.
+  await waitFor(async () => {
+    expect((await repo.ultimoPlan())?.pasos[0]?.estado).toBe('hecho')
+  })
 })
 
 test('el plan sobrevive a recargar la página', async () => {

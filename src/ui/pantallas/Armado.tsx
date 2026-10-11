@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { ambientePorId, objetoPorId, objetosDeAmbiente, tareasDeAmbiente } from '../../domain/catalogo'
+import { nuevoId } from '../id'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import type { Ambiente, Tarea } from '../../domain/tipos'
@@ -125,7 +126,7 @@ export default function Armado() {
     // Una tarea propia es una sola frase: va entera en la acción, que es lo que la
     // pantalla del plan muestra en grande, y la descripción queda vacía.
     const tarea: Tarea = {
-      id: `propia-${crypto.randomUUID()}`,
+      id: `propia-${nuevoId()}`,
       ambienteId,
       subAmbienteId: null,
       objetoId: null,
