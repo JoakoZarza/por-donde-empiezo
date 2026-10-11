@@ -10,12 +10,14 @@ import type { Ambiente, Objeto, Tarea } from '../tipos'
   `tarea <id>:`, y los de un ambiente con `ambiente <id>:`. Es lo que permite que
   los tests afirmen sobre un problema concreto y no sobre el texto en general.
 
-  Dos reglas de dependencia de la sección 5.4 NO se pueden comprobar acá y se
-  garantizan al escribir el catálogo:
-    - «arriba antes que abajo»: haría falta una noción de altura por objeto, que
-      el modelo de datos no tiene.
-    - «sacar antes que limpiar»: depende de la redacción.
-  Sí se comprueba «seco antes que húmedo», que es la que más se olvida.
+  Dos de las tres reglas de dependencia se comprueban acá: «seco antes que húmedo»
+  y «arriba antes que abajo». La tercera, «sacar antes que limpiar», depende de la
+  redacción y queda como garantía de autoría.
+
+  «Arriba antes que abajo» se comprobaba a mano hasta que un plan real mostró que
+  el catálogo la violaba: la cocina trapeaba el piso antes de limpiar las hornallas
+  y lavar los platos. Se puede verificar con los datos que ya existen —el piso es un
+  objeto con nombre— y ahora se verifica.
 */
 
 /*
@@ -25,6 +27,7 @@ import type { Ambiente, Objeto, Tarea } from '../tipos'
 */
 const RE_HUMEDO = /trap|fregar el piso|lavar el piso|lavar el suelo|baldear/i
 const RE_SECO = /barr|aspir|escob/i
+const RE_PISO = /piso/i
 
 /** La acción y su complemento juntos: ahí está la palabra que dice qué se hace. */
 function texto(tarea: Tarea): string {
@@ -85,6 +88,64 @@ function detectarCiclos(porId: Map<string, Tarea>, problemas: string[]): void {
   // Orden estable por id: el mismo catálogo produce siempre los mismos mensajes.
   for (const id of [...porId.keys()].sort((a, b) => a.localeCompare(b))) {
     visitar(id)
+  }
+}
+
+/** Todas las tareas que hay que hacer antes que esta, siguiendo las dependencias. */
+function alcanzablesDesde(id: string, porId: Map<string, Tarea>): Set<string> {
+  const vistos = new Set<string>()
+  const pendientes = [id]
+
+  while (pendientes.length > 0) {
+    const actual = pendientes.pop()
+    if (actual === undefined) break
+    for (const dependencia of porId.get(actual)?.requiere ?? []) {
+      if (vistos.has(dependencia) || !porId.has(dependencia)) continue
+      vistos.add(dependencia)
+      pendientes.push(dependencia)
+    }
+  }
+
+  return vistos
+}
+
+function validarArribaAntesQueAbajo(
+  ambientes: Ambiente[],
+  tareas: Tarea[],
+  objetos: Objeto[],
+  porId: Map<string, Tarea>,
+  problemas: string[],
+): void {
+  const objetoPorId = new Map(objetos.map((objeto) => [objeto.id, objeto]))
+
+  const esDelPiso = (tarea: Tarea): boolean => {
+    if (tarea.objetoId === null) return false
+    const objeto = objetoPorId.get(tarea.objetoId)
+    return objeto !== undefined && RE_PISO.test(objeto.nombre)
+  }
+
+  for (const ambiente of ambientes) {
+    const delAmbiente = tareas.filter((tarea) => tarea.ambienteId === ambiente.id)
+
+    // Limpiar el piso: barrer, trapear, baldear. No cuenta juntar cosas del piso,
+    // que es una tarea de otro tipo y puede ir primero.
+    const limpiezaDelPiso = delAmbiente.filter(
+      (tarea) => esDelPiso(tarea) && (tarea.verbo === 'limpiar' || tarea.verbo === 'lavar'),
+    )
+    // Superficies elevadas: todo lo que se trabaja sobre un objeto que no es el piso.
+    const elevadas = delAmbiente.filter((tarea) => tarea.objetoId !== null && !esDelPiso(tarea))
+
+    if (limpiezaDelPiso.length === 0 || elevadas.length === 0) continue
+
+    for (const delPiso of limpiezaDelPiso) {
+      const anteriores = alcanzablesDesde(delPiso.id, porId)
+      for (const elevada of elevadas) {
+        if (anteriores.has(elevada.id)) continue
+        problemas.push(
+          `arriba antes que abajo: tarea ${delPiso.id}: "${texto(delPiso)}" no depende, ni directa ni indirectamente, de la tarea ${elevada.id} ("${texto(elevada)}"), que trabaja una superficie elevada del mismo ambiente`,
+        )
+      }
+    }
   }
 }
 
@@ -175,6 +236,8 @@ export function validarCatalogo(
       )
     }
   }
+
+  validarArribaAntesQueAbajo(ambientes, tareas, objetos, porId, problemas)
 
   return problemas
 }

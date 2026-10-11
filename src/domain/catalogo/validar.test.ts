@@ -140,3 +140,64 @@ test('reporta una tarea que apunta a un objeto inexistente', () => {
   const problemas = validarCatalogo(ambientes, tareas, objetos)
   expect(problemas.some((p) => p.includes('no-existe'))).toBe(true)
 })
+
+test('reporta una limpieza de piso que no depende de una superficie elevada', () => {
+  // El defecto que apareció al leer un plan real: la cocina trapeaba el piso antes
+  // de limpiar las hornallas y lavar los platos.
+  const ambientes = [ambiente('cocina')]
+  const objetos: Objeto[] = [
+    { id: 'piso', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Piso' },
+    { id: 'mesada', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Mesada' },
+  ]
+  const tareas = [
+    tarea('arranque', { duracionMin: 2, objetoId: 'mesada' }),
+    tarea('limpiar-mesada', { objetoId: 'mesada' }),
+    tarea('barrer', { accion: 'Barré', descripcion: 'el piso', objetoId: 'piso' }),
+    tarea('trapear', { accion: 'Trapeá', descripcion: 'el piso', requiere: ['barrer'], objetoId: 'piso' }),
+  ]
+  const problemas = validarCatalogo(ambientes, tareas, objetos)
+  expect(problemas.some((p) => /arriba antes que abajo/i.test(p))).toBe(true)
+})
+
+test('no reporta nada si la limpieza del piso depende de todo lo elevado', () => {
+  const ambientes = [ambiente('cocina')]
+  const objetos: Objeto[] = [
+    { id: 'piso', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Piso' },
+    { id: 'mesada', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Mesada' },
+  ]
+  const tareas = [
+    tarea('arranque', { duracionMin: 2, objetoId: 'mesada' }),
+    tarea('limpiar-mesada', { objetoId: 'mesada' }),
+    tarea('barrer', {
+      accion: 'Barré',
+      descripcion: 'el piso',
+      requiere: ['arranque', 'limpiar-mesada'],
+      objetoId: 'piso',
+    }),
+    tarea('trapear', { accion: 'Trapeá', descripcion: 'el piso', requiere: ['barrer'], objetoId: 'piso' }),
+  ]
+  expect(validarCatalogo(ambientes, tareas, objetos)).toEqual([])
+})
+
+test('juntar cosas del piso no cuenta como limpiar el piso', () => {
+  // «Juntá lo que quedó tirado» trabaja sobre el piso pero no lo limpia: puede ir
+  // antes que las superficies elevadas sin violar la regla.
+  const ambientes = [ambiente('cocina')]
+  const objetos: Objeto[] = [
+    { id: 'piso', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Piso' },
+    { id: 'mesada', ambienteId: 'cocina', subAmbienteId: null, nombre: 'Mesada' },
+  ]
+  const tareas = [
+    tarea('arranque', { duracionMin: 2, verbo: 'tirar', accion: 'Juntá', descripcion: 'lo tirado', objetoId: 'piso' }),
+    tarea('limpiar-mesada', { objetoId: 'mesada' }),
+    tarea('barrer', {
+      accion: 'Barré',
+      descripcion: 'el piso',
+      requiere: ['arranque', 'limpiar-mesada'],
+      objetoId: 'piso',
+    }),
+    tarea('trapear', { accion: 'Trapeá', descripcion: 'el piso', requiere: ['barrer'], objetoId: 'piso' }),
+  ]
+  expect(validarCatalogo(ambientes, tareas, objetos)).toEqual([])
+})
+

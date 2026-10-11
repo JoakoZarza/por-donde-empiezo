@@ -9,10 +9,15 @@ import type { Ambiente, Objeto, Tarea, TipoAmbiente, Verbo } from '../tipos'
   `bano-barrer`. Es lo que hace que la tabla se lea como una receta y no como un
   grafo.
 
-  Las tres reglas de dependencia de la sección 5.4 se codifican acá a mano:
+  Las reglas de dependencia de la sección 5.4 se codifican acá a mano, y dos de
+  ellas el validador las comprueba:
+
     - Seco antes que húmedo: `trapear` siempre requiere `barrer`.
-    - Arriba antes que abajo: el piso se barre después de las superficies y los
-      muebles, no antes.
+    - Arriba antes que abajo: `barrer` requiere TODAS las tareas que trabajan una
+      superficie elevada del ambiente, porque el piso va último. Esto se descubrió
+      tarde: al principio solo requería despejar la mesada, y el plan resultante
+      trapeaba el piso antes de limpiar las hornallas. Ahora hay un test que lo
+      impide.
     - Sacar antes que limpiar: nada se limpia antes de sacar lo que lo tapa
       (la ropa del piso antes de barrer, los papeles antes del escritorio).
 */
@@ -63,7 +68,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'placard', verbo: 'ordenar', accion: 'Ordená', descripcion: 'el placard', min: 10, esfuerzo: 3, impacto: 1, requiere: ['guardar-ropa'], objeto: 'placard' },
       { clave: 'mesa-luz', verbo: 'tirar', accion: 'Tirá', descripcion: 'lo que no sirve de la mesa de luz', min: 2, esfuerzo: 1, impacto: 1, objeto: 'mesa-luz' },
       { clave: 'ventana', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la ventana', min: 5, esfuerzo: 1, impacto: 2, herramientas: ['trapo'], objeto: 'ventana' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['ropa-piso'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['cama', 'ropa-piso', 'doblar-ropa', 'guardar-ropa', 'placard', 'mesa-luz', 'ventana'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 5, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -87,7 +92,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'mesa', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la mesa', min: 3, esfuerzo: 2, impacto: 3, requiere: ['mesa-despejar'], herramientas: ['trapo'], objeto: 'mesa' },
       { clave: 'estantes', verbo: 'ordenar', accion: 'Ordená', descripcion: 'los estantes', min: 8, esfuerzo: 2, impacto: 2, objeto: 'estantes' },
       { clave: 'ventana', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la ventana', min: 6, esfuerzo: 2, impacto: 2, herramientas: ['trapo'], objeto: 'ventana' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 5, esfuerzo: 2, impacto: 3, requiere: ['mesa-despejar'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 5, esfuerzo: 2, impacto: 3, requiere: ['mesa-despejar', 'mantas', 'tele', 'mesa', 'estantes', 'ventana'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 6, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -113,7 +118,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'bacha', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la bacha y la grifería', min: 5, esfuerzo: 2, impacto: 3, requiere: ['ropa-sucia'], herramientas: ['trapo', 'detergente'], objeto: 'bacha' },
       { clave: 'inodoro', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'el inodoro', min: 6, esfuerzo: 3, impacto: 3, herramientas: ['trapo', 'detergente'], objeto: 'inodoro' },
       { clave: 'ducha', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la ducha', min: 8, esfuerzo: 3, impacto: 2, herramientas: ['trapo', 'detergente'], objeto: 'ducha' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['ropa-sucia'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['ropa-sucia', 'toallas', 'botiquin', 'espejo', 'bacha', 'inodoro', 'ducha'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -138,7 +143,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'superficie', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'el escritorio', min: 4, esfuerzo: 2, impacto: 3, requiere: ['papelitos'], herramientas: ['trapo'], objeto: 'escritorio' },
       { clave: 'cables', verbo: 'ordenar', accion: 'Ordená', descripcion: 'los cables', min: 5, esfuerzo: 2, impacto: 1, objeto: 'cables' },
       { clave: 'cajones', verbo: 'ordenar', accion: 'Ordená', descripcion: 'los cajones', min: 10, esfuerzo: 3, impacto: 1, requiere: ['clasificar'], objeto: 'cajones' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['papelitos'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['tazas', 'papelitos', 'pantalla', 'clasificar', 'superficie', 'cables', 'cajones'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -162,7 +167,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'lavarropas', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'el lavarropas por fuera', min: 4, esfuerzo: 2, impacto: 2, herramientas: ['trapo'], objeto: 'lavarropas' },
       { clave: 'filtro', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'el filtro del lavarropas', min: 6, esfuerzo: 2, impacto: 1, requiere: ['lavarropas'], objeto: 'lavarropas' },
       { clave: 'tender', verbo: 'ordenar', accion: 'Ordená', descripcion: 'el tender', min: 4, esfuerzo: 1, impacto: 2, objeto: 'tender' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['tacho'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 3, esfuerzo: 2, impacto: 3, requiere: ['tacho', 'detergentes', 'pileta', 'lavarropas', 'filtro', 'tender'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -184,7 +189,8 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'sillas', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'las sillas', min: 3, esfuerzo: 2, impacto: 2, herramientas: ['trapo'], objeto: 'sillas' },
       { clave: 'baranda', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la baranda', min: 4, esfuerzo: 2, impacto: 2, herramientas: ['trapo'], objeto: 'baranda' },
       { clave: 'parrilla', verbo: 'limpiar', accion: 'Limpiá', descripcion: 'la parrilla', min: 8, esfuerzo: 3, impacto: 1, herramientas: ['trapo', 'detergente'], objeto: 'parrilla' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['basura'], herramientas: ['escoba'], objeto: 'piso' },
+      // `basura` trabaja sobre el piso pero no lo limpia: es juntar lo tirado, y va primero.
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 4, esfuerzo: 2, impacto: 3, requiere: ['macetas', 'sillas', 'baranda', 'parrilla', 'basura'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 5, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },
@@ -204,7 +210,7 @@ const DATOS: DatosAmbiente[] = [
       { clave: 'basura', verbo: 'tirar', accion: 'Tirá', descripcion: 'lo que no sirve', min: 3, esfuerzo: 1, impacto: 3, objeto: 'cajas' },
       { clave: 'herramientas', verbo: 'ordenar', accion: 'Ordená', descripcion: 'las herramientas', min: 6, esfuerzo: 2, impacto: 2, objeto: 'herramientas' },
       { clave: 'estantes', verbo: 'ordenar', accion: 'Ordená', descripcion: 'los estantes', min: 8, esfuerzo: 3, impacto: 1, objeto: 'estantes' },
-      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 6, esfuerzo: 2, impacto: 3, requiere: ['cajas', 'basura'], herramientas: ['escoba'], objeto: 'piso' },
+      { clave: 'barrer', verbo: 'limpiar', accion: 'Barré', descripcion: 'el piso', min: 6, esfuerzo: 2, impacto: 3, requiere: ['cajas', 'basura', 'herramientas', 'estantes'], herramientas: ['escoba'], objeto: 'piso' },
       { clave: 'trapear', verbo: 'limpiar', accion: 'Trapeá', descripcion: 'el piso', min: 7, esfuerzo: 2, impacto: 3, requiere: ['barrer'], herramientas: ['trapo', 'balde'], objeto: 'piso' },
     ],
   },

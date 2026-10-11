@@ -179,7 +179,21 @@ export const tareasCocina: Tarea[] = [
     duracionMin: 5,
     esfuerzo: 2,
     impactoVisual: 3,
-    requiere: ['cocina-mesada-despejar'],
+    // Arriba antes que abajo: el piso va último, después de todo lo que se
+    // trabaja sobre una superficie elevada. Sin estas dependencias, el plan
+    // barría y trapeaba antes de limpiar las hornallas y lavar los platos.
+    requiere: [
+      'cocina-tirar-basura',
+      'cocina-guardar-platos',
+      'cocina-lavar-platos',
+      'cocina-mesada-despejar',
+      'cocina-hornallas',
+      'cocina-mesada',
+      'cocina-mesa',
+      'cocina-alacena',
+      'cocina-heladera',
+      'cocina-heladera-limpia',
+    ],
     herramientas: ['escoba'],
     objetoId: 'cocina-obj-piso',
   }),
