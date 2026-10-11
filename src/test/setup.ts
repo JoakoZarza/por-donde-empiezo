@@ -1,3 +1,11 @@
+/*
+  IndexedDB no existe en jsdom, y el store construye su repositorio al importarse
+  el módulo: cualquier test que toque el store —aunque no use la base— necesita el
+  reemplazo. Sin esto, Vitest informa un «Unhandled Rejection: IndexedDB API
+  missing» DESPUÉS de que el test termina, sale con código 1 y todos los tests
+  parecen haber pasado.
+*/
+import 'fake-indexeddb/auto'
 import '@testing-library/jest-dom/vitest'
 import { afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
