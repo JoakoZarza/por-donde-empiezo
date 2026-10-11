@@ -14,12 +14,22 @@ import type { Ambiente, Objeto, Tarea } from '../tipos'
   garantizan al escribir el catálogo:
     - «arriba antes que abajo»: haría falta una noción de altura por objeto, que
       el modelo de datos no tiene.
-    - «sacar antes que limpiar»: depende de la redacción de la descripción.
+    - «sacar antes que limpiar»: depende de la redacción.
   Sí se comprueba «seco antes que húmedo», que es la que más se olvida.
 */
 
-const RE_HUMEDO = /trape|lavar el piso|baldear/i
-const RE_SECO = /barrer|aspirar/i
+/*
+  Las expresiones se escriben sin la terminación del verbo a propósito: el
+  catálogo guarda el imperativo en voseo («Barré», «Trapeá»), y buscar «barrer»
+  literal no encontraría «Barré».
+*/
+const RE_HUMEDO = /trap|fregar el piso|lavar el piso|lavar el suelo|baldear/i
+const RE_SECO = /barr|aspir|escob/i
+
+/** La acción y su complemento juntos: ahí está la palabra que dice qué se hace. */
+function texto(tarea: Tarea): string {
+  return `${tarea.accion} ${tarea.descripcion}`
+}
 
 function enteroEnRango(valor: unknown, minimo: number, maximo: number): boolean {
   return typeof valor === 'number' && Number.isInteger(valor) && valor >= minimo && valor <= maximo
@@ -107,6 +117,10 @@ export function validarCatalogo(
       problemas.push(`tarea ${tarea.id}: verbo inválido "${String(tarea.verbo)}"`)
     }
 
+    if (tarea.accion.trim() === '') {
+      problemas.push(`tarea ${tarea.id}: la acción no puede estar vacía`)
+    }
+
     if (!enteroEnRango(tarea.duracionMin, 1, Number.MAX_SAFE_INTEGER)) {
       problemas.push(`tarea ${tarea.id}: la duración debe ser un entero mayor que cero, y es ${tarea.duracionMin}`)
     }
@@ -146,18 +160,18 @@ export function validarCatalogo(
 
   // Seco antes que húmedo.
   for (const tarea of tareas) {
-    if (!RE_HUMEDO.test(tarea.descripcion)) continue
+    if (!RE_HUMEDO.test(texto(tarea))) continue
     const tieneSeco = tarea.requiere.some((id) => {
       const dependencia = porId.get(id)
       return (
         dependencia !== undefined &&
         dependencia.ambienteId === tarea.ambienteId &&
-        RE_SECO.test(dependencia.descripcion)
+        RE_SECO.test(texto(dependencia))
       )
     })
     if (!tieneSeco) {
       problemas.push(
-        `seco antes que húmedo: tarea ${tarea.id}: "${tarea.descripcion}" no declara depender de una tarea de barrer o aspirar del ambiente ${tarea.ambienteId}`,
+        `seco antes que húmedo: tarea ${tarea.id}: "${texto(tarea)}" no declara depender de una tarea de barrer o aspirar del ambiente ${tarea.ambienteId}`,
       )
     }
   }

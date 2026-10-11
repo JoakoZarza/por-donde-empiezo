@@ -33,6 +33,7 @@ function tarea(id: string, extra: Partial<Tarea> = {}): Tarea {
     subAmbienteId: null,
     objetoId: null,
     verbo: 'limpiar',
+    accion: id,
     descripcion: id,
     duracionMin: 5,
     esfuerzo: 1,

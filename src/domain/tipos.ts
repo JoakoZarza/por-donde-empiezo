@@ -69,6 +69,9 @@ export interface Tarea {
   subAmbienteId: string | null
   objetoId: string | null
   verbo: Verbo
+  /** El imperativo que la pantalla del plan muestra en grande, en voseo: «Trapeá». */
+  accion: string
+  /** El complemento, sin el verbo: «el piso». La pantalla lo muestra debajo de la acción. */
   descripcion: string
   duracionMin: number
   esfuerzo: 1 | 2 | 3
