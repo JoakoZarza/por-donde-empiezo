@@ -262,17 +262,27 @@
 }
 
 /*
-  La lámpara: el único adorno de toda la app. Un resplandor ámbar muy tenue en el
-  medio de la pantalla, que es el espacio que se deja vacío a propósito.
+  El escenario: el hueco del medio de la pantalla, que es el cuarto. La lámpara va
+  posicionada detrás de la tarjeta, no en el flujo: si estuviera en el flujo se ve
+  como una banda con degradado suelta, que es exactamente lo que no es.
 */
-.lampara {
+.escenario {
+  position: relative;
+  display: flex;
   flex: 1 1 auto;
-  min-height: 120px;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.lampara {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background: radial-gradient(
-    circle at 50% 45%,
-    rgb(242 180 85 / 0.14) 0%,
-    rgb(242 180 85 / 0.05) 28%,
-    transparent 62%
+    circle at 50% 62%,
+    rgb(242 180 85 / 0.16) 0%,
+    rgb(242 180 85 / 0.05) 30%,
+    transparent 66%
   );
 }
 

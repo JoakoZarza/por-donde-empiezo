@@ -154,30 +154,41 @@ export default function Plan() {
         </p>
       </div>
 
-      <div className="lampara" aria-hidden="true" />
+      {/*
+        El escenario: el hueco vacío del medio de la pantalla —el cuarto— con la
+        lámpara brillando detrás de la tarjeta. La luz no es una banda suelta: es lo
+        que ilumina el paso actual, y por eso vive pegada a la tarjeta.
+      */}
+      <div className="escenario">
+        <div className="lampara" aria-hidden="true" />
 
-      <p className="menudo" role="status" aria-live="polite">
-        {tarea ? `Paso actual: ${tarea.accion} ${tarea.descripcion}`.trim() : 'Cargando el plan…'}
-      </p>
-
-      {error && (
-        <p className="alerta" role="alert">
-          {error}
+        {/*
+          El aviso para lectores de pantalla. En el diseño aprobado arriba solo van
+          la barra y el contador, así que el texto no se muestra: se anuncia.
+        */}
+        <p className="sr-only" role="status" aria-live="polite">
+          {tarea ? `Paso actual: ${tarea.accion} ${tarea.descripcion}`.trim() : 'Cargando el plan…'}
         </p>
-      )}
 
-      {tarea && (
-        <article className="paso">
-          <h2 className="paso__accion">{tarea.accion}</h2>
-          {tarea.descripcion && <p className="paso__objeto">{tarea.descripcion}</p>}
-          <p className="menudo">
-            {ambiente?.nombre ?? 'Casa'} · {tarea.duracionMin}&nbsp;min
+        {error && (
+          <p className="alerta" role="alert">
+            {error}
           </p>
-          {tarea.herramientas.length > 0 && (
-            <p className="paso__herramientas">Vas a necesitar {tarea.herramientas.join(' y ')}</p>
-          )}
-        </article>
-      )}
+        )}
+
+        {tarea && (
+          <article className="paso">
+            <h2 className="paso__accion">{tarea.accion}</h2>
+            {tarea.descripcion && <p className="paso__objeto">{tarea.descripcion}</p>}
+            <p className="menudo">
+              {ambiente?.nombre ?? 'Casa'} · {tarea.duracionMin}&nbsp;min
+            </p>
+            {tarea.herramientas.length > 0 && (
+              <p className="paso__herramientas">Vas a necesitar {tarea.herramientas.join(' y ')}</p>
+            )}
+          </article>
+        )}
+      </div>
 
       <div className="pantalla__pie">
         <button type="button" className="boton-principal" onClick={() => void alListo()}>
