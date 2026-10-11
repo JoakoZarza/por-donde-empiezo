@@ -101,10 +101,12 @@
   flex-direction: column;
   gap: 0.125rem;
   min-width: 0;
+  font-weight: 600;
 }
 
-.ficha__texto strong {
-  font-weight: 600;
+/* La explicación va en peso normal, aunque herede el énfasis del nombre. */
+.ficha__texto .menudo {
+  font-weight: 400;
 }
 
 /* Acción principal: el ámbar es escaso, así que esto es lo único que brilla. */
@@ -230,4 +232,100 @@
 .tarea input:checked ~ .ficha__marca {
   border-color: var(--color-menta);
   background-color: var(--color-menta);
+}
+
+/* --- La pantalla del plan --- */
+
+/* Visible para lectores de pantalla, invisible en la pantalla. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.progreso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progreso__barra {
+  height: 2px;
+  background-color: var(--color-velador);
+  transform-origin: left center;
+}
+
+/*
+  La lámpara: el único adorno de toda la app. Un resplandor ámbar muy tenue en el
+  medio de la pantalla, que es el espacio que se deja vacío a propósito.
+*/
+.lampara {
+  flex: 1 1 auto;
+  min-height: 120px;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgb(242 180 85 / 0.14) 0%,
+    rgb(242 180 85 / 0.05) 28%,
+    transparent 62%
+  );
+}
+
+.paso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background-color: var(--color-pared);
+  box-shadow: var(--sombra-tarjeta);
+}
+
+.paso__accion {
+  margin: 0;
+  font-family: var(--font-verbo);
+  font-size: var(--texto-paso);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-hueso);
+}
+
+.paso__objeto {
+  margin: 0;
+  font-size: var(--texto-titulo);
+  color: var(--color-humo);
+}
+
+.paso__herramientas {
+  margin: 0.5rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-borde);
+  font-size: var(--texto-menudo);
+  color: var(--color-humo);
+}
+
+.pantalla--plan .pantalla__pie {
+  gap: 0.5rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.acciones .boton-secundario {
+  flex: 1 1 auto;
+  min-width: 30%;
+}
+
+.cierre {
+  font-size: var(--texto-titulo);
+  color: var(--color-hueso);
 }

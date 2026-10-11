@@ -1,8 +1,9 @@
 import { create } from 'zustand'
 import { CATALOGO, tareasDeAmbiente } from '../../domain/catalogo'
+import { generarPlan } from '../../domain/motor/generarPlan'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
 import type { Repositorio } from '../../data/repositorio'
-import type { Ambiente, Paso, Plan } from '../../domain/tipos'
+import type { Ambiente, Paso, Plan, Tarea } from '../../domain/tipos'
 
 /*
   El estado de la sesión en curso.
@@ -32,6 +33,8 @@ interface EstadoSesion {
   paso(): Paso | null
   avanzar(ahora: string): Promise<void>
   saltear(ahora: string): Promise<void>
+  /** Rearma el plan con lo que quedó pendiente. Devuelve el id nuevo, o nulo. */
+  reordenar(ahora: string): Promise<string | null>
 }
 
 const repositorio = crearRepositorioLocal()
@@ -54,6 +57,11 @@ async function cerrarPaso(
   )
   const actualizado: Plan = { ...planActual, pasos }
 
+  // Primero el registro del ciclo, después el plan. Si el primero falla, el plan
+  // no se toca y el estado de la pantalla sigue siendo coherente con lo guardado.
+  if (estado === 'hecho') {
+    await repo.marcarHecha(paso.tareaId, ahora)
+  }
   await repo.guardarPlan(actualizado)
   set({ planActual: actualizado, pasoActual: pasoActual + 1 })
 }
@@ -101,5 +109,43 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
 
   async saltear(ahora) {
     await cerrarPaso(set, get, 'salteado', ahora)
+  },
+
+  async reordenar(ahora) {
+    const { planActual, repositorio: repo } = get()
+    if (!planActual) return null
+
+    const hechas = planActual.pasos.filter((paso) => paso.estado === 'hecho').map((paso) => paso.tareaId)
+    const pendientes = new Set(
+      planActual.pasos.filter((paso) => paso.estado !== 'hecho').map((paso) => paso.tareaId),
+    )
+
+    const ambientes = await repo.listarAmbientes()
+    const tareas: Tarea[] = []
+    for (const ambiente of ambientes) {
+      const guardadas = await repo.listarTareas(ambiente.id)
+      tareas.push(...guardadas.filter((tarea) => pendientes.has(tarea.id)))
+    }
+
+    const { herramientasDisponibles } = await repo.preferencias()
+    const minutos = planActual.presupuestoSegundos === null ? null : planActual.presupuestoSegundos / 60
+    const idPlan = crypto.randomUUID()
+
+    const { plan } = generarPlan(
+      {
+        ambientes,
+        tareas,
+        hechasEnCiclo: hechas,
+        presupuestoMin: minutos,
+        modo: planActual.modo,
+        herramientasDisponibles,
+      },
+      ahora,
+      idPlan,
+    )
+
+    await repo.guardarPlan(plan)
+    set({ planActual: plan, pasoActual: 0 })
+    return idPlan
   },
 }))

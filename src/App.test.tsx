@@ -73,9 +73,9 @@ test('la ruta de sesión nueva muestra la elección de tiempo', () => {
   expect(screen.getByRole('heading', { name: /cuánto tiempo/i })).toBeInTheDocument()
 })
 
-test('la ruta del plan toma el identificador del plan de la URL', () => {
+test('la ruta del plan muestra la pantalla del plan', () => {
   renderEn('/plan/plan-abc')
-  expect(screen.getByText('plan-abc')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /^el plan$/i })).toBeInTheDocument()
 })
 
 test('una ruta desconocida no deja a la persona sin salida', () => {
