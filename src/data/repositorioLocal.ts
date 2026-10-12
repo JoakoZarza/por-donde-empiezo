@@ -1,6 +1,6 @@
 import Dexie from 'dexie'
 import type { Table } from 'dexie'
-import type { Ambiente, Plan, Preferencias, Tarea } from '../domain/tipos'
+import type { Ambiente, MarcaDeHistorial, Plan, Preferencias, Tarea } from '../domain/tipos'
 import { PREFERENCIAS_POR_DEFECTO } from './repositorio'
 import type { Repositorio } from './repositorio'
 
@@ -21,6 +21,11 @@ interface FilaPreferencias extends Preferencias {
   clave: string
 }
 
+/** La marca del historial, más la clave que le asigna la base. */
+interface FilaHistorial extends MarcaDeHistorial {
+  id?: number
+}
+
 const CLAVE_PREFERENCIAS = 'unica'
 
 class BaseLocal extends Dexie {
@@ -29,6 +34,7 @@ class BaseLocal extends Dexie {
   hechas!: Table<Hecha, string>
   planes!: Table<Plan, string>
   preferencias!: Table<FilaPreferencias, string>
+  historial!: Table<FilaHistorial, number>
 
   constructor(nombre: string) {
     super(nombre)
@@ -39,6 +45,18 @@ class BaseLocal extends Dexie {
       hechas: 'tareaId, ambienteId',
       planes: 'id, creadoEn',
       preferencias: 'clave',
+    })
+    /*
+      La segunda versión agrega el historial. La primera queda declarada a propósito:
+      así un teléfono que ya tiene datos se actualiza solo, en vez de perderlos.
+    */
+    this.version(2).stores({
+      ambientes: 'id, ordenRecorrido',
+      tareas: 'id, ambienteId',
+      hechas: 'tareaId, ambienteId',
+      planes: 'id, creadoEn',
+      preferencias: 'clave',
+      historial: '++id, ambienteId, hechoEn',
     })
   }
 }
@@ -89,12 +107,27 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         throw new Error(`no se puede marcar como hecha la tarea ${tareaId}: no está guardada`)
       }
       await base.hechas.put({ tareaId, ambienteId: tarea.ambienteId, hechoEn })
+      /*
+        Y se anota en el historial, la tabla que solo crece. Marcar la misma tarea dos
+        veces —porque se reinició el ciclo— anota dos veces: es trabajo hecho dos
+        veces, y el total tiene que reflejarlo.
+      */
+      await base.historial.add({
+        tareaId,
+        ambienteId: tarea.ambienteId,
+        minutos: tarea.duracionMin,
+        hechoEn,
+      })
     },
 
     async limpiarHechas(ambienteId) {
       // Solo las marcas del ciclo: los totales históricos viven en otra tabla y no
       // se tocan. Nada de lo que la persona ganó se pierde.
       await base.hechas.where('ambienteId').equals(ambienteId).delete()
+    },
+
+    async listarHistorial() {
+      return base.historial.toArray()
     },
 
     async guardarPlan(plan) {
@@ -134,13 +167,11 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
     },
 
     async borrarTodo() {
+      // Con seis tablas hay que usar la forma de lista: la de argumentos sueltos
+      // tiene un tope de cinco.
       await base.transaction(
         'rw',
-        base.ambientes,
-        base.tareas,
-        base.hechas,
-        base.planes,
-        base.preferencias,
+        [base.ambientes, base.tareas, base.hechas, base.planes, base.preferencias, base.historial],
         async () => {
           await Promise.all([
             base.ambientes.clear(),
@@ -148,6 +179,7 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
             base.hechas.clear(),
             base.planes.clear(),
             base.preferencias.clear(),
+            base.historial.clear(),
           ])
         },
       )

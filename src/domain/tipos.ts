@@ -147,3 +147,17 @@ export const HERRAMIENTAS_POR_DEFECTO: readonly string[] = [
   'balde',
   'detergente',
 ]
+
+/*
+  El registro de todo lo que la persona terminó, alguna vez.
+
+  Es una tabla que solo crece: se escribe una fila por tarea completada y no se
+  borra nunca, ni siquiera cuando se reinicia el ciclo de un ambiente. Es lo que
+  permite que los totales no bajen jamás.
+*/
+export interface MarcaDeHistorial {
+  tareaId: string
+  ambienteId: string
+  minutos: number
+  hechoEn: string
+}

@@ -5,6 +5,7 @@ import Armado from './ui/pantallas/Armado'
 import ArranqueSesion from './ui/pantallas/ArranqueSesion'
 import Plan from './ui/pantallas/Plan'
 import Ajustes from './ui/pantallas/Ajustes'
+import Logros from './ui/pantallas/Logros'
 import NoEncontrada from './ui/pantallas/NoEncontrada'
 
 /*
@@ -24,6 +25,7 @@ export const RUTAS: RutaDeLaApp[] = [
   { path: '/sesion/nueva', element: <ArranqueSesion /> },
   { path: '/plan/:planId', element: <Plan /> },
   { path: '/ajustes', element: <Ajustes /> },
+  { path: '/logros', element: <Logros /> },
   { path: '*', element: <NoEncontrada /> },
 ]
 

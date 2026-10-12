@@ -1,5 +1,5 @@
 import { HERRAMIENTAS_POR_DEFECTO } from '../domain/tipos'
-import type { Ambiente, Plan, Preferencias, Tarea } from '../domain/tipos'
+import type { Ambiente, MarcaDeHistorial, Plan, Preferencias, Tarea } from '../domain/tipos'
 
 /*
   La única puerta a la persistencia.
@@ -29,6 +29,15 @@ export interface Repositorio {
    * ambiente» de la especificación, sección 4.2.
    */
   limpiarHechas(ambienteId: string): Promise<void>
+
+  /**
+   * Todo lo que la persona terminó alguna vez, en orden de escritura.
+   *
+   * Es un registro que solo crece: reiniciar el ciclo de un ambiente no lo toca.
+   * De acá salen los totales, y por eso no pueden bajar nunca. Solo `borrarTodo`
+   * —la acción destructiva explícita— lo vacía.
+   */
+  listarHistorial(): Promise<MarcaDeHistorial[]>
 
   guardarPlan(plan: Plan): Promise<void>
   obtenerPlan(planId: string): Promise<Plan | null>
