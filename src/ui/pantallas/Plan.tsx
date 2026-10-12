@@ -160,7 +160,7 @@ export default function Plan() {
         que ilumina el paso actual, y por eso vive pegada a la tarjeta.
       */}
       <div className="escenario">
-        <div className="lampara" aria-hidden="true" />
+        <div className="lampara" aria-hidden="true" key={indice} />
 
         {/*
           El aviso para lectores de pantalla. En el diseño aprobado arriba solo van
@@ -177,7 +177,7 @@ export default function Plan() {
         )}
 
         {tarea && (
-          <article className="paso">
+          <article className="paso" key={tarea.id}>
             {/*
               El verbo y el objeto van en la MISMA frase. Separados en dos renglones
               se leían como dos pedazos —«Limpiá» arriba, «la mesa» abajo— y no como
