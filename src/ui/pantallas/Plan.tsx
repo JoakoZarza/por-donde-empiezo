@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import { enReloj, estadoDelReto, finDelReto, resumenDelReto, segundosRestantes } from '../../domain/contrarreloj'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
@@ -33,6 +34,18 @@ export default function Plan() {
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [noEncontrado, setNoEncontrado] = useState(false)
+  const [ahora, setAhora] = useState<string | null>(null)
+
+  /*
+    El latido del reloj. Solo late si el plan tiene presupuesto de tiempo, y se
+    apaga al salir de la pantalla: no queda ningún temporizador corriendo de fondo.
+  */
+  useEffect(() => {
+    if (!plan?.presupuestoSegundos) return
+    setAhora(new Date().toISOString())
+    const latido = setInterval(() => setAhora(new Date().toISOString()), 1000)
+    return () => clearInterval(latido)
+  }, [plan?.presupuestoSegundos])
 
   useTitulo('El plan')
 
@@ -94,6 +107,17 @@ export default function Plan() {
   const total = plan?.pasos.length ?? 0
   const hechos = plan?.pasos.filter((cada) => cada.estado === 'hecho').length ?? 0
   const ambiente = tarea ? ambientes[tarea.ambienteId] : undefined
+
+  // El reloj. `ahora` es nulo hasta el primer latido, así que sin presupuesto de
+  // tiempo no se muestra nada: un plan sin límite no tiene cuenta regresiva.
+  const minutosPorTarea: Record<string, number> = {}
+  for (const [id, cada] of Object.entries(tareas)) minutosPorTarea[id] = cada.duracionMin
+
+  const fin = plan ? finDelReto(plan.creadoEn, plan.presupuestoSegundos) : null
+  const restantes = fin && ahora ? segundosRestantes(fin, ahora) : null
+  const resumen = plan ? resumenDelReto(plan.pasos, minutosPorTarea) : null
+  const sinTiempo =
+    resumen !== null && restantes !== null && estadoDelReto(resumen, restantes) === 'seAcaboElTiempo'
 
   async function alListo(): Promise<void> {
     try {
@@ -205,9 +229,24 @@ export default function Plan() {
 
       <div className="progreso">
         <div className="progreso__barra" style={{ transform: `scaleX(${total === 0 ? 0 : indice / total})` }} />
-        <p className="menudo tabular">
-          {Math.min(indice + 1, total)} de {total}
-        </p>
+        <div className="progreso__linea">
+          <p className="menudo tabular">
+            {Math.min(indice + 1, total)} de {total}
+          </p>
+          {restantes !== null && (
+            <p className={sinTiempo ? 'reloj reloj--agotado tabular' : 'reloj tabular'}>{enReloj(restantes)}</p>
+          )}
+        </div>
+        {/*
+          Cuando se acaba el tiempo se dice, y nada más. No hay veredicto ni castigo:
+          los botones de siempre siguen ahí y la persona decide si para o si sigue.
+          Lo que hizo ya está anotado, y los totales no bajaron nada.
+        */}
+        {sinTiempo && resumen && (
+          <p className="menudo">
+            Se acabó el tiempo: hiciste {resumen.hechos} de {resumen.total}. Podés seguir igual, se anota todo.
+          </p>
+        )}
       </div>
 
       {/*

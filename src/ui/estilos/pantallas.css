@@ -261,6 +261,32 @@
   transform-origin: left center;
 }
 
+.progreso__linea {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/*
+  El reloj del contrarreloj. `tabular-nums` no es un detalle estético: sin él los
+  dígitos cambian de ancho al avanzar y el número baila mientras corre, que es
+  justo lo que AGENTS.md prohíbe para cualquier cifra que se compare.
+*/
+.reloj {
+  margin: 0;
+  font-family: var(--font-verbo);
+  font-size: var(--texto-titulo);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-velador);
+}
+
+/* Se acabó el tiempo. Gris, no rojo: no es un error, y no es una deuda. */
+.reloj--agotado {
+  color: var(--color-humo);
+}
+
 /*
   El escenario: el hueco del medio de la pantalla, que es el cuarto. La lámpara va
   posicionada detrás de la tarjeta, no en el flujo: si estuviera en el flujo se ve
