@@ -349,10 +349,13 @@
   overflow-wrap: anywhere;
 }
 
+/*
+  La instrucción es UNA sola frase y va toda del mismo tamaño. Antes el verbo salía
+  enorme y el objeto chico, y se leía como dos pedazos en vez de como una orden.
+*/
 .paso__objeto {
-  margin: 0;
-  font-size: var(--texto-titulo);
-  color: var(--color-humo);
+  font: inherit;
+  color: inherit;
 }
 
 .paso__herramientas {
