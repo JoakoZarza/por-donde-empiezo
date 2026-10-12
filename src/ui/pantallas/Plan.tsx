@@ -171,7 +171,7 @@ export default function Plan() {
         </p>
 
         {error && (
-          <p className="alerta" role="alert">
+          <p className="alerta" role="status" aria-live="polite">
             {error}
           </p>
         )}

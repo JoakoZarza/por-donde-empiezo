@@ -105,7 +105,7 @@ test('no guarda una tarea propia con el nombre vacío, y lo explica', async () =
   await usuario.type(screen.getByLabelText(/agregar algo mío/i), '    ')
   await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
 
-  expect(await screen.findByRole('alert')).toBeInTheDocument()
+  expect(await screen.findByRole('status')).toBeInTheDocument()
   const guardadas = await repo.listarTareas('cocina')
   expect(guardadas.every((t) => t.esDelCatalogo)).toBe(true)
 })

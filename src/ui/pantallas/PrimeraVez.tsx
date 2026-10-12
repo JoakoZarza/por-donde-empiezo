@@ -68,7 +68,7 @@ export default function PrimeraVez() {
       <div className="pantalla__pie">
         {elegidos.length === 0 && <p className="menudo">Elegí al menos un ambiente.</p>}
         {error && (
-          <p className="alerta" role="alert">
+          <p className="alerta" role="status" aria-live="polite">
             {error}
           </p>
         )}

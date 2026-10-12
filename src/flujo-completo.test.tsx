@@ -67,7 +67,9 @@ test('de elegir ambientes a tildar el primer paso, sin escribir ninguna direcci�
   await usuario.click(screen.getByRole('button', { name: 'Listo' }))
   // Si la pantalla hubiera fallado al guardar, mostraría un aviso: se comprueba
   // antes de mirar la base, para saber si el problema es el guardado o la lectura.
-  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  // El aviso de error es una región `polite` y el paso actual también, así que no
+  // alcanza con buscar por rol: hay que buscar el texto del error.
+  expect(screen.queryByText(/No pudimos/)).not.toBeInTheDocument()
   // El guardado es asíncrono y el clic no espera a las promesas del manejador.
   await waitFor(async () => {
     expect((await repo.ultimoPlan())?.pasos[0]?.estado).toBe('hecho')
