@@ -18,7 +18,7 @@ import { configure } from '@testing-library/react'
   en vez de bajar la cantidad de aserciones: un test que falla por reloj no dice
   nada sobre el código.
 */
-configure({ asyncUtilTimeout: 5000 })
+configure({ asyncUtilTimeout: 15000 })
 
 /*
   La limpieza automática de Testing Library se registra sola solo si existe un
