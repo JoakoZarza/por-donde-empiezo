@@ -20,9 +20,10 @@
   /* El borde de la tarjeta no es un séptimo color: se deriva del hueso. */
   --color-borde: color-mix(in oklab, var(--color-hueso) 12%, transparent);
 
-  /* Tipografía: dos familias con roles que no se pisan. */
-  --font-interfaz: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-verbo: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  /* Tipografía: dos familias con roles que no se pisan. Los nombres llevan
+     «Variable» porque son los que declaran los paquetes autoalojados. */
+  --font-interfaz: 'Instrument Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-verbo: 'Bricolage Grotesque Variable', 'Instrument Sans Variable', system-ui, sans-serif;
 
   /* Escala tipográfica */
   --texto-paso: clamp(2.5rem, 13vw, 4.5rem);

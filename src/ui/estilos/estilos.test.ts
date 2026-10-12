@@ -68,3 +68,16 @@ test('no deshabilita el zoom del navegador', () => {
 test('las entradas de texto no disparan el zoom automático de iOS', () => {
   expect(todaLaHoja()).toMatch(/font-size:\s*1(6|7|8|9)px/)
 })
+
+test('las tipografías aprobadas se cargan de verdad, no solo se declaran', () => {
+  // Este test existe por un defecto real: durante varias tareas los tokens
+  // declaraban Instrument Sans y Bricolage Grotesque, no había ningún archivo, y
+  // todo caía a la tipografía del sistema sin que nada lo avisara.
+  const main = leer('src/main.tsx')
+  expect(main).toMatch(/@fontsource-variable\/instrument-sans/)
+  expect(main).toMatch(/@fontsource-variable\/bricolage-grotesque/)
+
+  // Y el nombre declarado tiene que ser el que el paquete realmente expone.
+  expect(todaLaHoja()).toMatch(/Instrument Sans Variable/)
+  expect(todaLaHoja()).toMatch(/Bricolage Grotesque Variable/)
+})
