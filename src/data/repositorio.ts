@@ -1,5 +1,6 @@
 import { HERRAMIENTAS_POR_DEFECTO } from '../domain/tipos'
 import type { Ambiente, MarcaDeHistorial, Plan, Preferencias, Tarea } from '../domain/tipos'
+import type { Respaldo } from '../domain/respaldo'
 
 /*
   La única puerta a la persistencia.
@@ -45,6 +46,15 @@ export interface Repositorio {
 
   preferencias(): Promise<Preferencias>
   guardarPreferencias(preferencias: Preferencias): Promise<void>
+
+  /** Todo lo guardado, en un objeto que se puede escribir como archivo. */
+  exportar(): Promise<Respaldo>
+  /**
+   * Suma una copia a lo que ya hay. Nunca reemplaza ni borra: si algo ya existe con
+   * el mismo identificador, gana lo que ya estaba en este teléfono. Importar no
+   * puede ser la forma de perder datos.
+   */
+  importar(respaldo: Respaldo): Promise<void>
 
   borrarTodo(): Promise<void>
 }

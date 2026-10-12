@@ -3,6 +3,7 @@ import type { Table } from 'dexie'
 import type { Ambiente, MarcaDeHistorial, Plan, Preferencias, Tarea } from '../domain/tipos'
 import { PREFERENCIAS_POR_DEFECTO } from './repositorio'
 import type { Repositorio } from './repositorio'
+import { armarRespaldo } from '../domain/respaldo'
 
 /*
   La implementación del repositorio sobre IndexedDB, con Dexie.
@@ -164,6 +165,81 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
 
     async guardarPreferencias(preferencias) {
       await base.preferencias.put({ clave: CLAVE_PREFERENCIAS, ...preferencias })
+    },
+
+    async exportar() {
+      const [ambientes, tareas, hechas, filas, planes, fila] = await Promise.all([
+        base.ambientes.toArray(),
+        base.tareas.toArray(),
+        base.hechas.toArray(),
+        base.historial.toArray(),
+        base.planes.toArray(),
+        base.preferencias.get(CLAVE_PREFERENCIAS),
+      ])
+
+      return armarRespaldo(
+        {
+          ambientes,
+          tareas,
+          hechas,
+          // Se descarta la clave que le puso la base: no significa nada fuera de acá.
+          historial: filas.map(({ tareaId, ambienteId, minutos, hechoEn }) => ({
+            tareaId,
+            ambienteId,
+            minutos,
+            hechoEn,
+          })),
+          planes,
+          preferencias: { ...PREFERENCIAS_POR_DEFECTO, ...(fila ?? {}) },
+        },
+        new Date().toISOString(),
+      )
+    },
+
+    async importar(respaldo) {
+      const clave = (marca: { tareaId: string; hechoEn: string }): string => `${marca.tareaId}|${marca.hechoEn}`
+
+      /*
+        Se lee lo que ya hay antes de escribir, para poder sumar sin pisar. Todo va
+        en una sola transacción: si algo falla a mitad de camino, el teléfono queda
+        como estaba y no a medio importar.
+      */
+      const yaHay = {
+        ambientes: new Set((await base.ambientes.toArray()).map((ambiente) => ambiente.id)),
+        tareas: new Set((await base.tareas.toArray()).map((tarea) => tarea.id)),
+        planes: new Set((await base.planes.toArray()).map((plan) => plan.id)),
+        hechas: new Set((await base.hechas.toArray()).map(clave)),
+        historial: new Set((await base.historial.toArray()).map(clave)),
+      }
+
+      await base.transaction(
+        'rw',
+        [base.ambientes, base.tareas, base.hechas, base.historial, base.planes, base.preferencias],
+        async () => {
+          for (const ambiente of respaldo.ambientes) {
+            if (yaHay.ambientes.has(ambiente.id)) continue
+            await base.ambientes.put(ambiente)
+          }
+          for (const tarea of respaldo.tareas) {
+            if (yaHay.tareas.has(tarea.id)) continue
+            await base.tareas.put(tarea)
+          }
+          for (const plan of respaldo.planes) {
+            if (yaHay.planes.has(plan.id)) continue
+            await base.planes.put(plan)
+          }
+          for (const marca of respaldo.hechas) {
+            if (yaHay.hechas.has(clave(marca))) continue
+            await base.hechas.put(marca)
+          }
+          for (const marca of respaldo.historial) {
+            if (yaHay.historial.has(clave(marca))) continue
+            await base.historial.add(marca)
+          }
+          // Los ajustes sí se adoptan: son de la persona, no del teléfono.
+          await base.preferencias.put({ clave: CLAVE_PREFERENCIAS, ...respaldo.preferencias })
+        },
+      )
     },
 
     async borrarTodo() {

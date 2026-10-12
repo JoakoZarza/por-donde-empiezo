@@ -586,3 +586,16 @@
   color: var(--color-humo);
   font-weight: 400;
 }
+
+/*
+  El selector de archivos para traer una copia. Se deja visible y nativo, sin
+  disfrazarlo: en un teléfono la persona reconoce «Elegir archivo», y esconderlo
+  detrás de una etiqueta deja el control sin foco visible para quien navega con
+  teclado. Necesita el área táctil y los 16 px de siempre, o iOS hace zoom al
+  tocarlo.
+*/
+input[type='file'] {
+  min-height: var(--toque-minimo);
+  font-size: 1rem;
+  color: var(--color-humo);
+}

@@ -161,3 +161,10 @@ export interface MarcaDeHistorial {
   minutos: number
   hechoEn: string
 }
+
+/** Una tarea marcada como hecha dentro del ciclo actual de un ambiente. */
+export interface MarcaDeCiclo {
+  tareaId: string
+  ambienteId: string
+  hechoEn: string
+}

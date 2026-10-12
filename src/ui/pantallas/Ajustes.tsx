@@ -5,6 +5,7 @@ import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import type { Modo, Preferencias } from '../../domain/tipos'
 
 /*
@@ -43,6 +44,7 @@ export default function Ajustes() {
   const [playlist, setPlaylist] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [guardado, setGuardado] = useState(false)
+  const [mensaje, setMensaje] = useState<string | null>(null)
 
   useTitulo('Ajustes')
 
@@ -88,6 +90,55 @@ export default function Ajustes() {
       ? preferencias.herramientasDisponibles.filter((cada) => cada !== herramienta)
       : [...preferencias.herramientasDisponibles, herramienta]
     await guardar({ herramientasDisponibles: lista })
+  }
+
+  async function guardarCopia(): Promise<void> {
+    setError(null)
+    setMensaje(null)
+    try {
+      const respaldo = await repositorio.exportar()
+      // Un archivo común, que la persona manda por donde quiera. Nada sale del
+      // teléfono hasta que ella lo saca.
+      const blob = new Blob([JSON.stringify(respaldo)], { type: 'application/json' })
+      const enlace = document.createElement('a')
+      enlace.href = URL.createObjectURL(blob)
+      enlace.download = nombreDelArchivo(respaldo.generadoEn)
+      enlace.click()
+      URL.revokeObjectURL(enlace.href)
+      setMensaje('Listo, la copia se bajó a tu teléfono.')
+    } catch {
+      setError('No pudimos armar la copia. Probá de nuevo.')
+    }
+  }
+
+  async function traerCopia(archivo: File): Promise<void> {
+    setError(null)
+    setMensaje(null)
+    try {
+      const respaldo = leerRespaldo(await archivo.text())
+      await repositorio.importar(respaldo)
+      setMensaje('Listo, se sumó todo lo que faltaba. Nada de lo que tenías se perdió.')
+    } catch (falla) {
+      // Si el archivo está mal, se dice por qué. «Error al importar» no le sirve
+      // a nadie que acaba de elegir el archivo equivocado.
+      setError(falla instanceof RespaldoInvalido ? falla.message : 'No pudimos leer el archivo.')
+    }
+  }
+
+  async function empezarDeCero(): Promise<void> {
+    const confirmado = window.confirm(
+      'Se borra todo de este teléfono: los ambientes, las tareas y los totales. No se puede deshacer. ¿Seguro?',
+    )
+    if (!confirmado) return
+
+    setError(null)
+    setMensaje(null)
+    try {
+      await repositorio.borrarTodo()
+      setMensaje('Listo, este teléfono quedó en cero.')
+    } catch {
+      setError('No pudimos borrar los datos.')
+    }
   }
 
   if (!preferencias) {
@@ -188,13 +239,50 @@ export default function Ajustes() {
         </button>
       </form>
 
+      <section className="grupo">
+        <h2 className="pantalla__titulo">Tus datos</h2>
+        <p className="menudo">
+          Todo esto vive solo en este teléfono. Para pasar tu trabajo a otro, bajá una copia y llevala como cualquier
+          archivo: al traerla se suma a lo que ese teléfono ya tenga. Nunca lo reemplaza.
+        </p>
+
+        <button type="button" className="boton-secundario" onClick={() => void guardarCopia()}>
+          Guardar una copia
+        </button>
+
+        <label className="menudo" htmlFor="copia">
+          Traer de otra copia
+        </label>
+        <input
+          id="copia"
+          name="copia"
+          type="file"
+          accept="application/json,.json"
+          onChange={(evento) => {
+            const archivo = evento.target.files?.[0]
+            if (archivo) void traerCopia(archivo)
+            // Se limpia para que elegir el mismo archivo dos veces vuelva a disparar.
+            evento.target.value = ''
+          }}
+        />
+
+        <button type="button" className="boton-secundario" onClick={() => void empezarDeCero()}>
+          Empezar de cero en este teléfono
+        </button>
+      </section>
+
       <div className="pantalla__pie">
         {error && (
           <p className="alerta" role="status" aria-live="polite">
             {error}
           </p>
         )}
-        {guardado && !error && <p className="menudo">Listo, quedó guardado.</p>}
+        {mensaje && !error && (
+          <p className="menudo" role="status" aria-live="polite">
+            {mensaje}
+          </p>
+        )}
+        {guardado && !error && !mensaje && <p className="menudo">Listo, quedó guardado.</p>}
         <Link className="boton-principal" to="/">
           Volver al principio
         </Link>
