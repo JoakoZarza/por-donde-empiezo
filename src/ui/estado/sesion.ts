@@ -4,7 +4,7 @@ import { generarPlan } from '../../domain/motor/generarPlan'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
 import { nuevoId } from '../id'
 import type { Repositorio } from '../../data/repositorio'
-import type { Ambiente, Paso, Plan, Tarea } from '../../domain/tipos'
+import type { Ambiente, Plan, Tarea } from '../../domain/tipos'
 
 /*
   El estado de la sesión en curso.
@@ -23,15 +23,12 @@ interface EstadoSesion {
   ambientes: Ambiente[]
   planActual: Plan | null
   pasoActual: number
-  cargar(): Promise<void>
   /**
    * Guarda los ambientes elegidos con sus tareas del catálogo, y devuelve el id
    * del primero del recorrido para que la pantalla sepa a dónde ir.
    */
   elegirAmbientes(ids: string[]): Promise<string | null>
   abrirPlan(plan: Plan): void
-  /** El paso en curso, o nulo si no hay plan o ya se terminó. */
-  paso(): Paso | null
   avanzar(ahora: string): Promise<void>
   saltear(ahora: string): Promise<void>
   /** Rearma el plan con lo que quedó pendiente. Devuelve el id nuevo, o nulo. */
@@ -73,11 +70,6 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
   planActual: null,
   pasoActual: 0,
 
-  async cargar() {
-    const { repositorio: repo } = get()
-    set({ ambientes: await repo.listarAmbientes() })
-  },
-
   async elegirAmbientes(ids) {
     const { repositorio: repo } = get()
     const elegidos = CATALOGO.ambientes
@@ -105,11 +97,6 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
     // página el plan ya tiene pasos hechos, y volver al paso 1 los haría rehacer.
     const primeroPendiente = plan.pasos.findIndex((paso) => paso.estado === 'pendiente')
     set({ planActual: plan, pasoActual: primeroPendiente === -1 ? plan.pasos.length : primeroPendiente })
-  },
-
-  paso() {
-    const { planActual, pasoActual } = get()
-    return planActual?.pasos[pasoActual] ?? null
   },
 
   async avanzar(ahora) {
