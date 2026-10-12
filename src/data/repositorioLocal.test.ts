@@ -170,6 +170,7 @@ test('guarda y recupera las preferencias', async () => {
     herramientasDisponibles: ['escoba'],
     modoPorDefecto: 'puestaAPunto',
     duracionRetoPreferida: 15,
+    playlistPropia: null,
   })
   const preferencias = await repo.preferencias()
   expect(preferencias.herramientasDisponibles).toEqual(['escoba'])
@@ -187,6 +188,7 @@ test('borrarTodo deja el repositorio vacío', async () => {
     herramientasDisponibles: ['escoba'],
     modoPorDefecto: 'puestaAPunto',
     duracionRetoPreferida: 15,
+    playlistPropia: null,
   })
 
   await repo.borrarTodo()

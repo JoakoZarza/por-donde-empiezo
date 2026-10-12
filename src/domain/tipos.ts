@@ -132,6 +132,12 @@ export interface Preferencias {
   modoPorDefecto: Modo
   /** Minutos de los retos contrarreloj. */
   duracionRetoPreferida: number
+  /**
+   * La playlist de la persona, si pegó una. Nulo significa que la app ofrece sus
+   * propias búsquedas. Es una dirección, no un identificador: sirve igual para
+   * Spotify que para YouTube, y no ata la app a ninguna plataforma.
+   */
+  playlistPropia: string | null
 }
 
 /** Las herramientas que la app asume si la persona no dijo nada. */

@@ -48,4 +48,5 @@ export const PREFERENCIAS_POR_DEFECTO: Preferencias = {
   herramientasDisponibles: [...HERRAMIENTAS_POR_DEFECTO],
   modoPorDefecto: 'arrancarYa',
   duracionRetoPreferida: 10,
+  playlistPropia: null,
 }

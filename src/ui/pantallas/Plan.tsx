@@ -31,6 +31,8 @@ export default function Plan() {
   const [ambientes, setAmbientes] = useState<Record<string, Ambiente>>({})
   const [cortado, setCortado] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cargando, setCargando] = useState(true)
+  const [noEncontrado, setNoEncontrado] = useState(false)
 
   useTitulo('El plan')
 
@@ -54,8 +56,29 @@ export default function Plan() {
       setTareas(porTarea)
       setAmbientes(porAmbiente)
 
+      /*
+        Un plan que no está en la base es un estado posible, no un accidente: puede
+        ser una dirección vieja, o el teléfono haber borrado los datos por falta de
+        uso. iOS lo hace a los siete días sin abrir la app, y este producto es de uso
+        esporádico a propósito.
+
+        Sin esta rama, la pantalla caía al render normal con el plan en nulo: «0 de
+        0», el anuncio de «Cargando el plan…» para siempre, ningún paso, y los cuatro
+        botones inertes porque no había nada que avanzar. Un callejón sin salida, y
+        justo en la situación más probable: volver después de mucho tiempo.
+      */
+      if (!guardado) {
+        // Si el plan está en memoria —recién armado en esta sesión— se usa ese: que
+        // la base haya quedado atrás no tiene por qué cortar el trabajo en curso.
+        if (!useSesion.getState().planActual) setNoEncontrado(true)
+        setCargando(false)
+        return
+      }
+
+      setCargando(false)
+
       // Solo se abre si es otro plan: si no, se perdería el avance al recargar.
-      if (guardado && useSesion.getState().planActual?.id !== guardado.id) {
+      if (useSesion.getState().planActual?.id !== guardado.id) {
         abrirPlan(guardado)
       }
     }
@@ -95,6 +118,39 @@ export default function Plan() {
     } catch {
       setError('No pudimos reordenar. Probá de nuevo.')
     }
+  }
+
+  if (cargando) {
+    return (
+      <main className="pantalla">
+        <h1 className="sr-only">El plan</h1>
+        <div className="lampara" aria-hidden="true" />
+        <p className="menudo" role="status" aria-live="polite">
+          Cargando el plan…
+        </p>
+      </main>
+    )
+  }
+
+  // El plan no existe: se dice, y se ofrece una salida de verdad.
+  if (noEncontrado) {
+    return (
+      <main className="pantalla">
+        <h1 className="pantalla__titulo">No encontramos ese plan</h1>
+        <p className="menudo">
+          Puede que la dirección esté vieja, o que el teléfono haya borrado los datos por falta de uso. No se
+          perdió nada tuyo: los ambientes y las tareas están donde estaban.
+        </p>
+        <div className="pantalla__pie">
+          <Link className="boton-secundario" to="/">
+            Volver al principio
+          </Link>
+          <Link className="boton-principal" to="/sesion/nueva">
+            Armar una sesión nueva
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   // Plan sin nada que hacer: se explica por qué, sin dejar la pantalla muerta.

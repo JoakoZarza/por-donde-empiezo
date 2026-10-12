@@ -54,6 +54,7 @@ export default function ArranqueSesion() {
 
   const [tiempo, setTiempo] = useState<string>('20')
   const [modo, setModo] = useState<Modo>('arrancarYa')
+  const [playlist, setPlaylist] = useState<string | null>(null)
   const [estadoDeTareas, setEstadoDeTareas] = useState<EstadoDeTareas>('cargando')
   const [armando, setArmando] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -78,7 +79,13 @@ export default function ArranqueSesion() {
         pendientes += tareas.filter((tarea) => !hechas.has(tarea.id)).length
       }
 
+      const { modoPorDefecto, playlistPropia } = await repositorio.preferencias()
+
       if (!vigente) return
+      // El modo y la música que la persona eligió en Ajustes se aplican acá: son las
+      // dos preferencias que hasta ahora existían sin que nadie las leyera.
+      setModo(modoPorDefecto)
+      setPlaylist(playlistPropia)
       if (guardadas === 0) setEstadoDeTareas('sinTareas')
       else if (pendientes === 0) setEstadoDeTareas('todoHecho')
       else setEstadoDeTareas('hayTareas')
@@ -169,7 +176,7 @@ export default function ArranqueSesion() {
       <div className="grupo">
         <p className="menudo">Poné algo y arrancamos</p>
         <ul className="musica">
-          {opcionesDeMusica(minutosElegidos).map((opcion) => (
+          {opcionesDeMusica(minutosElegidos, playlist).map((opcion) => (
             <li key={opcion.nombre}>
               <a className="boton-secundario" href={opcion.url} rel="noreferrer">
                 {opcion.nombre}

@@ -113,10 +113,19 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
     async preferencias() {
       const fila = await base.preferencias.get(CLAVE_PREFERENCIAS)
       if (!fila) return { ...PREFERENCIAS_POR_DEFECTO }
+      /*
+        Se parte de los valores por defecto y se pisa con lo guardado, en vez de
+        listar los campos a mano. Listándolos, cualquier preferencia nueva se
+        perdía en silencio al leer: la fila guardada la tenía y la app la devolvía
+        como si no existiera.
+      */
       return {
-        herramientasDisponibles: fila.herramientasDisponibles,
-        modoPorDefecto: fila.modoPorDefecto,
-        duracionRetoPreferida: fila.duracionRetoPreferida,
+        ...PREFERENCIAS_POR_DEFECTO,
+        ...fila,
+        herramientasDisponibles: fila.herramientasDisponibles ?? PREFERENCIAS_POR_DEFECTO.herramientasDisponibles,
+        modoPorDefecto: fila.modoPorDefecto ?? PREFERENCIAS_POR_DEFECTO.modoPorDefecto,
+        duracionRetoPreferida: fila.duracionRetoPreferida ?? PREFERENCIAS_POR_DEFECTO.duracionRetoPreferida,
+        playlistPropia: fila.playlistPropia ?? null,
       }
     },
 

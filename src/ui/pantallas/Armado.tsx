@@ -39,9 +39,15 @@ export default function Armado() {
       const delCatalogo = tareasDeAmbiente(ambienteId)
       let guardadas = await repositorio.listarTareas(ambienteId)
 
-      // Si se llega directo a esta dirección, sin pasar por la primera pantalla,
-      // el ambiente se siembra con lo que propone el catálogo.
-      if (guardadas.length === 0 && delCatalogo.length > 0 && ambiente) {
+      /*
+        La siembra del catálogo corresponde solo si la persona todavía no eligió este
+        ambiente. Con la condición «no hay tareas guardadas» alcanzaba con destildar
+        todas y volver —con el botón Atrás, o recargando— para que reaparecieran todas
+        y entraran al plan: su decisión se revertía en silencio.
+      */
+      const yaElegido = (await repositorio.listarAmbientes()).some((otro) => otro.id === ambienteId)
+
+      if (!yaElegido && guardadas.length === 0 && delCatalogo.length > 0 && ambiente) {
         await repositorio.guardarAmbiente(ambiente)
         for (const tarea of delCatalogo) await repositorio.guardarTarea(tarea)
         guardadas = delCatalogo

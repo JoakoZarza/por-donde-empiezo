@@ -19,13 +19,20 @@ export interface OpcionDeMusica {
 const CONSULTA_CORTA = 'música para limpiar rápido'
 const CONSULTA_LARGA = 'música para limpiar la casa'
 
-export function opcionesDeMusica(minutos: number | null): OpcionDeMusica[] {
+export function opcionesDeMusica(minutos: number | null, playlistPropia: string | null = null): OpcionDeMusica[] {
   // Una sesión corta pide algo movido; una larga, algo para aguantar.
   const consulta = minutos !== null && minutos <= 20 ? CONSULTA_CORTA : CONSULTA_LARGA
   const codificada = encodeURIComponent(consulta)
 
-  return [
+  const busquedas: OpcionDeMusica[] = [
     { nombre: 'Spotify', url: `https://open.spotify.com/search/${codificada}` },
     { nombre: 'YouTube', url: `https://www.youtube.com/results?search_query=${codificada}` },
   ]
+
+  // Si la persona pegó su playlist, va primero: es la que quiere escuchar. Las
+  // búsquedas quedan al lado, porque puede querer otra cosa ese día.
+  const propia = playlistPropia?.trim()
+  if (propia) return [{ nombre: 'Tu playlist', url: propia }, ...busquedas]
+
+  return busquedas
 }
