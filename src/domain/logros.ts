@@ -107,7 +107,9 @@ export function calcularLogros(totales: Totales, cantidadDeAmbientes: number): L
     logro('cinco-horas', 'Cinco horas', 'Cinco horas acumuladas.', horas >= 5),
     logro('tres-dias', 'Tres días', 'Trabajaste en tres días distintos.', totales.diasActivos >= 3),
     logro('siete-dias', 'Siete días', 'Trabajaste en siete días distintos.', totales.diasActivos >= 7),
-    logro('casa-entera', 'La casa entera', 'Tocaste todos los ambientes.', cantidadDeAmbientes >= 8),
+    // Ojo con el texto: esto se gana por ELEGIR los ocho ambientes, no por trabajar
+    // en ellos. Decir «tocaste» sería mentir sobre lo que la app midió.
+    logro('casa-entera', 'La casa entera', 'Elegiste todos los ambientes de la casa.', cantidadDeAmbientes >= 8),
     logro('volviste', 'Volviste', 'Te tomaste unos días y volviste igual.', totales.mayorPausaDias >= 3),
   ]
 }
