@@ -279,6 +279,25 @@
   justify-content: center;
 }
 
+/*
+  El único momento animado de toda la app: la luz viaja.
+
+  Al tocar «Listo», el resplandor llega desde arriba —donde estaba el paso que se
+  acaba de completar— y se asienta detrás de la tarjeta nueva. El elemento se vuelve
+  a montar en cada paso, así que la animación se repite sola. Con
+  `prefers-reduced-motion` no hay viaje: `base.css` apaga las animaciones.
+*/
+@keyframes viaje-de-la-luz {
+  from {
+    opacity: 0.35;
+    transform: translateY(-18px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .lampara {
   position: absolute;
   inset: 0;
@@ -289,6 +308,16 @@
     rgb(242 180 85 / 0.05) 30%,
     transparent 66%
   );
+  animation: viaje-de-la-luz var(--viaje-luz) ease-out;
+}
+
+@keyframes aparecer-el-paso {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .paso {
@@ -300,6 +329,8 @@
   border-radius: var(--radio-tarjeta);
   background-color: var(--color-pared);
   box-shadow: var(--sombra-tarjeta);
+  /* El paso nuevo entra con un fundido corto, en el mismo tiempo que la luz. */
+  animation: aparecer-el-paso var(--viaje-luz) ease-out;
 }
 
 .paso__accion {
