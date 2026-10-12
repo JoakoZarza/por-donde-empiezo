@@ -267,6 +267,8 @@ export default function Plan() {
               {enReloj(planilla.realSegundos)} de trabajo real, contra {enReloj(planilla.estimadoSegundos)} estimados.
               {planilla.ganadas > 0 && ` Le ganaste a ${planilla.ganadas} ${planilla.ganadas === 1 ? 'tarea' : 'tareas'}.`}
               {planilla.perdidas > 0 && ` Te pasaste en ${planilla.perdidas}.`}
+              {planilla.conPausa > 0 &&
+                ` Las ${planilla.conPausa === 1 ? 'tarea' : 'tareas'} con pausa quedan fuera de la cuenta.`}
             </p>
 
             <ul className="planilla">

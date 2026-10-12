@@ -48,17 +48,32 @@ test('clavar la estimación no es ganar ni perder', () => {
   expect(planilla.perdidas).toBe(0)
 })
 
-test('una pausa larga se muestra pero no arruina el resultado', () => {
+test('una pausa larga se muestra pero queda afuera de TODAS las cuentas', () => {
   // Una tarea de 10 minutos abierta ocho horas: la persona dejó el teléfono y volvió.
   const planilla = calcularResultados([paso('a', 'hecho', 8 * 3600), paso('b', 'hecho', 240)], MINUTOS)
 
   expect(planilla.tareas[0]?.conPausa).toBe(true)
-  // El tiempo real se muestra igual, porque es la verdad del reloj.
+  // El tiempo real de esa fila se muestra igual, porque es la verdad del reloj.
   expect(planilla.tareas[0]?.realSegundos).toBe(8 * 3600)
   expect(planilla.conPausa).toBe(1)
-  // Pero el resultado final solo cuenta la tarea que se hizo de corrido.
+  /*
+    Y queda afuera de las tres cuentas: estimado, real y diferencia. Antes sumaba al
+    real pero no a la diferencia, así que la misma pantalla podía decir «8:04:00 de
+    trabajo real contra 15:00 estimados» y «le ganaste a la estimación por un minuto».
+    Este test afirmaba ese total inflado: congelaba el defecto como si fuera correcto.
+  */
+  expect(planilla.realSegundos).toBe(240)
+  expect(planilla.estimadoSegundos).toBe(300)
   expect(planilla.diferenciaSegundos).toBe(60)
-  expect(planilla.realSegundos).toBe(8 * 3600 + 240)
+})
+
+test('el total y la diferencia siempre cuentan el mismo conjunto de tareas', () => {
+  // La invariante que impide los dos números incompatibles en la misma pantalla.
+  const conPausa = calcularResultados([paso('a', 'hecho', 8 * 3600), paso('b', 'hecho', 240)], MINUTOS)
+  expect(conPausa.diferenciaSegundos).toBe(conPausa.estimadoSegundos - conPausa.realSegundos)
+
+  const sinPausa = calcularResultados([paso('a', 'hecho', 480), paso('b', 'pendiente')], MINUTOS)
+  expect(sinPausa.diferenciaSegundos).toBe(sinPausa.estimadoSegundos - sinPausa.realSegundos)
 })
 
 test('una tarea lenta pero plausible NO es una pausa', () => {

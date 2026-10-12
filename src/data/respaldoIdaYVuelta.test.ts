@@ -127,3 +127,68 @@ test('un respaldo de una base vacía se puede importar sin romper nada', async (
   expect(await destino.listarAmbientes()).toEqual([])
   expect(calcularTotales(await destino.listarHistorial()).tareas).toBe(0)
 })
+
+test('la clave de IA NUNCA viaja dentro de una copia', async () => {
+  /*
+    La copia está pensada para mandarse por WhatsApp o por correo. Que la clave de la
+    persona viajara ahí adentro era la peor fuga posible, y encima contradecía el
+    aviso que ella aceptó al activar la IA: «se manda únicamente a Google».
+  */
+  const repo = repositorio()
+  await repo.guardarPreferencias({
+    ...PREFERENCIAS_POR_DEFECTO,
+    claveDeIa: 'AIzaSy-una-clave-secreta',
+    avisoDePrivacidadAceptado: true,
+  })
+
+  const texto = JSON.stringify(await repo.exportar())
+
+  // Precondición: sin esto, el test pasaría aunque la clave nunca se hubiera
+  // guardado, que es la forma más común de escribir un test que no prueba nada.
+  expect((await repo.preferencias()).claveDeIa).toBe('AIzaSy-una-clave-secreta')
+
+  expect(texto).not.toContain('AIzaSy-una-clave-secreta')
+  expect((await repo.exportar()).preferencias.claveDeIa).toBeNull()
+  // Lo que sí tiene que viajar es lo demás.
+  expect((await repo.exportar()).preferencias.avisoDePrivacidadAceptado).toBe(true)
+})
+
+test('importar completa los ajustes pero NO pisa los que ya estaban en el teléfono', async () => {
+  const destino = repositorio()
+  // Este teléfono ya tiene su configuración hecha a mano.
+  await destino.guardarPreferencias({
+    ...PREFERENCIAS_POR_DEFECTO,
+    modoPorDefecto: 'puestaAPunto',
+    herramientasDisponibles: ['escoba'],
+  })
+
+  const origen = repositorio()
+  await origen.guardarPreferencias({
+    ...PREFERENCIAS_POR_DEFECTO,
+    modoPorDefecto: 'ambientePorAmbiente',
+    playlistPropia: 'https://open.spotify.com/playlist/mia',
+  })
+
+  await destino.importar(leerRespaldo(JSON.stringify(await origen.exportar())))
+  const quedaron = await destino.preferencias()
+
+  // Lo configurado acá manda: importar nunca reemplaza.
+  expect(quedaron.modoPorDefecto).toBe('puestaAPunto')
+  expect(quedaron.herramientasDisponibles).toEqual(['escoba'])
+  // Y lo que seguía en su valor de fábrica se completa con lo de la copia.
+  expect(quedaron.playlistPropia).toBe('https://open.spotify.com/playlist/mia')
+})
+
+test('importar no le borra la clave de IA a este teléfono', async () => {
+  const destino = repositorio()
+  await destino.guardarPreferencias({
+    ...PREFERENCIAS_POR_DEFECTO,
+    claveDeIa: 'mi-clave-local',
+    avisoDePrivacidadAceptado: true,
+  })
+
+  const origen = repositorio()
+  await destino.importar(leerRespaldo(JSON.stringify(await origen.exportar())))
+
+  expect((await destino.preferencias()).claveDeIa).toBe('mi-clave-local')
+})

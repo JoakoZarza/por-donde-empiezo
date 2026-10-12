@@ -29,6 +29,14 @@ interface FilaHistorial extends MarcaDeHistorial {
 
 const CLAVE_PREFERENCIAS = 'unica'
 
+/** Si dos listas de herramientas tienen lo mismo, sin importar el orden. */
+function mismoConjunto(a: string[], b: readonly string[]): boolean {
+  if (a.length !== b.length) return false
+  const uno = [...a].sort()
+  const otro = [...b].sort()
+  return uno.every((cada, indice) => cada === otro[indice])
+}
+
 class BaseLocal extends Dexie {
   ambientes!: Table<Ambiente, string>
   tareas!: Table<Tarea, string>
@@ -193,7 +201,13 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
             hechoEn,
           })),
           planes,
-          preferencias: { ...PREFERENCIAS_POR_DEFECTO, ...(fila ?? {}) },
+          /*
+            La clave de IA NUNCA entra en una copia. Esta copia está pensada para
+            mandarse por WhatsApp, por correo o por un cable, y la clave es de la
+            persona: sacarla del teléfono contradiría el aviso que ella aceptó —«se
+            manda únicamente a Google»— y la regla de AGENTS.md.
+          */
+          preferencias: { ...PREFERENCIAS_POR_DEFECTO, ...(fila ?? {}), claveDeIa: null },
         },
         new Date().toISOString(),
       )
@@ -207,6 +221,37 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         en una sola transacción: si algo falla a mitad de camino, el teléfono queda
         como estaba y no a medio importar.
       */
+      /*
+        Los ajustes se COMPLETAN, no se pisan. Lo que la persona ya configuró en este
+        teléfono se queda, y solo se adopta lo que sigue en su valor de fábrica. Antes
+        se escribía la fila entera de la copia, así que importar borraba las
+        herramientas, el modo y el estilo de reloj de este teléfono: lo contrario de
+        «nunca reemplaza».
+      */
+      const filaActual = await base.preferencias.get(CLAVE_PREFERENCIAS)
+      const actuales: Preferencias = { ...PREFERENCIAS_POR_DEFECTO, ...(filaActual ?? {}) }
+      const venidas = respaldo.preferencias
+      const fabrica = PREFERENCIAS_POR_DEFECTO
+
+      const fusionadas: Preferencias = {
+        herramientasDisponibles: mismoConjunto(actuales.herramientasDisponibles, fabrica.herramientasDisponibles)
+          ? venidas.herramientasDisponibles
+          : actuales.herramientasDisponibles,
+        modoPorDefecto:
+          actuales.modoPorDefecto === fabrica.modoPorDefecto ? venidas.modoPorDefecto : actuales.modoPorDefecto,
+        duracionRetoPreferida:
+          actuales.duracionRetoPreferida === fabrica.duracionRetoPreferida
+            ? venidas.duracionRetoPreferida
+            : actuales.duracionRetoPreferida,
+        estiloDeReloj:
+          actuales.estiloDeReloj === fabrica.estiloDeReloj ? venidas.estiloDeReloj : actuales.estiloDeReloj,
+        playlistPropia: actuales.playlistPropia ?? venidas.playlistPropia,
+        // La clave de este teléfono no se toca: no viaja en las copias, así que la
+        // copia siempre trae null y pisarla sería borrarla.
+        claveDeIa: actuales.claveDeIa,
+        avisoDePrivacidadAceptado: actuales.avisoDePrivacidadAceptado || venidas.avisoDePrivacidadAceptado,
+      }
+
       const yaHay = {
         ambientes: new Set((await base.ambientes.toArray()).map((ambiente) => ambiente.id)),
         tareas: new Set((await base.tareas.toArray()).map((tarea) => tarea.id)),
@@ -239,8 +284,7 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
             if (yaHay.historial.has(clave(marca))) continue
             await base.historial.add(marca)
           }
-          // Los ajustes sí se adoptan: son de la persona, no del teléfono.
-          await base.preferencias.put({ clave: CLAVE_PREFERENCIAS, ...respaldo.preferencias })
+          await base.preferencias.put({ clave: CLAVE_PREFERENCIAS, ...fusionadas })
         },
       )
     },

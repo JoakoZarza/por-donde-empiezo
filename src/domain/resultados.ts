@@ -78,14 +78,19 @@ export function calcularResultados(
 
     if (real === null) continue
 
-    estimadoSegundos += estimado
-    realSegundos += real
-
+    /*
+      Una tarea con pausa queda afuera de TODAS las cuentas: del estimado, del real y
+      de la diferencia. Antes sumaba al tiempo real pero no a la diferencia, así que
+      la misma pantalla podía decir «8:04:00 de trabajo real contra 15:00 estimados» y
+      «le ganaste a la estimación»: dos frases incompatibles.
+    */
     if (pausa) {
       conPausa += 1
       continue
     }
 
+    estimadoSegundos += estimado
+    realSegundos += real
     diferenciaSegundos += diferencia ?? 0
     // Una diferencia de cero no es ni ganada ni perdida: clavó la estimación.
     if ((diferencia ?? 0) > 0) ganadas += 1
