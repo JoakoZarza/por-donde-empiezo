@@ -412,3 +412,20 @@
   justify-content: center;
   text-decoration: none;
 }
+
+/*
+  Un enlace con aspecto de botón tiene que comportarse como botón.
+
+  Un `<a>` es `display: inline` por defecto, así que `min-height` no le aplica: el
+  área táctil quedaba por debajo de los 44 px que exige AGENTS.md, y el defecto era
+  invisible en la computadora, donde se toca con el mouse. Pasó dos veces —con los
+  enlaces de música y con la pantalla de «no encontrada»— así que la regla va una
+  sola vez para las dos clases.
+*/
+.boton-principal,
+.boton-secundario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

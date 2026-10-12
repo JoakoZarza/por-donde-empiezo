@@ -81,3 +81,14 @@ test('las tipografías aprobadas se cargan de verdad, no solo se declaran', () =
   expect(todaLaHoja()).toMatch(/Instrument Sans Variable/)
   expect(todaLaHoja()).toMatch(/Bricolage Grotesque Variable/)
 })
+
+test('un enlace con aspecto de botón conserva el área táctil mínima', () => {
+  // Este test existe por un defecto real que apareció dos veces: un `<a>` es
+  // `display: inline`, `min-height` no le aplica, y el área táctil de un enlace
+  // disfrazado de botón quedaba por debajo de los 44 px. En la computadora se toca
+  // con el mouse y no se nota; en el teléfono, con el pulgar, sí.
+  const hoja = todaLaHoja()
+  const conAreaTactil = /\.boton-principal,\s*\.boton-secundario\s*\{[^}]*display:\s*flex/
+  expect(hoja).toMatch(conAreaTactil)
+  expect(hoja).toMatch(/min-height:\s*var\(--toque-minimo\)/)
+})
