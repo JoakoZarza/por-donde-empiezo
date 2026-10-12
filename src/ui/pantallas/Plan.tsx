@@ -10,8 +10,8 @@ import {
   resumenDelReto,
   segundosRestantes,
   segundosTranscurridos,
-  ventajaSegundos,
 } from '../../domain/contrarreloj'
+import { calcularResultados, resultadoAnterior } from '../../domain/resultados'
 import type { EstiloDeReloj } from '../../domain/tipos'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
@@ -26,6 +26,13 @@ import type { Ambiente, Tarea } from '../../domain/tipos'
   El plan se lee por su id desde la URL, así recargar la página o volver a abrirla
   no pierde la sesión.
 */
+/** Los segundos en palabras, redondeados: «48 segundos», «1:05». */
+function enPalabras(segundos: number): string {
+  const total = Math.round(Math.abs(segundos))
+  if (total < 60) return `${total} segundo${total === 1 ? '' : 's'}`
+  return enReloj(total)
+}
+
 export default function Plan() {
   const { planId = '' } = useParams()
   const navegar = useNavigate()
@@ -149,7 +156,13 @@ export default function Plan() {
   // trabajo ya hecho. Va en el mismo lugar que la cuenta atrás, porque es la misma
   // información mirada al revés.
   const transcurridos = plan && ahora ? segundosTranscurridos(plan.creadoEn, ahora) : null
-  const ventaja = resumen && transcurridos !== null ? ventajaSegundos(resumen.minutosHechos, transcurridos) : null
+
+  /*
+    El resultado de la tarea anterior, quieto. En vivo el número cambiaba mientras se
+    trabajaba, y eso es ruido: no se puede leer mientras se limpia. Como resultado de
+    algo que ya terminaste, en cambio, dice algo concreto.
+  */
+  const anterior = plan ? resultadoAnterior(plan.pasos, indice, minutosPorTarea) : null
 
   async function alListo(): Promise<void> {
     try {
@@ -233,12 +246,53 @@ export default function Plan() {
 
   // Se terminó, o la persona dijo que no puede ahora.
   if (plan && (cortado || !paso)) {
+    const planilla = calcularResultados(plan.pasos, minutosPorTarea)
+
     return (
       <main className="pantalla">
         <h1 className="pantalla__titulo">El plan</h1>
         <p className="cierre">
           {hechos === total ? 'Terminaste lo que te propusiste.' : `Hiciste ${hechos} de ${total}.`}
         </p>
+
+        {planilla.realSegundos > 0 && (
+          <section className="grupo">
+            <h2 className="pantalla__titulo">Cómo te fue</h2>
+            <p className="resultado">
+              {planilla.diferenciaSegundos >= 0
+                ? `Le ganaste a la estimación por ${enPalabras(planilla.diferenciaSegundos)}.`
+                : `Te pasaste de la estimación por ${enPalabras(Math.abs(planilla.diferenciaSegundos))}.`}
+            </p>
+            <p className="menudo">
+              {enReloj(planilla.realSegundos)} de trabajo real, contra {enReloj(planilla.estimadoSegundos)} estimados.
+              {planilla.ganadas > 0 && ` Le ganaste a ${planilla.ganadas} ${planilla.ganadas === 1 ? 'tarea' : 'tareas'}.`}
+              {planilla.perdidas > 0 && ` Te pasaste en ${planilla.perdidas}.`}
+            </p>
+
+            <ul className="planilla">
+              {planilla.tareas.map((fila) => {
+                const cada = tareas[fila.tareaId]
+                return (
+                  <li key={fila.tareaId} className="fila">
+                    <span className="fila__nombre">
+                      {cada ? `${cada.accion} ${cada.descripcion}`.trim() : fila.tareaId}
+                    </span>
+                    <span className="fila__cifras tabular">
+                      {fila.realSegundos === null ? '—' : enReloj(fila.realSegundos)}
+                      {fila.diferenciaSegundos !== null && (
+                        <span className={fila.diferenciaSegundos < 0 ? 'ventaja ventaja--atras' : 'ventaja'}>
+                          {enVentaja(fila.diferenciaSegundos)}
+                        </span>
+                      )}
+                      {fila.conPausa && <span className="menudo">con pausa</span>}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        )}
+
         <div className="pantalla__pie">
           <button type="button" className="boton-principal" onClick={() => navegar('/sesion/nueva')}>
             Seguir un rato más
@@ -266,14 +320,7 @@ export default function Plan() {
             {Math.min(indice + 1, total)} de {total}
           </p>
           {estilo === 'carrera' && transcurridos !== null ? (
-            <span className="relojes">
-              <p className="reloj tabular">{enReloj(transcurridos)}</p>
-              {ventaja !== null && (
-                <p className={ventaja < 0 ? 'ventaja ventaja--atras tabular' : 'ventaja tabular'}>
-                  {enVentaja(ventaja)}
-                </p>
-              )}
-            </span>
+            <p className="reloj tabular">{enReloj(transcurridos)}</p>
           ) : (
             restantes !== null && (
               <p className={sinTiempo ? 'reloj reloj--agotado tabular' : 'reloj tabular'}>{enReloj(restantes)}</p>
@@ -311,6 +358,18 @@ export default function Plan() {
         {error && (
           <p className="alerta" role="status" aria-live="polite">
             {error}
+          </p>
+        )}
+
+        {anterior && (
+          <p className={anterior.diferenciaSegundos !== null && anterior.diferenciaSegundos < 0 ? 'resultado resultado--atras' : 'resultado'}>
+            {anterior.conPausa
+              ? 'La tarea anterior estuvo abierta mucho rato, así que no la contamos como resultado.'
+              : `Terminaste la anterior en ${enReloj(anterior.realSegundos ?? 0)}: ${
+                  anterior.diferenciaSegundos !== null && anterior.diferenciaSegundos < 0
+                    ? `te costó ${enPalabras(Math.abs(anterior.diferenciaSegundos))} más`
+                    : `te sobraron ${enPalabras(Math.abs(anterior.diferenciaSegundos ?? 0))}`
+                }.`}
           </p>
         )}
 

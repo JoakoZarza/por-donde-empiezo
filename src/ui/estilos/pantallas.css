@@ -287,16 +287,14 @@
   color: var(--color-humo);
 }
 
-/* El reloj de carrera: el tiempo que pasó, y al lado lo que vas ganando o perdiendo. */
-.relojes {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
+/*
+  El número de la ventaja o la desventaja. NO se muestra en vivo —cambiaría mientras
+  se trabaja, y eso es ruido que no se puede leer mientras se limpia—: aparece como
+  resultado de la tarea que se acaba de cerrar y en la planilla del final.
+*/
 .ventaja {
   margin: 0;
-  font-size: var(--texto-menudo);
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
   /* Ganar se ve en el color de lo ganado. */
   color: var(--color-menta);
@@ -307,6 +305,58 @@
   no se descuenta de ningún total ni corta ninguna racha.
 */
 .ventaja--atras {
+  color: var(--color-humo);
+}
+
+/* El resultado de la tarea que se acaba de cerrar, arriba de la tarjeta del paso. */
+.resultado {
+  margin: 0;
+  font-size: var(--texto-menudo);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-menta);
+}
+
+.resultado--atras {
+  color: var(--color-humo);
+}
+
+/* --- La planilla de resultados --- */
+
+.planilla {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-control);
+  background-color: var(--color-pared);
+}
+
+/* `min-width: 0` y el recorte: un nombre largo no puede empujar las cifras afuera. */
+.fila__nombre {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-hueso);
+}
+
+.fila__cifras {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 0.5rem;
   color: var(--color-humo);
 }
 

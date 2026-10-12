@@ -50,9 +50,25 @@ async function cerrarPaso(
   const paso = planActual.pasos[pasoActual]
   if (!paso) return
 
-  const pasos = planActual.pasos.map((actual, indice) =>
-    indice === pasoActual ? { ...actual, estado, hechoEn: ahora } : actual,
-  )
+  /*
+    Cuánto tardó: del momento en que este paso pasó a ser el actual hasta ahora. Si
+    no hay marca de inicio —un plan armado antes de que existiera la medición— se usa
+    el momento en que se armó el plan, que es la mejor aproximación disponible.
+  */
+  const desde = Date.parse(paso.empezadoEn ?? planActual.creadoEn)
+  const segundosReales = Math.max(0, Math.round((Date.parse(ahora) - desde) / 1000))
+
+  const pasos = planActual.pasos.map((actual, indice) => {
+    if (indice === pasoActual) {
+      return { ...actual, estado, hechoEn: ahora, segundosReales }
+    }
+    // El paso siguiente arranca ahora: es su marca de inicio, y sin ella no se podría
+    // medir nada.
+    if (indice === pasoActual + 1 && !actual.empezadoEn) {
+      return { ...actual, empezadoEn: ahora }
+    }
+    return actual
+  })
   const actualizado: Plan = { ...planActual, pasos }
 
   // Primero el registro del ciclo, después el plan. Si el primero falla, el plan
@@ -96,7 +112,23 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
     // Se retoma en el primer paso PENDIENTE, no en el primero: al recargar la
     // página el plan ya tiene pasos hechos, y volver al paso 1 los haría rehacer.
     const primeroPendiente = plan.pasos.findIndex((paso) => paso.estado === 'pendiente')
-    set({ planActual: plan, pasoActual: primeroPendiente === -1 ? plan.pasos.length : primeroPendiente })
+
+    /*
+      Y si el paso en curso no tiene marca de inicio, se le pone ahora: es lo que
+      permite medir cuánto tarda. Sin esto, la primera tarea de cada plan mediría
+      desde que se armó el plan, aunque la persona haya empezado mucho después.
+    */
+    const pasos =
+      primeroPendiente === -1 || plan.pasos[primeroPendiente]?.empezadoEn
+        ? plan.pasos
+        : plan.pasos.map((paso, indice) =>
+            indice === primeroPendiente ? { ...paso, empezadoEn: new Date().toISOString() } : paso,
+          )
+
+    set({
+      planActual: { ...plan, pasos },
+      pasoActual: primeroPendiente === -1 ? plan.pasos.length : primeroPendiente,
+    })
   },
 
   async avanzar(ahora) {

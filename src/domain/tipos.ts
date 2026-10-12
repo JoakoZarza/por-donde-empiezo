@@ -89,6 +89,13 @@ export interface Paso {
   tareaId: string
   estado: EstadoPaso
   hechoEn: string | null
+  /**
+   * Cuándo se empezó a trabajar en este paso. Nulo hasta que el paso anterior se
+   * cierra: es lo que permite medir cuánto tardó cada tarea.
+   */
+  empezadoEn?: string | null
+  /** Lo que tardó de verdad, medido al cerrarlo. Nulo mientras está pendiente. */
+  segundosReales?: number | null
 }
 
 export interface Plan {
