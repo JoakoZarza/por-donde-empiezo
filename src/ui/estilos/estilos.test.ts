@@ -92,3 +92,18 @@ test('un enlace con aspecto de botón conserva el área táctil mínima', () => 
   expect(hoja).toMatch(conAreaTactil)
   expect(hoja).toMatch(/min-height:\s*var\(--toque-minimo\)/)
 })
+
+test('un nombre largo escrito por la persona no puede romper la pantalla del paso', () => {
+  /*
+    El caso 3 de Review Focus: una tarea de 150 caracteres, o una cadena sin
+    espacios. En jsdom no hay layout que medir, así que se prueba el contrato del
+    CSS, que es lo que impide el desborde: el recorte a tres líneas, el corte de
+    palabras largas, y los hijos flexibles con `min-width: 0` —sin eso, un hijo
+    flexible se niega a encogerse y empuja el botón fuera de la pantalla igual—.
+  */
+  const hoja = todaLaHoja()
+  expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*-webkit-line-clamp:\s*3/)
+  expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*overflow-wrap:\s*anywhere/)
+  expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*overflow:\s*hidden/)
+  expect(hoja).toMatch(/min-width:\s*0/)
+})

@@ -173,8 +173,10 @@ test('si el plan quedó vacío explica por qué y ofrece seguir', async () => {
   await planManual([])
   montar(`manual-${contador}`)
 
-  const explicacion = await screen.findByText(/minutos/i)
-  expect(explicacion).toBeInTheDocument()
+  // Se busca el texto de la advertencia, no `/minutos/i`: eso último matchearía
+  // cualquier cosa que dijera «minutos» en cualquier parte de la pantalla, incluida
+  // la duración de una tarea.
+  expect(await screen.findByText(/no entra ninguna tarea/i)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /seguir con más tiempo/i })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Listo' })).not.toBeInTheDocument()
 })

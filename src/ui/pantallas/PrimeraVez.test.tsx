@@ -93,10 +93,21 @@ test('al avanzar guarda el ambiente elegido y todas sus tareas', async () => {
   expect(tareas.every((t) => t.esDelCatalogo)).toBe(true)
 })
 
-test('no guarda nada si no se eligió ningún ambiente', async () => {
+test('sin ningún ambiente elegido, el botón está deshabilitado y la pantalla lo dice', async () => {
+  /*
+    Antes este test hacía clic en el botón deshabilitado y comprobaba que no había
+    pasado nada: verdadero por construcción, porque un botón deshabilitado no dispara
+    nada nunca. Lo que importa —y lo que se prueba ahora— es que la pantalla AVISE,
+    que es la regla de «una pantalla vacía nunca se deja en blanco».
+  */
   const usuario = userEvent.setup()
   montar()
-  await usuario.click(screen.getByRole('button', { name: /armá las tareas/i })).catch(() => undefined)
+
+  const boton = screen.getByRole('button', { name: /armá las tareas/i })
+  expect(boton).toBeDisabled()
+  expect(screen.getByText(/elegí al menos un ambiente/i)).toBeInTheDocument()
+
+  await usuario.click(boton)
   expect(await repo.listarAmbientes()).toEqual([])
 })
 

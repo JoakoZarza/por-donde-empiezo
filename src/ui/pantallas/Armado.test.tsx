@@ -110,8 +110,16 @@ test('no guarda una tarea propia con el nombre vacío, y lo explica', async () =
   expect(guardadas.every((t) => t.esDelCatalogo)).toBe(true)
 })
 
-test('un nombre de 150 caracteres entra igual, sin romper nada', async () => {
-  // Caso 3 de Review Focus, la otra mitad.
+test('un nombre de 150 caracteres se guarda completo: el recorte es solo visual', async () => {
+  /*
+    Caso 3 de Review Focus, la mitad de los datos.
+
+    La otra mitad —que un nombre largo no empuje el botón fuera de la pantalla— se
+    prueba en `estilos.test.ts`, porque en jsdom no hay layout que medir y este test
+    solo podía afirmar que se guardó. Acá se fija lo complementario: el texto se
+    guarda ENTERO. El recorte a tres líneas es de la pantalla, y truncar el dato
+    sería perder lo que la persona escribió.
+  */
   const usuario = userEvent.setup()
   montar()
   await screen.findByRole('heading', { name: /mesada/i })
@@ -124,7 +132,11 @@ test('un nombre de 150 caracteres entra igual, sin romper nada', async () => {
   await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
 
   await waitFor(async () => {
-    const guardadas = await repo.listarTareas('cocina')
-    expect(guardadas.some((t) => t.accion === largo)).toBe(true)
+    const guardada = (await repo.listarTareas('cocina')).find((t) => t.accion === largo)
+    expect(guardada).toBeDefined()
+    expect(guardada?.accion).toHaveLength(largo.length)
   })
+
+  // Y la pantalla sigue entera: el grupo no se perdió al entrar el nombre largo.
+  expect(screen.getByRole('heading', { name: /mesada/i })).toBeInTheDocument()
 })

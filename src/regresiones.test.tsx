@@ -157,5 +157,9 @@ test('M6: si el respaldo del arranque elige una tarea con dependencias, lo advie
     { ambienteAnterior: null, herramientasEnMano: [] },
     'arrancarYa',
   )
-  expect(resultado?.advertencia).not.toBeNull()
+  // Se comprueba el contenido, no solo que el campo exista: `expect(undefined).not.toBeNull()`
+  // daría verde con la función devolviendo nada, que es justo la regresión que este
+  // test dice cubrir.
+  expect(resultado).not.toBeNull()
+  expect(resultado?.advertencia).toMatch(/se usa la más corta/)
 })

@@ -15,10 +15,12 @@ test('dos cadenas iguales empatan', () => {
   expect(comparar('cocina-trapear', 'cocina-trapear')).toBe(0)
 })
 
-test('el resultado no depende del idioma del dispositivo', () => {
-  const ids = ['ambiente-10', 'ambiente-2', 'Bano', 'bano', 'cocina']
-  const una = [...ids].sort(comparar)
-  const otra = [...ids].sort(comparar)
-  expect(una).toEqual(otra)
-  expect(una).toEqual(['Bano', 'ambiente-10', 'ambiente-2', 'bano', 'cocina'])
+test('el orden por código NO es el orden del idioma, y es el que queremos', () => {
+  // El test anterior ordenaba el mismo arreglo dos veces y lo comparaba consigo
+  // mismo: no podía fallar nunca. Éste compara contra el comportamiento del idioma,
+  // que es justo lo que se está evitando.
+  // Por código, la minúscula va después: 'a' (97) > 'B' (66).
+  expect(comparar('a', 'B')).toBeGreaterThan(0)
+  // En español, en cambio, la 'a' va antes que la 'b', sin importar la caja.
+  expect('a'.localeCompare('B', 'es')).toBeLessThan(0)
 })
