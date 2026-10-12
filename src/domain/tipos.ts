@@ -127,11 +127,23 @@ export interface EntradaPlan {
   herramientasDisponibles: string[]
 }
 
+/**
+ * Cómo se mide el tiempo durante el trabajo.
+ *
+ * `cuentaAtras` baja desde el presupuesto hasta cero. `carrera` sube desde cero y
+ * muestra la ventaja o la desventaja contra lo que estaba estimado: terminás antes
+ * y ganás segundos, terminás después y los perdés. Ninguna de las dos cuesta nada:
+ * el tiempo es información, no una deuda.
+ */
+export type EstiloDeReloj = 'cuentaAtras' | 'carrera'
+
 export interface Preferencias {
   herramientasDisponibles: string[]
   modoPorDefecto: Modo
   /** Minutos de los retos contrarreloj. */
   duracionRetoPreferida: number
+  /** Cuál de los dos relojes se usa al trabajar. */
+  estiloDeReloj: EstiloDeReloj
   /**
    * La playlist de la persona, si pegó una. Nulo significa que la app ofrece sus
    * propias búsquedas. Es una dirección, no un identificador: sirve igual para

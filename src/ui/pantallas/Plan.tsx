@@ -2,7 +2,17 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
-import { enReloj, estadoDelReto, finDelReto, resumenDelReto, segundosRestantes } from '../../domain/contrarreloj'
+import {
+  enReloj,
+  enVentaja,
+  estadoDelReto,
+  finDelReto,
+  resumenDelReto,
+  segundosRestantes,
+  segundosTranscurridos,
+  ventajaSegundos,
+} from '../../domain/contrarreloj'
+import type { EstiloDeReloj } from '../../domain/tipos'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
@@ -46,6 +56,22 @@ export default function Plan() {
     const latido = setInterval(() => setAhora(new Date().toISOString()), 1000)
     return () => clearInterval(latido)
   }, [plan?.presupuestoSegundos])
+
+  // Cuál de los dos relojes quiere la persona. Se lee una vez al abrir la pantalla.
+  const [estilo, setEstilo] = useState<EstiloDeReloj>('cuentaAtras')
+
+  useEffect(() => {
+    let vigente = true
+
+    void (async () => {
+      const { estiloDeReloj } = await repositorio.preferencias()
+      if (vigente) setEstilo(estiloDeReloj)
+    })()
+
+    return () => {
+      vigente = false
+    }
+  }, [repositorio])
 
   useTitulo('El plan')
 
@@ -118,6 +144,12 @@ export default function Plan() {
   const resumen = plan ? resumenDelReto(plan.pasos, minutosPorTarea) : null
   const sinTiempo =
     resumen !== null && restantes !== null && estadoDelReto(resumen, restantes) === 'seAcaboElTiempo'
+
+  // El reloj de carrera: cuánto pasó, y la diferencia contra lo estimado para el
+  // trabajo ya hecho. Va en el mismo lugar que la cuenta atrás, porque es la misma
+  // información mirada al revés.
+  const transcurridos = plan && ahora ? segundosTranscurridos(plan.creadoEn, ahora) : null
+  const ventaja = resumen && transcurridos !== null ? ventajaSegundos(resumen.minutosHechos, transcurridos) : null
 
   async function alListo(): Promise<void> {
     try {
@@ -233,8 +265,19 @@ export default function Plan() {
           <p className="menudo tabular">
             {Math.min(indice + 1, total)} de {total}
           </p>
-          {restantes !== null && (
-            <p className={sinTiempo ? 'reloj reloj--agotado tabular' : 'reloj tabular'}>{enReloj(restantes)}</p>
+          {estilo === 'carrera' && transcurridos !== null ? (
+            <span className="relojes">
+              <p className="reloj tabular">{enReloj(transcurridos)}</p>
+              {ventaja !== null && (
+                <p className={ventaja < 0 ? 'ventaja ventaja--atras tabular' : 'ventaja tabular'}>
+                  {enVentaja(ventaja)}
+                </p>
+              )}
+            </span>
+          ) : (
+            restantes !== null && (
+              <p className={sinTiempo ? 'reloj reloj--agotado tabular' : 'reloj tabular'}>{enReloj(restantes)}</p>
+            )
           )}
         </div>
         {/*
@@ -242,7 +285,7 @@ export default function Plan() {
           los botones de siempre siguen ahí y la persona decide si para o si sigue.
           Lo que hizo ya está anotado, y los totales no bajaron nada.
         */}
-        {sinTiempo && resumen && (
+        {sinTiempo && estilo === 'cuentaAtras' && resumen && (
           <p className="menudo">
             Se acabó el tiempo: hiciste {resumen.hechos} de {resumen.total}. Podés seguir igual, se anota todo.
           </p>

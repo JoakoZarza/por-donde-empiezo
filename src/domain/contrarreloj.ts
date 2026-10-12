@@ -73,3 +73,31 @@ export function enReloj(segundos: number): string {
 
   return horas > 0 ? `${horas}:${dosDigitos(minutos)}:${dosDigitos(resto)}` : `${dosDigitos(minutos)}:${dosDigitos(resto)}`
 }
+
+/*
+  El reloj de carrera.
+
+  En vez de bajar hasta cero, sube desde cero, y al lado va la diferencia contra lo
+  que estaba estimado para el trabajo ya hecho. Si hiciste veinte minutos de tareas
+  en dieciséis, vas +4:00; si tardaste veinticuatro, vas −4:00. Es la misma
+  información que una cuenta atrás, pero al derecho: dice cuánto llevás ganado en vez
+  de cuánto te queda, y eso se siente distinto —y para mucha gente, mejor—.
+
+  La desventaja NO cuesta nada: no se descuenta de ningún total, no corta ninguna
+  racha. Es un resultado de carrera, no una multa.
+*/
+
+/** Los segundos que pasaron desde que se armó el plan. */
+export function segundosTranscurridos(creadoEn: string, ahora: string): number {
+  return Math.max(0, Math.floor((Date.parse(ahora) - Date.parse(creadoEn)) / 1000))
+}
+
+/** Los segundos ganados (positivos) o perdidos (negativos) contra lo estimado. */
+export function ventajaSegundos(minutosHechos: number, transcurridos: number): number {
+  return minutosHechos * 60 - transcurridos
+}
+
+/** La ventaja con su signo: `+2:30`, `−1:05`. El menos es tipográfico, no un guion. */
+export function enVentaja(segundos: number): string {
+  return `${segundos < 0 ? '−' : '+'}${enReloj(Math.abs(segundos))}`
+}

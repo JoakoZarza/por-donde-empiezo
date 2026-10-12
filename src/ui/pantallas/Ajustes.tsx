@@ -7,7 +7,7 @@ import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
-import type { Modo, Preferencias } from '../../domain/tipos'
+import type { EstiloDeReloj, Modo, Preferencias } from '../../domain/tipos'
 
 /*
   Ajustes: lo que la app necesita saber de tu casa para no proponerte cosas
@@ -24,6 +24,11 @@ const MODOS: { valor: Modo; nombre: string }[] = [
   { valor: 'arrancarYa', nombre: 'Arrancar ya' },
   { valor: 'ambientePorAmbiente', nombre: 'Ambiente por ambiente' },
   { valor: 'puestaAPunto', nombre: 'Puesta a punto' },
+]
+
+const ESTILOS: { valor: EstiloDeReloj; nombre: string }[] = [
+  { valor: 'carrera', nombre: 'Carrera: el reloj sube y ves cuánto ganás' },
+  { valor: 'cuentaAtras', nombre: 'Cuenta atrás: el reloj baja hasta cero' },
 ]
 
 /*
@@ -99,13 +104,32 @@ export default function Ajustes() {
     // Se sacan los espacios de los costados: pegar una clave arrastra un salto de
     // línea casi siempre, y después el error es imposible de ver.
     const limpia = clave.trim()
-    await guardar({ claveDeIa: limpia === '' ? null : limpia })
-    setMensaje(limpia === '' ? 'Listo, borramos la clave de este teléfono.' : 'Listo, la clave quedó guardada.')
+    if (limpia === '') {
+      // Antes esto no hacía nada y no decía nada, que es la peor combinación: la
+      // persona toca, no pasa nada, y no sabe si la app está rota o si se equivocó.
+      setMensaje(null)
+      setError('Pegá una clave primero. Si ya no querés usar la IA, tocá «Borrar la clave».')
+      return
+    }
+
+    await guardar({ claveDeIa: limpia })
+    setClave('')
+    setMensaje('Listo, la clave quedó guardada en este teléfono.')
+  }
+
+  async function borrarClave(): Promise<void> {
+    await guardar({ claveDeIa: null })
+    setClave('')
+    setMensaje('Listo, borramos la clave de este teléfono.')
   }
 
   async function probarClave(): Promise<void> {
     const limpia = clave.trim()
-    if (limpia === '') return
+    if (limpia === '') {
+      setMensaje(null)
+      setError('Escribí la clave en el campo de arriba y después tocá «Probar».')
+      return
+    }
 
     setProbando(true)
     setError(null)
@@ -295,42 +319,94 @@ export default function Ajustes() {
           </span>
         </label>
 
-        {preferencias.avisoDePrivacidadAceptado && (
-          <form
-            onSubmit={(evento) => {
-              evento.preventDefault()
-              void guardarClave()
-            }}
-          >
-            <label className="menudo" htmlFor="clave-ia">
-              Tu clave de Google
-            </label>
-            <input
-              id="clave-ia"
-              name="clave-ia"
-              type="password"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="Pegá tu clave acá…"
-              value={clave}
-              onChange={(evento) => setClave(evento.target.value)}
-            />
-            <div className="acciones">
-              <button type="submit" className="boton-secundario">
-                Guardar la clave
-              </button>
-              <button
-                type="button"
-                className="boton-secundario"
-                onClick={() => void probarClave()}
-                aria-busy={probando}
-              >
-                {probando ? 'Probando…' : 'Probar'}
-              </button>
-            </div>
-          </form>
+        {preferencias.claveDeIa && (
+          <p className="menudo">
+            Hay una clave guardada en este teléfono.{' '}
+            <button type="button" className="boton-secundario" onClick={() => void borrarClave()}>
+              Borrar la clave
+            </button>
+          </p>
         )}
+
+        <form
+          onSubmit={(evento) => {
+            evento.preventDefault()
+            void guardarClave()
+          }}
+        >
+          <label className="menudo" htmlFor="clave-ia">
+            Tu clave de Google
+          </label>
+          {/*
+            El campo se muestra siempre, deshabilitado hasta que se acepta el aviso.
+            Antes aparecía recién al aceptarlo, así que tocar el tilde parecía no
+            hacer nada: la pantalla cambiaba abajo, fuera de la vista.
+          */}
+          {!preferencias.avisoDePrivacidadAceptado && (
+            <p className="menudo">Aceptá el aviso de arriba para poder cargarla.</p>
+          )}
+          <input
+            id="clave-ia"
+            name="clave-ia"
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="Pegá tu clave acá…"
+            value={clave}
+            disabled={!preferencias.avisoDePrivacidadAceptado}
+            onChange={(evento) => setClave(evento.target.value)}
+          />
+          <div className="acciones">
+            <button
+              type="submit"
+              className="boton-secundario"
+              disabled={!preferencias.avisoDePrivacidadAceptado}
+            >
+              Guardar la clave
+            </button>
+            <button
+              type="button"
+              className="boton-secundario"
+              onClick={() => void probarClave()}
+              disabled={!preferencias.avisoDePrivacidadAceptado}
+              aria-busy={probando}
+            >
+              {probando ? 'Probando…' : 'Probar'}
+            </button>
+          </div>
+        </form>
       </section>
+
+      <fieldset className="grupo">
+        <legend className="menudo">Cómo medimos el tiempo</legend>
+        <p className="menudo">
+          La cuenta atrás baja hasta cero y se siente como una carrera contra el reloj. La carrera sube y te va
+          mostrando cuántos segundos ganás o perdés contra lo que estaba estimado: terminás antes y ganás, terminás
+          después y perdés. Ninguna de las dos te cuesta nada.
+        </p>
+        <ul className="fichas fichas--una-columna">
+          {ESTILOS.map((opcion) => (
+            <li key={opcion.valor}>
+              <label
+                htmlFor={`reloj-${opcion.valor}`}
+                className={preferencias.estiloDeReloj === opcion.valor ? 'ficha ficha--elegida' : 'ficha'}
+              >
+                <input
+                  id={`reloj-${opcion.valor}`}
+                  type="radio"
+                  name="estiloDeReloj"
+                  value={opcion.valor}
+                  className="ficha__entrada"
+                  checked={preferencias.estiloDeReloj === opcion.valor}
+                  onChange={() => void guardar({ estiloDeReloj: opcion.valor })}
+                />
+                <span className="ficha__marca" aria-hidden="true" />
+                <span className="ficha__texto">{opcion.nombre}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </fieldset>
 
       <section className="grupo">
         <h2 className="pantalla__titulo">Tus datos</h2>

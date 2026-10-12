@@ -287,6 +287,29 @@
   color: var(--color-humo);
 }
 
+/* El reloj de carrera: el tiempo que pasó, y al lado lo que vas ganando o perdiendo. */
+.relojes {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.ventaja {
+  margin: 0;
+  font-size: var(--texto-menudo);
+  font-weight: 600;
+  /* Ganar se ve en el color de lo ganado. */
+  color: var(--color-menta);
+}
+
+/*
+  Perder tiempo va en gris, nunca en rojo. Es un resultado de carrera, no una multa:
+  no se descuenta de ningún total ni corta ninguna racha.
+*/
+.ventaja--atras {
+  color: var(--color-humo);
+}
+
 /*
   El escenario: el hueco del medio de la pantalla, que es el cuarto. La lámpara va
   posicionada detrás de la tarjeta, no en el flujo: si estuviera en el flujo se ve

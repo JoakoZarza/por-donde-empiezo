@@ -159,6 +159,7 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         herramientasDisponibles: fila.herramientasDisponibles ?? PREFERENCIAS_POR_DEFECTO.herramientasDisponibles,
         modoPorDefecto: fila.modoPorDefecto ?? PREFERENCIAS_POR_DEFECTO.modoPorDefecto,
         duracionRetoPreferida: fila.duracionRetoPreferida ?? PREFERENCIAS_POR_DEFECTO.duracionRetoPreferida,
+        estiloDeReloj: fila.estiloDeReloj ?? PREFERENCIAS_POR_DEFECTO.estiloDeReloj,
         playlistPropia: fila.playlistPropia ?? null,
         claveDeIa: fila.claveDeIa ?? null,
         avisoDePrivacidadAceptado: fila.avisoDePrivacidadAceptado ?? false,

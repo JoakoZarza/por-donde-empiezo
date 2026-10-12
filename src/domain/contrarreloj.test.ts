@@ -1,5 +1,14 @@
 import { expect, test } from 'vitest'
-import { enReloj, estadoDelReto, finDelReto, resumenDelReto, segundosRestantes } from './contrarreloj'
+import {
+  enReloj,
+  enVentaja,
+  estadoDelReto,
+  finDelReto,
+  resumenDelReto,
+  segundosRestantes,
+  segundosTranscurridos,
+  ventajaSegundos,
+} from './contrarreloj'
 import type { Paso } from './tipos'
 
 /*
@@ -70,4 +79,29 @@ test('saltear todas las tareas también cierra el reto', () => {
   const todoSalteado = resumenDelReto([paso('a', 'salteado'), paso('b', 'salteado')], MINUTOS)
   expect(todoSalteado.pendientes).toBe(0)
   expect(estadoDelReto(todoSalteado, 0)).toBe('cumplido')
+})
+
+test('el reloj de carrera sube, y nunca va para atrás', () => {
+  const creado = '2026-10-10T21:00:00.000Z'
+  expect(segundosTranscurridos(creado, '2026-10-10T21:05:00.000Z')).toBe(300)
+  // Un teléfono con la fecha mal puesta no puede mostrar un tiempo negativo.
+  expect(segundosTranscurridos(creado, '2026-10-10T20:00:00.000Z')).toBe(0)
+})
+
+test('la ventaja se mide contra lo estimado para el trabajo hecho', () => {
+  // Veinte minutos de tareas hechos en dieciséis: cuatro minutos ganados.
+  expect(ventajaSegundos(20, 16 * 60)).toBe(240)
+  // Los mismos veinte en veinticuatro: cuatro perdidos.
+  expect(ventajaSegundos(20, 24 * 60)).toBe(-240)
+  // Sin nada hecho y sin tiempo corrido, la carrera está empatada.
+  expect(ventajaSegundos(0, 0)).toBe(0)
+})
+
+test('la ventaja se escribe con signo, y con el menos tipográfico', () => {
+  expect(enVentaja(150)).toBe('+02:30')
+  expect(enVentaja(-65)).toBe('−01:05')
+  expect(enVentaja(0)).toBe('+00:00')
+  // El menos es el carácter «−» (U+2212), no un guion: en la tipografía de display
+  // se nota, y AGENTS.md pide los caracteres tipográficos.
+  expect(enVentaja(-1)).not.toContain('-')
 })
