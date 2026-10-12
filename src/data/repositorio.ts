@@ -68,4 +68,6 @@ export const PREFERENCIAS_POR_DEFECTO: Preferencias = {
   modoPorDefecto: 'arrancarYa',
   duracionRetoPreferida: 10,
   playlistPropia: null,
+  claveDeIa: null,
+  avisoDePrivacidadAceptado: false,
 }

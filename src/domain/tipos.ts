@@ -138,6 +138,17 @@ export interface Preferencias {
    * Spotify que para YouTube, y no ata la app a ninguna plataforma.
    */
   playlistPropia: string | null
+  /**
+   * La clave de IA de la persona. Vive solo en este teléfono y viaja únicamente al
+   * proveedor elegido, en el pedido que ella dispara. Nunca se registra en ningún
+   * lado, ni siquiera en un mensaje de error.
+   */
+  claveDeIa: string | null
+  /**
+   * Si la persona leyó y aceptó la advertencia de privacidad. Sin esto, la app no
+   * hace ni un pedido: la IA se activa solo después de un sí explícito.
+   */
+  avisoDePrivacidadAceptado: boolean
 }
 
 /** Las herramientas que la app asume si la persona no dijo nada. */

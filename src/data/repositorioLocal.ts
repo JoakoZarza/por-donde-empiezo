@@ -160,6 +160,8 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         modoPorDefecto: fila.modoPorDefecto ?? PREFERENCIAS_POR_DEFECTO.modoPorDefecto,
         duracionRetoPreferida: fila.duracionRetoPreferida ?? PREFERENCIAS_POR_DEFECTO.duracionRetoPreferida,
         playlistPropia: fila.playlistPropia ?? null,
+        claveDeIa: fila.claveDeIa ?? null,
+        avisoDePrivacidadAceptado: fila.avisoDePrivacidadAceptado ?? false,
       }
     },
 

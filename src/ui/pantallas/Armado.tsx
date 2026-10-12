@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { ambientePorId, objetoPorId, objetosDeAmbiente, tareasDeAmbiente } from '../../domain/catalogo'
 import { nuevoId } from '../id'
+import { armarPedido, leerSugerencias } from '../../domain/ia'
+import { consultarIa, FalloDeIa, leerImagen } from '../../data/iaCliente'
+import type { Sugerencia } from '../../domain/ia'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import type { Ambiente, Tarea } from '../../domain/tipos'
@@ -28,6 +31,12 @@ export default function Armado() {
   const [siguiente, setSiguiente] = useState<Ambiente | null>(null)
   const [propia, setPropia] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [iaTexto, setIaTexto] = useState('')
+  const [iaFoto, setIaFoto] = useState<File | null>(null)
+  const [sugerencias, setSugerencias] = useState<Sugerencia[]>([])
+  const [elegidas, setElegidas] = useState<number[]>([])
+  const [pensando, setPensando] = useState(false)
+  const [iaError, setIaError] = useState<string | null>(null)
 
   const ambiente = ambientePorId(ambienteId)
   useTitulo(ambiente?.nombre ?? 'Armar el ambiente')
@@ -122,6 +131,83 @@ export default function Armado() {
     }
   }
 
+  /*
+    La IA propone, la persona decide.
+
+    Nada de lo que devuelve el modelo entra en la lista por su cuenta: se muestra con
+    una tilde puesta —porque si pidió ideas es porque las quiere— y recién cuando
+    toca «Agregar las elegidas» se convierten en tareas.
+  */
+  async function pedirIdeas(): Promise<void> {
+    setIaError(null)
+    setPensando(true)
+    try {
+      const { claveDeIa, avisoDePrivacidadAceptado } = await repositorio.preferencias()
+      if (!claveDeIa || !avisoDePrivacidadAceptado) {
+        setIaError('Para pedir ideas primero hay que configurar la clave y aceptar el aviso, en Ajustes.')
+        return
+      }
+
+      const imagen = iaFoto ? await leerImagen(iaFoto) : null
+      const pedido = armarPedido({
+        ambiente: ambiente?.nombre ?? 'este ambiente',
+        yaIncluidas: conocidas
+          .filter((tarea) => incluidas.includes(tarea.id))
+          .map((tarea) => `${tarea.accion} ${tarea.descripcion}`.trim()),
+        descripcion: iaTexto.trim() === '' ? null : iaTexto.trim(),
+        hayFoto: imagen !== null,
+      })
+
+      const respuesta = await consultarIa({ clave: claveDeIa, texto: pedido, imagen })
+      const leidas = leerSugerencias(respuesta)
+      setSugerencias(leidas)
+      setElegidas(leidas.map((_, indice) => indice))
+
+      if (leidas.length === 0) {
+        setIaError('La IA no propuso nada que se pueda usar. Probá contando un poco más.')
+      }
+    } catch (falla) {
+      setIaError(falla instanceof FalloDeIa ? falla.message : 'No pudimos pedir ideas.')
+    } finally {
+      setPensando(false)
+    }
+  }
+
+  async function agregarSugerencias(): Promise<void> {
+    for (const indice of elegidas) {
+      const sugerencia = sugerencias[indice]
+      if (!sugerencia) continue
+
+      const tarea: Tarea = {
+        id: `ia-${nuevoId()}`,
+        ambienteId,
+        subAmbienteId: null,
+        objetoId: null,
+        verbo: sugerencia.verbo,
+        accion: sugerencia.accion,
+        descripcion: sugerencia.descripcion,
+        duracionMin: sugerencia.duracionMin,
+        // Una idea de la IA no viene con esfuerzo ni impacto medidos, así que se
+        // asume el medio: no se le inventa un dato que después ordena el plan.
+        esfuerzo: 2,
+        impactoVisual: 2,
+        requiere: [],
+        herramientas: [],
+        esDelCatalogo: false,
+        notas: 'Sugerida por la IA.',
+      }
+
+      await repositorio.guardarTarea(tarea)
+      setConocidas((previas) => [...previas, tarea])
+      setIncluidas((previas) => [...previas, tarea.id])
+    }
+
+    setSugerencias([])
+    setElegidas([])
+    setIaTexto('')
+    setIaFoto(null)
+  }
+
   async function agregar(): Promise<void> {
     const texto = propia.trim()
     if (texto === '') {
@@ -205,6 +291,83 @@ export default function Armado() {
             {error}
           </p>
         )}
+        <section className="grupo">
+          <h2 className="pantalla__titulo">¿No sabés por dónde empezar?</h2>
+          <p className="menudo">
+            Contá lo que ves, o sacale una foto, y la IA te tira ideas. Vos elegís cuáles quedan.
+          </p>
+
+          <label className="menudo" htmlFor="ia-texto">
+            Contá lo que ves
+          </label>
+          <textarea
+            id="ia-texto"
+            name="ia-texto"
+            rows={3}
+            value={iaTexto}
+            placeholder="Ejemplo: hay ropa tirada y la mesada llena de cosas…"
+            onChange={(evento) => setIaTexto(evento.target.value)}
+          />
+
+          <label className="menudo" htmlFor="ia-foto">
+            O sacale una foto
+          </label>
+          <input
+            id="ia-foto"
+            name="ia-foto"
+            type="file"
+            accept="image/*"
+            onChange={(evento) => setIaFoto(evento.target.files?.[0] ?? null)}
+          />
+
+          <button type="button" className="boton-secundario" onClick={() => void pedirIdeas()} aria-busy={pensando}>
+            {pensando ? 'Pensando…' : 'Pedir ideas'}
+          </button>
+
+          {iaError && (
+            <p className="alerta" role="status" aria-live="polite">
+              {iaError}
+            </p>
+          )}
+
+          {sugerencias.length > 0 && (
+            <ul className="fichas fichas--una-columna">
+              {sugerencias.map((sugerencia, indice) => (
+                <li key={`${sugerencia.accion}-${indice}`} className="tarea">
+                  <label className="ficha" htmlFor={`idea-${indice}`}>
+                    <input
+                      id={`idea-${indice}`}
+                      type="checkbox"
+                      className="ficha__entrada"
+                      checked={elegidas.includes(indice)}
+                      onChange={() =>
+                        setElegidas((previas) =>
+                          previas.includes(indice) ? previas.filter((cada) => cada !== indice) : [...previas, indice],
+                        )
+                      }
+                    />
+                    <span className="ficha__marca" aria-hidden="true" />
+                    <span className="ficha__texto">
+                      {`${sugerencia.accion} ${sugerencia.descripcion}`.trim()}
+                      <span className="menudo">{sugerencia.duracionMin}&nbsp;min</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {sugerencias.length > 0 && (
+            <button type="button" className="boton-secundario" onClick={() => void agregarSugerencias()}>
+              Agregar las elegidas
+            </button>
+          )}
+
+          <Link className="menudo" to="/ajustes">
+            Configurar la IA
+          </Link>
+        </section>
+
         <button type="button" className="boton-secundario" onClick={() => void agregar()}>
           Agregar
         </button>

@@ -6,6 +6,7 @@ import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
+import { consultarIa, FalloDeIa } from '../../data/iaCliente'
 import type { Modo, Preferencias } from '../../domain/tipos'
 
 /*
@@ -45,6 +46,8 @@ export default function Ajustes() {
   const [error, setError] = useState<string | null>(null)
   const [guardado, setGuardado] = useState(false)
   const [mensaje, setMensaje] = useState<string | null>(null)
+  const [clave, setClave] = useState('')
+  const [probando, setProbando] = useState(false)
 
   useTitulo('Ajustes')
 
@@ -90,6 +93,33 @@ export default function Ajustes() {
       ? preferencias.herramientasDisponibles.filter((cada) => cada !== herramienta)
       : [...preferencias.herramientasDisponibles, herramienta]
     await guardar({ herramientasDisponibles: lista })
+  }
+
+  async function guardarClave(): Promise<void> {
+    // Se sacan los espacios de los costados: pegar una clave arrastra un salto de
+    // línea casi siempre, y después el error es imposible de ver.
+    const limpia = clave.trim()
+    await guardar({ claveDeIa: limpia === '' ? null : limpia })
+    setMensaje(limpia === '' ? 'Listo, borramos la clave de este teléfono.' : 'Listo, la clave quedó guardada.')
+  }
+
+  async function probarClave(): Promise<void> {
+    const limpia = clave.trim()
+    if (limpia === '') return
+
+    setProbando(true)
+    setError(null)
+    setMensaje(null)
+    try {
+      // Un pedido de una palabra: alcanza para saber si la clave sirve, y gasta lo
+      // mínimo de la cuota gratuita de la persona.
+      const respuesta = await consultarIa({ clave: limpia, texto: 'Contestá solamente: listo', imagen: null })
+      setMensaje(`La clave funciona. La IA contestó «${respuesta.slice(0, 40)}».`)
+    } catch (falla) {
+      setError(falla instanceof FalloDeIa ? falla.message : 'No pudimos probar la clave.')
+    } finally {
+      setProbando(false)
+    }
   }
 
   async function guardarCopia(): Promise<void> {
@@ -238,6 +268,69 @@ export default function Ajustes() {
           Guardar la playlist
         </button>
       </form>
+
+      <section className="grupo">
+        <h2 className="pantalla__titulo">Ideas con IA</h2>
+        <p className="menudo">
+          Es opcional, y la app funciona entera sin esto: la IA sirve para tirarte ideas cuando no sabés por dónde
+          empezar con un ambiente.
+        </p>
+
+        <label className="ficha" htmlFor="acepto-ia">
+          <input
+            id="acepto-ia"
+            type="checkbox"
+            className="ficha__entrada"
+            checked={preferencias.avisoDePrivacidadAceptado}
+            onChange={(evento) => void guardar({ avisoDePrivacidadAceptado: evento.target.checked })}
+          />
+          <span className="ficha__marca" aria-hidden="true" />
+          <span className="ficha__texto">
+            Entiendo y quiero usarla
+            <span className="menudo">
+              Tu clave se guarda solo en este teléfono y se manda únicamente a Google, cuando vos pedís una idea. No
+              pasa por ningún servidor nuestro, porque no tenemos. Si perdés el teléfono, revocá la clave desde tu
+              cuenta de Google.
+            </span>
+          </span>
+        </label>
+
+        {preferencias.avisoDePrivacidadAceptado && (
+          <form
+            onSubmit={(evento) => {
+              evento.preventDefault()
+              void guardarClave()
+            }}
+          >
+            <label className="menudo" htmlFor="clave-ia">
+              Tu clave de Google
+            </label>
+            <input
+              id="clave-ia"
+              name="clave-ia"
+              type="password"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="Pegá tu clave acá…"
+              value={clave}
+              onChange={(evento) => setClave(evento.target.value)}
+            />
+            <div className="acciones">
+              <button type="submit" className="boton-secundario">
+                Guardar la clave
+              </button>
+              <button
+                type="button"
+                className="boton-secundario"
+                onClick={() => void probarClave()}
+                aria-busy={probando}
+              >
+                {probando ? 'Probando…' : 'Probar'}
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
 
       <section className="grupo">
         <h2 className="pantalla__titulo">Tus datos</h2>
