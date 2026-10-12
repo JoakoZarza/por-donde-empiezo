@@ -1,5 +1,6 @@
 import { puntaje } from './puntaje'
 import type { ContextoPuntaje } from './puntaje'
+import { comparar } from '../orden'
 import type { EntradaPlan, Modo, Tarea } from '../tipos'
 
 /*
@@ -35,7 +36,7 @@ export function elegirAmbienteDeArranque(
   const ordenados = [...candidatos].sort((a, b) => {
     if (entrada.modo === 'puestaAPunto') {
       if (a.ordenRecorrido !== b.ordenRecorrido) return a.ordenRecorrido - b.ordenRecorrido
-      return a.id.localeCompare(b.id)
+      return comparar(a.id, b.id)
     }
 
     const porCantidad = (cuenta.get(b.id) ?? 0) - (cuenta.get(a.id) ?? 0)
@@ -44,9 +45,9 @@ export function elegirAmbienteDeArranque(
     // La puesta al día más antigua gana, y «nunca» le gana a cualquier fecha.
     const fechaA = a.ultimaPuestaAlDia ?? ''
     const fechaB = b.ultimaPuestaAlDia ?? ''
-    if (fechaA !== fechaB) return fechaA.localeCompare(fechaB)
+    if (fechaA !== fechaB) return comparar(fechaA, fechaB)
 
-    return a.id.localeCompare(b.id)
+    return comparar(a.id, b.id)
   })
 
   return ordenados[0]?.id ?? null
@@ -74,14 +75,14 @@ export function elegirPasoDeArranque(
   if (cortas.length > 0) {
     const elegida = [...cortas].sort((a, b) => {
       const porPuntaje = puntaje(b, modo, contexto) - puntaje(a, modo, contexto)
-      return porPuntaje !== 0 ? porPuntaje : a.id.localeCompare(b.id)
+      return porPuntaje !== 0 ? porPuntaje : comparar(a.id, b.id)
     })[0]
     if (elegida) return { tarea: elegida, advertencia: null }
   }
 
   const masCorta = [...disponibles].sort((a, b) => {
     const porDuracion = a.duracionMin - b.duracionMin
-    return porDuracion !== 0 ? porDuracion : a.id.localeCompare(b.id)
+    return porDuracion !== 0 ? porDuracion : comparar(a.id, b.id)
   })[0]
   if (!masCorta) return null
 

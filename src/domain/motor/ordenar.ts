@@ -1,5 +1,6 @@
 import { puntaje, VERBO_ORDEN } from './puntaje'
 import type { ContextoPuntaje } from './puntaje'
+import { comparar as compararTexto } from '../orden'
 import type { Ambiente, Modo, Tarea } from '../tipos'
 
 /*
@@ -51,8 +52,8 @@ function comparar(
   const porPuntaje = puntaje(b, modo, contexto) - puntaje(a, modo, contexto)
   if (porPuntaje !== 0) return porPuntaje
 
-  if (a.ambienteId !== b.ambienteId) return a.ambienteId.localeCompare(b.ambienteId)
-  return a.id.localeCompare(b.id)
+  if (a.ambienteId !== b.ambienteId) return compararTexto(a.ambienteId, b.ambienteId)
+  return compararTexto(a.id, b.id)
 }
 
 export function ordenarResto(opciones: OpcionesOrden): Tarea[] {

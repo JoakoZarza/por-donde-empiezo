@@ -1,3 +1,4 @@
+import { comparar } from '../orden'
 import { TIPOS_AMBIENTE, VERBOS } from '../tipos'
 import type { Ambiente, Objeto, Tarea } from '../tipos'
 
@@ -86,7 +87,7 @@ function detectarCiclos(porId: Map<string, Tarea>, problemas: string[]): void {
   }
 
   // Orden estable por id: el mismo catálogo produce siempre los mismos mensajes.
-  for (const id of [...porId.keys()].sort((a, b) => a.localeCompare(b))) {
+  for (const id of [...porId.keys()].sort(comparar)) {
     visitar(id)
   }
 }

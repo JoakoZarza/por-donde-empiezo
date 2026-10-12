@@ -1,3 +1,4 @@
+import { comparar } from '../orden'
 import type { Tarea } from '../tipos'
 
 /*
@@ -27,7 +28,7 @@ export interface ResultadoCiclos {
 
 /** Orden estable por id: el mismo grafo produce siempre el mismo resultado. */
 function ordenados(ids: Iterable<string>): string[] {
-  return [...ids].sort((a, b) => a.localeCompare(b))
+  return [...ids].sort(comparar)
 }
 
 function dependenciasInternas(tareas: Tarea[]): Map<string, Set<string>> {
@@ -78,7 +79,7 @@ function masLarga(ciclo: string[], porId: Map<string, Tarea>): string {
     const duracionCandidata = porId.get(candidata)?.duracionMin ?? 0
     const duracionElegida = porId.get(elegida)?.duracionMin ?? 0
     if (duracionCandidata > duracionElegida) return candidata
-    if (duracionCandidata === duracionElegida && candidata.localeCompare(elegida) > 0) return candidata
+    if (duracionCandidata === duracionElegida && comparar(candidata, elegida) > 0) return candidata
     return elegida
   })
 }
