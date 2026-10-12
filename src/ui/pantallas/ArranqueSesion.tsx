@@ -55,6 +55,8 @@ export default function ArranqueSesion() {
   const [tiempo, setTiempo] = useState<string>('20')
   const [modo, setModo] = useState<Modo>('arrancarYa')
   const [playlist, setPlaylist] = useState<string | null>(null)
+  /** Si la persona tocó el tiempo a mano, la preferencia ya no manda. */
+  const [tiempoTocado, setTiempoTocado] = useState(false)
   const [estadoDeTareas, setEstadoDeTareas] = useState<EstadoDeTareas>('cargando')
   const [armando, setArmando] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -79,13 +81,20 @@ export default function ArranqueSesion() {
         pendientes += tareas.filter((tarea) => !hechas.has(tarea.id)).length
       }
 
-      const { modoPorDefecto, playlistPropia } = await repositorio.preferencias()
+      const { modoPorDefecto, playlistPropia, duracionRetoPreferida } = await repositorio.preferencias()
 
       if (!vigente) return
-      // El modo y la música que la persona eligió en Ajustes se aplican acá: son las
-      // dos preferencias que hasta ahora existían sin que nadie las leyera.
+      // Las preferencias se aplican acá: son las tres que hasta ahora existían sin que
+      // ninguna pantalla las leyera.
       setModo(modoPorDefecto)
       setPlaylist(playlistPropia)
+
+      // La duración preferida viene marcada, salvo que la persona ya haya elegido otra
+      // cosa a mano en esta pantalla.
+      if (!tiempoTocado) {
+        const opcion = TIEMPOS.find((cada) => cada.minutos === duracionRetoPreferida)
+        setTiempo(opcion ? opcion.valor : 'sinLimite')
+      }
       if (guardadas === 0) setEstadoDeTareas('sinTareas')
       else if (pendientes === 0) setEstadoDeTareas('todoHecho')
       else setEstadoDeTareas('hayTareas')
@@ -123,8 +132,19 @@ export default function ArranqueSesion() {
         hechasEnCiclo.push(...(await repositorio.listarHechas(ambiente.id)))
       }
 
-      const { herramientasDisponibles } = await repositorio.preferencias()
       const minutos = TIEMPOS.find((opcion) => opcion.valor === tiempo)?.minutos ?? null
+      const preferencias = await repositorio.preferencias()
+      const { herramientasDisponibles } = preferencias
+
+      /*
+        La duración elegida se guarda como preferencia. Así la próxima vez viene
+        marcada la que la persona realmente usa, sin tener que configurarla en otro
+        lado —que es justamente lo que faltaba: la preferencia existía y nadie la
+        escribía ni la leía—.
+      */
+      if (minutos !== null && minutos !== preferencias.duracionRetoPreferida) {
+        await repositorio.guardarPreferencias({ ...preferencias, duracionRetoPreferida: minutos })
+      }
       const idPlan = nuevoId()
 
       const { plan } = generarPlan(
@@ -163,7 +183,10 @@ export default function ArranqueSesion() {
                   value={opcion.valor}
                   className="ficha__entrada"
                   checked={tiempo === opcion.valor}
-                  onChange={() => setTiempo(opcion.valor)}
+                  onChange={() => {
+                    setTiempo(opcion.valor)
+                    setTiempoTocado(true)
+                  }}
                 />
                 <span className="ficha__marca" aria-hidden="true" />
                 <span className="ficha__texto">{opcion.etiqueta}</span>

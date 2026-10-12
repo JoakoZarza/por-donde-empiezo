@@ -95,8 +95,7 @@ test('con presupuesto insuficiente lo dice en vez de devolver nada en silencio',
   expect(conservadas).toEqual([])
   expect(minutosFaltantes).toBe(20)
   expect(advertencias).toHaveLength(1)
-  expect(advertencias[0]).toMatch(/20 minutos/)
-})
+  expect(advertencias[0]).toMatch(/20 minutos/)})
 
 test('presupuesto cero o negativo no rompe nada', () => {
   const sola = [tarea('larga', { duracionMin: 20 })]

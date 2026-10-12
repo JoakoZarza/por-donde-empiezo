@@ -13,6 +13,11 @@ import type { Tarea } from '../tipos'
   es un plan que no sirve.
 */
 
+/** «1 minuto» y «12 minutos»: sin esto la app dice «con 1 minutos». */
+function enMinutos(cantidad: number): string {
+  return `${cantidad} ${cantidad === 1 ? 'minuto' : 'minutos'}`
+}
+
 export interface ResultadoRecorte {
   conservadas: Tarea[]
   /** Minutos de las tareas que quedaron afuera. */
@@ -55,11 +60,11 @@ export function recortarAlPresupuesto(
   if (tareasOrdenadas.length > 0 && conservadas.length === 0) {
     const masCorta = Math.min(...tareasOrdenadas.map((tarea) => tarea.duracionMin))
     advertencias.push(
-      `con ${presupuestoMin} minutos no entra ninguna tarea: la más corta dura ${masCorta} minutos`,
+      `con ${enMinutos(presupuestoMin)} no entra ninguna tarea: la más corta dura ${enMinutos(masCorta)}`,
     )
   } else if (minutosFaltantes > 0) {
     advertencias.push(
-      `quedaron ${minutosFaltantes} minutos de tareas afuera del presupuesto de ${presupuestoMin} minutos`,
+      `quedaron ${enMinutos(minutosFaltantes)} de tareas afuera del presupuesto de ${enMinutos(presupuestoMin)}`,
     )
   }
 
