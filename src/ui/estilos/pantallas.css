@@ -498,3 +498,65 @@
   border-radius: 50%;
   background-color: var(--color-menta);
 }
+
+/* --- El plano de la casa --- */
+
+.casa {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+  El cuarto. La luz entra desde abajo y crece con lo hecho en el ciclo: es la misma
+  idea que la lámpara de la pantalla del plan, aplicada a la casa entera.
+
+  El texto va después de la luz en el marcado, así que se dibuja encima sin
+  necesidad de z-index.
+*/
+.cuarto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-height: 104px;
+  padding: 0.875rem;
+  overflow: hidden;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background-color: var(--color-pared);
+  text-decoration: none;
+  transition: border-color 240ms ease;
+}
+
+.cuarto:hover,
+.cuarto:focus-visible {
+  border-color: var(--color-velador);
+}
+
+.cuarto__luz {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 130%,
+    rgb(242 180 85 / 0.55) 0%,
+    rgb(242 180 85 / 0.18) 45%,
+    transparent 75%
+  );
+  transition: opacity 240ms ease;
+}
+
+.cuarto__nombre {
+  color: var(--color-hueso);
+  font-weight: 600;
+}
+
+/* Un ambiente que la persona no eligió se ve apagado, no roto. */
+.cuarto--apagado .cuarto__nombre {
+  color: var(--color-humo);
+  font-weight: 400;
+}

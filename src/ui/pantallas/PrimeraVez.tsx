@@ -69,6 +69,9 @@ export default function PrimeraVez() {
       <div className="pantalla__pie">
         <Bienvenida />
         <div className="acciones">
+          <Link className="boton-secundario" to="/casa">
+            Tu casa
+          </Link>
           <Link className="boton-secundario" to="/logros">
             Lo que hiciste
           </Link>

@@ -6,6 +6,7 @@ import ArranqueSesion from './ui/pantallas/ArranqueSesion'
 import Plan from './ui/pantallas/Plan'
 import Ajustes from './ui/pantallas/Ajustes'
 import Logros from './ui/pantallas/Logros'
+import Casa from './ui/pantallas/Casa'
 import NoEncontrada from './ui/pantallas/NoEncontrada'
 
 /*
@@ -26,6 +27,7 @@ export const RUTAS: RutaDeLaApp[] = [
   { path: '/plan/:planId', element: <Plan /> },
   { path: '/ajustes', element: <Ajustes /> },
   { path: '/logros', element: <Logros /> },
+  { path: '/casa', element: <Casa /> },
   { path: '*', element: <NoEncontrada /> },
 ]
 
