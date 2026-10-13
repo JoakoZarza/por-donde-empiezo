@@ -27,7 +27,7 @@ A diferencia de los gestores de tareas tradicionales, la app es **offline-first*
 
 ## Cómo correrlo localmente
 
-Requisitos: Node.js 20+ y npm.
+Requisitos: Node.js 22+ y npm.
 
 ```bash
 # Instalar dependencias
