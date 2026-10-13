@@ -1,8 +1,10 @@
 # Por Dónde Empiezo
 
+[![CI](https://github.com/JoakoZarza/por-donde-empiezo/actions/workflows/ci.yml/badge.svg)](https://github.com/JoakoZarza/por-donde-empiezo/actions/workflows/ci.yml)
+
 Aplicación web progresiva (PWA) *mobile-first* que ayuda a personas abrumadas por el desorden doméstico a empezar a limpiar con un paso a la vez.
 
-![Captura](docs/captura.png)
+![Captura](docs/capturas/plan.png)
 
 ## Qué resuelve
 
@@ -18,6 +20,7 @@ A diferencia de los gestores de tareas tradicionales, la app es **offline-first*
 |---|---|
 | **Frontend** | React 19 + TypeScript |
 | **Bundler & Tooling** | Vite |
+| **Deploy** | Vercel |
 | **Estado global** | Zustand |
 | **Persistencia local** | Dexie (IndexedDB) |
 | **Estilos & Diseño** | Tailwind CSS 4 + Tokens CSS («Luz de velador») |
@@ -54,7 +57,7 @@ npm run build
 
 ## Demo en vivo
 
-- Demo: [Ver demo en vivo](https://...) *(completar con la URL de despliegue)*
+- Demo: [https://por-donde-empiezo.vercel.app/](https://por-donde-empiezo.vercel.app/)
 
 ## Decisiones de diseño y arquitectura
 
