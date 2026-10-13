@@ -4,7 +4,9 @@
 
 Aplicación web progresiva (PWA) *mobile-first* que ayuda a personas abrumadas por el desorden doméstico a empezar a limpiar con un paso a la vez.
 
-![Captura](docs/capturas/plan.png)
+<!-- ![Pantalla principal](docs/capturas/plan.png) -->
+<!-- ![Armado de tareas](docs/capturas/02-armado.png) -->
+<!-- ![Plano de la casa](docs/capturas/05-casa.png) -->
 
 ## Qué resuelve
 
@@ -65,3 +67,9 @@ npm run build
 - **Garantías formales comprobables:** El motor asegura formalmente seis invariantes (G1 a G6) validadas por tests automáticos: primer paso ≤ 2 minutos, resolución acíclica de dependencias, desempates reproducibles y adaptación estricta al presupuesto de tiempo.
 - **Offline-first sin fricción:** La aplicación es 100% operativa sin conexión y sin backend. Todos los datos se guardan en IndexedDB y pueden migrarse entre dispositivos mediante un archivo de respaldo JSON local.
 - **Diseño ético («Sin culpa»):** Los contadores de esfuerzo solo crecen; la ausencia nunca se muestra como deuda ni penalización. La interfaz respeta safe-areas para dispositivos móviles, áreas táctiles ≥ 44 px y contraste accesible bajo estándares WCAG AA.
+
+## Roadmap
+
+- Sincronización multi-dispositivo.
+- Historial cronológico de sesiones.
+- Comparación fotográfica antes/después.
