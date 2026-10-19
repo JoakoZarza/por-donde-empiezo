@@ -29,6 +29,7 @@ export default function PrimeraVez() {
   }
 
   async function avanzar(): Promise<void> {
+    if (guardando) return
     setGuardando(true)
     setError(null)
     try {
@@ -89,7 +90,7 @@ export default function PrimeraVez() {
           type="button"
           className="boton-principal"
           onClick={avanzar}
-          disabled={elegidos.length === 0}
+          disabled={elegidos.length === 0 || guardando}
           aria-busy={guardando}
         >
           Armá las tareas

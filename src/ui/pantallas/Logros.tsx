@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { calcularLogros, calcularTotales, diasEntre } from '../../domain/logros'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Logro, Totales } from '../../domain/logros'
 
 /*
@@ -41,6 +42,8 @@ export default function Logros() {
   const [totales, setTotales] = useState<Totales | null>(null)
   const [logros, setLogros] = useState<Logro[]>([])
   const [ahora, setAhora] = useState<string>('')
+  const [falloLaCarga, setFalloLaCarga] = useState(false)
+  const [intento, setIntento] = useState(0)
 
   useTitulo('Lo que hiciste')
 
@@ -48,18 +51,29 @@ export default function Logros() {
     let vigente = true
 
     void (async () => {
-      const historial = await repositorio.listarHistorial()
-      if (!vigente) return
-      const calculados = calcularTotales(historial)
-      setTotales(calculados)
-      setLogros(calcularLogros(calculados, cantidadDeAmbientes))
-      setAhora(new Date().toISOString())
+      try {
+        const historial = await repositorio.listarHistorial()
+        if (!vigente) return
+        const calculados = calcularTotales(historial)
+        setTotales(calculados)
+        setLogros(calcularLogros(calculados, cantidadDeAmbientes))
+        setAhora(new Date().toISOString())
+      } catch {
+        if (vigente) setFalloLaCarga(true)
+      }
     })()
 
     return () => {
       vigente = false
     }
-  }, [repositorio, cantidadDeAmbientes])
+  }, [repositorio, cantidadDeAmbientes, intento])
+
+  function reintentar(): void {
+    setFalloLaCarga(false)
+    setIntento((previo) => previo + 1)
+  }
+
+  if (falloLaCarga) return <ErrorDeCarga titulo="Lo que hiciste" alReintentar={reintentar} />
 
   if (!totales) {
     return (

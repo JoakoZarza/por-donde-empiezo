@@ -25,8 +25,13 @@ export default function Bienvenida() {
     let vigente = true
 
     void (async () => {
-      const historial = await repositorio.listarHistorial()
-      if (!vigente) return
+      /*
+        El saludo es un extra: si no se puede leer el historial, simplemente no se
+        muestra. La pantalla de abajo sigue funcionando entera, y avisar de un error
+        acá asustaría por algo que no le impide nada a la persona.
+      */
+      const historial = await repositorio.listarHistorial().catch(() => null)
+      if (!vigente || !historial) return
 
       const totales = calcularTotales(historial)
       if (totales.tareas === 0) return

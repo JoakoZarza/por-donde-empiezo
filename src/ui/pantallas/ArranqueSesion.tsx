@@ -5,6 +5,7 @@ import { opcionesDeMusica } from '../musica'
 import { nuevoId } from '../id'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Modo, Tarea } from '../../domain/tipos'
 
 /*
@@ -45,7 +46,7 @@ const MODOS: { valor: Modo; nombre: string; explicacion: string }[] = [
   },
 ]
 
-type EstadoDeTareas = 'cargando' | 'sinTareas' | 'todoHecho' | 'hayTareas'
+type EstadoDeTareas = 'cargando' | 'falloLaCarga' | 'sinTareas' | 'todoHecho' | 'hayTareas'
 
 export default function ArranqueSesion() {
   const navegar = useNavigate()
@@ -100,7 +101,9 @@ export default function ArranqueSesion() {
       else setEstadoDeTareas('hayTareas')
     }
 
-    void mirar()
+    mirar().catch(() => {
+      if (vigente) setEstadoDeTareas('falloLaCarga')
+    })
     return () => {
       vigente = false
     }
@@ -113,10 +116,22 @@ export default function ArranqueSesion() {
    */
   async function empezarDeNuevo(): Promise<void> {
     setEstadoDeTareas('cargando')
-    const ambientes = await repositorio.listarAmbientes()
-    for (const ambiente of ambientes) {
-      await repositorio.limpiarHechas(ambiente.id)
+    setError(null)
+    try {
+      const ambientes = await repositorio.listarAmbientes()
+      for (const ambiente of ambientes) {
+        await repositorio.limpiarHechas(ambiente.id)
+      }
+    } catch {
+      setError('No pudimos arrancar de nuevo. Probá otra vez.')
     }
+    // Se vuelve a mirar igual: si falló a mitad de camino, la pantalla muestra lo que
+    // de verdad quedó guardado y no lo que se esperaba.
+    setRevision((previa) => previa + 1)
+  }
+
+  function reintentar(): void {
+    setEstadoDeTareas('cargando')
     setRevision((previa) => previa + 1)
   }
 
@@ -161,6 +176,10 @@ export default function ArranqueSesion() {
     } finally {
       setArmando(false)
     }
+  }
+
+  if (estadoDeTareas === 'falloLaCarga') {
+    return <ErrorDeCarga titulo="¿Cuánto tiempo tenés?" alReintentar={reintentar} />
   }
 
   return (

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import {
   enReloj,
   enVentaja,
@@ -13,6 +14,7 @@ import {
 } from '../../domain/contrarreloj'
 import { calcularResultados, resultadoAnterior } from '../../domain/resultados'
 import type { EstiloDeReloj } from '../../domain/tipos'
+import type { Repositorio } from '../../data/repositorio'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
@@ -51,7 +53,16 @@ export default function Plan() {
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [noEncontrado, setNoEncontrado] = useState(false)
+  const [falloLaCarga, setFalloLaCarga] = useState(false)
+  const [intento, setIntento] = useState(0)
   const [ahora, setAhora] = useState<string | null>(null)
+  /*
+    Una acción por vez. Con el pulgar, a las apuradas, un doble toque en «Listo»
+    marcaba dos pasos de una: el segundo toque llegaba mientras el primero todavía
+    guardaba. Es una ref y no estado porque tiene que cortar el segundo toque en el
+    mismo instante, sin esperar a que React vuelva a dibujar.
+  */
+  const enCurso = useRef(false)
 
   /*
     El latido del reloj. Solo late si el plan tiene presupuesto de tiempo, y se
@@ -71,8 +82,10 @@ export default function Plan() {
     let vigente = true
 
     void (async () => {
-      const { estiloDeReloj } = await repositorio.preferencias()
-      if (vigente) setEstilo(estiloDeReloj)
+      // Si no se puede leer la preferencia, queda la cuenta atrás: no vale cortar la
+      // sesión por el estilo del reloj.
+      const preferencias = await repositorio.preferencias().catch(() => null)
+      if (vigente && preferencias) setEstilo(preferencias.estiloDeReloj)
     })()
 
     return () => {
@@ -86,16 +99,26 @@ export default function Plan() {
     let vigente = true
 
     async function cargar(): Promise<void> {
-      const guardado = await repositorio.obtenerPlan(planId)
-      const listaDeAmbientes = await repositorio.listarAmbientes()
-
+      let guardado: Awaited<ReturnType<Repositorio['obtenerPlan']>>
       const porTarea: Record<string, Tarea> = {}
       const porAmbiente: Record<string, Ambiente> = {}
-      for (const ambiente of listaDeAmbientes) {
-        porAmbiente[ambiente.id] = ambiente
-        for (const tarea of await repositorio.listarTareas(ambiente.id)) {
-          porTarea[tarea.id] = tarea
+
+      try {
+        guardado = await repositorio.obtenerPlan(planId)
+        const listaDeAmbientes = await repositorio.listarAmbientes()
+
+        for (const ambiente of listaDeAmbientes) {
+          porAmbiente[ambiente.id] = ambiente
+          for (const tarea of await repositorio.listarTareas(ambiente.id)) {
+            porTarea[tarea.id] = tarea
+          }
         }
+      } catch {
+        if (vigente) {
+          setFalloLaCarga(true)
+          setCargando(false)
+        }
+        return
       }
 
       if (!vigente) return
@@ -133,7 +156,13 @@ export default function Plan() {
     return () => {
       vigente = false
     }
-  }, [planId, repositorio, abrirPlan])
+  }, [planId, repositorio, abrirPlan, intento])
+
+  function reintentar(): void {
+    setFalloLaCarga(false)
+    setCargando(true)
+    setIntento((previo) => previo + 1)
+  }
 
   const paso = plan?.pasos[indice]
   const tarea = paso ? tareas[paso.tareaId] : undefined
@@ -164,30 +193,36 @@ export default function Plan() {
   */
   const anterior = plan ? resultadoAnterior(plan.pasos, indice, minutosPorTarea) : null
 
-  async function alListo(): Promise<void> {
+  /** Corre la acción si no hay otra en curso; si falla, deja el aviso. */
+  async function unaPorVez(accion: () => Promise<void>, siFalla: string): Promise<void> {
+    if (enCurso.current) return
+    enCurso.current = true
     try {
-      await avanzar(new Date().toISOString())
+      await accion()
+      setError(null)
     } catch {
-      setError('No pudimos guardar el paso. Probá de nuevo.')
+      setError(siFalla)
+    } finally {
+      enCurso.current = false
     }
   }
 
-  async function alSaltear(): Promise<void> {
-    try {
-      await saltear(new Date().toISOString())
-    } catch {
-      setError('No pudimos saltear el paso. Probá de nuevo.')
-    }
+  function alListo(): Promise<void> {
+    return unaPorVez(() => avanzar(new Date().toISOString()), 'No pudimos guardar el paso. Probá de nuevo.')
   }
 
-  async function alReordenar(): Promise<void> {
-    try {
+  function alSaltear(): Promise<void> {
+    return unaPorVez(() => saltear(new Date().toISOString()), 'No pudimos saltear el paso. Probá de nuevo.')
+  }
+
+  function alReordenar(): Promise<void> {
+    return unaPorVez(async () => {
       const nuevo = await reordenar(new Date().toISOString())
       if (nuevo) navegar(`/plan/${nuevo}`)
-    } catch {
-      setError('No pudimos reordenar. Probá de nuevo.')
-    }
+    }, 'No pudimos reordenar. Probá de nuevo.')
   }
+
+  if (falloLaCarga) return <ErrorDeCarga titulo="El plan" alReintentar={reintentar} />
 
   if (cargando) {
     return (

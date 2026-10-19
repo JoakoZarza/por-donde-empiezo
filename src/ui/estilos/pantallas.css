@@ -213,8 +213,42 @@
   color: var(--color-humo);
 }
 
+/* El campo con su botón al lado: lo escrito y la acción que lo usa, en un renglón. */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.campo__fila {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.campo__fila .campo__entrada {
+  flex: 1;
+  min-width: 0;
+}
+
+.campo__fila .boton-secundario {
+  min-height: 56px;
+}
+
+.campo__entrada[aria-invalid='true'] {
+  border-color: var(--color-velador);
+}
+
+/*
+  Un aviso de algo que no salió. Sin rojo —es una regla del producto—, pero tampoco
+  igual al texto común: antes se confundía con cualquier renglón. Lleva fondo, una
+  barra de ámbar a la izquierda y queda pegado al control que lo causó.
+*/
 .alerta {
   margin: 0;
+  padding: 0.625rem 0.875rem;
+  border-left: 3px solid var(--color-velador);
+  border-radius: 0 var(--radio-control) var(--radio-control) 0;
+  background-color: var(--color-pared);
   font-size: var(--texto-menudo);
   color: var(--color-hueso);
 }

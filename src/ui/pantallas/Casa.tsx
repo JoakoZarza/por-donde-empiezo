@@ -4,6 +4,7 @@ import { CATALOGO } from '../../domain/catalogo'
 import { armarLaCasa } from '../../domain/casa'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Cuarto, EstadoDelAmbiente } from '../../domain/casa'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
@@ -29,6 +30,8 @@ const ESTADO_EN_PALABRAS: Record<EstadoDelAmbiente, string> = {
 export default function Casa() {
   const repositorio = useSesion((estado) => estado.repositorio)
   const [cuartos, setCuartos] = useState<Cuarto[] | null>(null)
+  const [falloLaCarga, setFalloLaCarga] = useState(false)
+  const [intento, setIntento] = useState(0)
 
   useTitulo('Tu casa')
 
@@ -36,30 +39,41 @@ export default function Casa() {
     let vigente = true
 
     void (async () => {
-      const elegidos: Ambiente[] = await repositorio.listarAmbientes()
-      const tareasPorAmbiente: Record<string, Tarea[]> = {}
-      const hechasPorAmbiente: Record<string, string[]> = {}
+      try {
+        const elegidos: Ambiente[] = await repositorio.listarAmbientes()
+        const tareasPorAmbiente: Record<string, Tarea[]> = {}
+        const hechasPorAmbiente: Record<string, string[]> = {}
 
-      for (const ambiente of CATALOGO.ambientes) {
-        tareasPorAmbiente[ambiente.id] = await repositorio.listarTareas(ambiente.id)
-        hechasPorAmbiente[ambiente.id] = await repositorio.listarHechas(ambiente.id)
+        for (const ambiente of CATALOGO.ambientes) {
+          tareasPorAmbiente[ambiente.id] = await repositorio.listarTareas(ambiente.id)
+          hechasPorAmbiente[ambiente.id] = await repositorio.listarHechas(ambiente.id)
+        }
+
+        if (!vigente) return
+        setCuartos(
+          armarLaCasa({
+            catalogo: CATALOGO.ambientes,
+            elegidos,
+            tareasPorAmbiente,
+            hechasPorAmbiente,
+          }),
+        )
+      } catch {
+        if (vigente) setFalloLaCarga(true)
       }
-
-      if (!vigente) return
-      setCuartos(
-        armarLaCasa({
-          catalogo: CATALOGO.ambientes,
-          elegidos,
-          tareasPorAmbiente,
-          hechasPorAmbiente,
-        }),
-      )
     })()
 
     return () => {
       vigente = false
     }
-  }, [repositorio])
+  }, [repositorio, intento])
+
+  function reintentar(): void {
+    setFalloLaCarga(false)
+    setIntento((previo) => previo + 1)
+  }
+
+  if (falloLaCarga) return <ErrorDeCarga titulo="Tu casa" alReintentar={reintentar} />
 
   if (!cuartos) {
     return (

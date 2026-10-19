@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { CATALOGO } from '../../domain/catalogo'
 import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
 import type { EstiloDeReloj, Modo, Preferencias } from '../../domain/tipos'
@@ -44,15 +45,41 @@ function todasLasHerramientas(): string[] {
   return [...todas].sort(comparar)
 }
 
+/*
+  Dónde se muestra cada aviso. Antes todos —errores y confirmaciones— iban al pie de
+  la página, y en un celular «Pegá una clave primero» quedaba fuera de la vista:
+  la persona tocaba y no veía pasar nada. Ahora cada aviso aparece junto al control
+  que lo causó.
+*/
+type Lugar = 'herramientas' | 'modo' | 'playlist' | 'clave' | 'reloj' | 'datos'
+
+interface Aviso {
+  lugar: Lugar
+  tipo: 'error' | 'listo'
+  texto: string
+}
+
+function AvisoEn({ lugar, aviso, id }: { lugar: Lugar; aviso: Aviso | null; id?: string }) {
+  // La región existe siempre, vacía o no: un `aria-live` que aparece junto con su
+  // texto no siempre se anuncia.
+  const visible = aviso?.lugar === lugar ? aviso : null
+  return (
+    <div id={id} role="status" aria-live="polite">
+      {visible && <p className={visible.tipo === 'error' ? 'alerta' : 'menudo'}>{visible.texto}</p>}
+    </div>
+  )
+}
+
 export default function Ajustes() {
   const repositorio = useSesion((estado) => estado.repositorio)
   const [preferencias, setPreferencias] = useState<Preferencias | null>(null)
   const [playlist, setPlaylist] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [guardado, setGuardado] = useState(false)
-  const [mensaje, setMensaje] = useState<string | null>(null)
+  const [aviso, setAviso] = useState<Aviso | null>(null)
+  const campoClave = useRef<HTMLInputElement>(null)
   const [clave, setClave] = useState('')
   const [probando, setProbando] = useState(false)
+  const [falloLaCarga, setFalloLaCarga] = useState(false)
+  const [intento, setIntento] = useState(0)
 
   useTitulo('Ajustes')
 
@@ -60,34 +87,44 @@ export default function Ajustes() {
     let vigente = true
 
     void (async () => {
-      const guardadas = await repositorio.preferencias()
-      if (!vigente) return
-      setPreferencias(guardadas)
-      setPlaylist(guardadas.playlistPropia ?? '')
+      try {
+        const guardadas = await repositorio.preferencias()
+        if (!vigente) return
+        setPreferencias(guardadas)
+        setPlaylist(guardadas.playlistPropia ?? '')
+      } catch {
+        if (vigente) setFalloLaCarga(true)
+      }
     })()
 
     return () => {
       vigente = false
     }
-  }, [repositorio])
+  }, [repositorio, intento])
 
   /*
     Se guarda sin hacer esperar a la persona y se revierte si falla: en un teléfono,
     que la casilla no responda hasta que conteste el disco se siente roto.
   */
-  async function guardar(cambio: Partial<Preferencias>): Promise<void> {
-    if (!preferencias) return
+  /** Devuelve si se guardó, para que quien llama no confirme algo que no pasó. */
+  async function guardar(
+    cambio: Partial<Preferencias>,
+    lugar: Lugar,
+    siSale = 'Listo, quedó guardado.',
+  ): Promise<boolean> {
+    if (!preferencias) return false
     const anterior = preferencias
     setPreferencias({ ...preferencias, ...cambio })
-    setError(null)
-    setGuardado(false)
+    setAviso(null)
 
     try {
       await repositorio.guardarPreferencias({ ...preferencias, ...cambio })
-      setGuardado(true)
+      setAviso({ lugar, tipo: 'listo', texto: siSale })
+      return true
     } catch {
       setPreferencias(anterior)
-      setError('No pudimos guardar los ajustes. Probá de nuevo.')
+      setAviso({ lugar, tipo: 'error', texto: 'No pudimos guardar este cambio. Probá de nuevo.' })
+      return false
     }
   }
 
@@ -97,7 +134,7 @@ export default function Ajustes() {
     const lista = tiene
       ? preferencias.herramientasDisponibles.filter((cada) => cada !== herramienta)
       : [...preferencias.herramientasDisponibles, herramienta]
-    await guardar({ herramientasDisponibles: lista })
+    await guardar({ herramientasDisponibles: lista }, 'herramientas')
   }
 
   async function guardarClave(): Promise<void> {
@@ -107,48 +144,61 @@ export default function Ajustes() {
     if (limpia === '') {
       // Antes esto no hacía nada y no decía nada, que es la peor combinación: la
       // persona toca, no pasa nada, y no sabe si la app está rota o si se equivocó.
-      setMensaje(null)
-      setError('Pegá una clave primero. Si ya no querés usar la IA, tocá «Borrar la clave».')
+      setAviso({
+        lugar: 'clave',
+        tipo: 'error',
+        texto: 'Pegá una clave primero. Si ya no querés usar la IA, tocá «Borrar la clave».',
+      })
+      campoClave.current?.focus()
       return
     }
 
-    await guardar({ claveDeIa: limpia })
-    setClave('')
-    setMensaje('Listo, la clave quedó guardada en este teléfono.')
+    // Lo pegado se borra del campo solo si quedó guardado: si falla, sigue ahí para
+    // volver a intentar sin tener que buscar la clave de nuevo.
+    if (await guardar({ claveDeIa: limpia }, 'clave', 'Listo, la clave quedó guardada en este teléfono.')) {
+      setClave('')
+    }
   }
 
   async function borrarClave(): Promise<void> {
-    await guardar({ claveDeIa: null })
-    setClave('')
-    setMensaje('Listo, borramos la clave de este teléfono.')
+    if (await guardar({ claveDeIa: null }, 'clave', 'Listo, borramos la clave de este teléfono.')) {
+      setClave('')
+    }
   }
 
   async function probarClave(): Promise<void> {
+    if (probando) return
     const limpia = clave.trim()
     if (limpia === '') {
-      setMensaje(null)
-      setError('Escribí la clave en el campo de arriba y después tocá «Probar».')
+      setAviso({
+        lugar: 'clave',
+        tipo: 'error',
+        texto: 'Escribí la clave en el campo de arriba y después tocá «Probar».',
+      })
+      campoClave.current?.focus()
       return
     }
 
     setProbando(true)
-    setError(null)
-    setMensaje(null)
+    setAviso(null)
     try {
       // Un pedido de una palabra: alcanza para saber si la clave sirve, y gasta lo
       // mínimo de la cuota gratuita de la persona.
       const respuesta = await consultarIa({ clave: limpia, texto: 'Contestá solamente: listo', imagen: null })
-      setMensaje(`La clave funciona. La IA contestó «${respuesta.slice(0, 40)}».`)
+      setAviso({ lugar: 'clave', tipo: 'listo', texto: `La clave funciona. La IA contestó «${respuesta.slice(0, 40)}».` })
     } catch (falla) {
-      setError(falla instanceof FalloDeIa ? falla.message : 'No pudimos probar la clave.')
+      setAviso({
+        lugar: 'clave',
+        tipo: 'error',
+        texto: falla instanceof FalloDeIa ? falla.message : 'No pudimos probar la clave.',
+      })
     } finally {
       setProbando(false)
     }
   }
 
   async function guardarCopia(): Promise<void> {
-    setError(null)
-    setMensaje(null)
+    setAviso(null)
     try {
       const respaldo = await repositorio.exportar()
       // Un archivo común, que la persona manda por donde quiera. Nada sale del
@@ -159,23 +209,30 @@ export default function Ajustes() {
       enlace.download = nombreDelArchivo(respaldo.generadoEn)
       enlace.click()
       URL.revokeObjectURL(enlace.href)
-      setMensaje('Listo, la copia se bajó a tu teléfono.')
+      setAviso({ lugar: 'datos', tipo: 'listo', texto: 'Listo, la copia se bajó a tu teléfono.' })
     } catch {
-      setError('No pudimos armar la copia. Probá de nuevo.')
+      setAviso({ lugar: 'datos', tipo: 'error', texto: 'No pudimos armar la copia. Probá de nuevo.' })
     }
   }
 
   async function traerCopia(archivo: File): Promise<void> {
-    setError(null)
-    setMensaje(null)
+    setAviso(null)
     try {
       const respaldo = leerRespaldo(await archivo.text())
       await repositorio.importar(respaldo)
-      setMensaje('Listo, se sumó todo lo que faltaba. Nada de lo que tenías se perdió.')
+      setAviso({
+        lugar: 'datos',
+        tipo: 'listo',
+        texto: 'Listo, se sumó todo lo que faltaba. Nada de lo que tenías se perdió.',
+      })
     } catch (falla) {
       // Si el archivo está mal, se dice por qué. «Error al importar» no le sirve
       // a nadie que acaba de elegir el archivo equivocado.
-      setError(falla instanceof RespaldoInvalido ? falla.message : 'No pudimos leer el archivo.')
+      setAviso({
+        lugar: 'datos',
+        tipo: 'error',
+        texto: falla instanceof RespaldoInvalido ? falla.message : 'No pudimos leer el archivo.',
+      })
     }
   }
 
@@ -185,14 +242,25 @@ export default function Ajustes() {
     )
     if (!confirmado) return
 
-    setError(null)
-    setMensaje(null)
+    setAviso(null)
     try {
       await repositorio.borrarTodo()
-      setMensaje('Listo, este teléfono quedó en cero.')
+      setAviso({ lugar: 'datos', tipo: 'listo', texto: 'Listo, este teléfono quedó en cero.' })
     } catch {
-      setError('No pudimos borrar los datos.')
+      setAviso({ lugar: 'datos', tipo: 'error', texto: 'No pudimos borrar los datos. No se tocó nada: probá de nuevo.' })
     }
+  }
+
+  if (falloLaCarga) {
+    return (
+      <ErrorDeCarga
+        titulo="Ajustes"
+        alReintentar={() => {
+          setFalloLaCarga(false)
+          setIntento((previo) => previo + 1)
+        }}
+      />
+    )
   }
 
   if (!preferencias) {
@@ -236,6 +304,7 @@ export default function Ajustes() {
             )
           })}
         </ul>
+        <AvisoEn lugar="herramientas" aviso={aviso} />
       </fieldset>
 
       <fieldset className="grupo">
@@ -254,7 +323,7 @@ export default function Ajustes() {
                   value={opcion.valor}
                   className="ficha__entrada"
                   checked={preferencias.modoPorDefecto === opcion.valor}
-                  onChange={() => void guardar({ modoPorDefecto: opcion.valor })}
+                  onChange={() => void guardar({ modoPorDefecto: opcion.valor }, 'modo')}
                 />
                 <span className="ficha__marca" aria-hidden="true" />
                 <span className="ficha__texto">{opcion.nombre}</span>
@@ -262,13 +331,18 @@ export default function Ajustes() {
             </li>
           ))}
         </ul>
+        <AvisoEn lugar="modo" aviso={aviso} />
       </fieldset>
 
       <form
         className="grupo"
         onSubmit={(evento) => {
           evento.preventDefault()
-          void guardar({ playlistPropia: playlist.trim() === '' ? null : playlist.trim() })
+          void guardar(
+            { playlistPropia: playlist.trim() === '' ? null : playlist.trim() },
+            'playlist',
+            playlist.trim() === '' ? 'Listo, sacamos tu playlist.' : 'Listo, la playlist quedó guardada.',
+          )
         }}
       >
         <label className="menudo" htmlFor="playlist">
@@ -291,6 +365,7 @@ export default function Ajustes() {
         <button type="submit" className="boton-secundario">
           Guardar la playlist
         </button>
+        <AvisoEn lugar="playlist" aviso={aviso} />
       </form>
 
       <section className="grupo">
@@ -306,7 +381,13 @@ export default function Ajustes() {
             type="checkbox"
             className="ficha__entrada"
             checked={preferencias.avisoDePrivacidadAceptado}
-            onChange={(evento) => void guardar({ avisoDePrivacidadAceptado: evento.target.checked })}
+            onChange={(evento) =>
+              void guardar(
+                { avisoDePrivacidadAceptado: evento.target.checked },
+                'clave',
+                evento.target.checked ? 'Listo, ya podés cargar tu clave.' : 'Listo, la IA quedó apagada.',
+              )
+            }
           />
           <span className="ficha__marca" aria-hidden="true" />
           <span className="ficha__texto">
@@ -346,8 +427,11 @@ export default function Ajustes() {
             <p className="menudo">Aceptá el aviso de arriba para poder cargarla.</p>
           )}
           <input
+            ref={campoClave}
             id="clave-ia"
             name="clave-ia"
+            aria-invalid={aviso?.lugar === 'clave' && aviso.tipo === 'error'}
+            aria-describedby="clave-ia-aviso"
             type="password"
             autoComplete="off"
             spellCheck={false}
@@ -368,12 +452,13 @@ export default function Ajustes() {
               type="button"
               className="boton-secundario"
               onClick={() => void probarClave()}
-              disabled={!preferencias.avisoDePrivacidadAceptado}
+              disabled={!preferencias.avisoDePrivacidadAceptado || probando}
               aria-busy={probando}
             >
               {probando ? 'Probando…' : 'Probar'}
             </button>
           </div>
+          <AvisoEn lugar="clave" aviso={aviso} id="clave-ia-aviso" />
         </form>
       </section>
 
@@ -398,7 +483,7 @@ export default function Ajustes() {
                   value={opcion.valor}
                   className="ficha__entrada"
                   checked={preferencias.estiloDeReloj === opcion.valor}
-                  onChange={() => void guardar({ estiloDeReloj: opcion.valor })}
+                  onChange={() => void guardar({ estiloDeReloj: opcion.valor }, 'reloj')}
                 />
                 <span className="ficha__marca" aria-hidden="true" />
                 <span className="ficha__texto">{opcion.nombre}</span>
@@ -406,6 +491,7 @@ export default function Ajustes() {
             </li>
           ))}
         </ul>
+        <AvisoEn lugar="reloj" aviso={aviso} />
       </fieldset>
 
       <section className="grupo">
@@ -438,20 +524,10 @@ export default function Ajustes() {
         <button type="button" className="boton-secundario" onClick={() => void empezarDeCero()}>
           Empezar de cero en este teléfono
         </button>
+        <AvisoEn lugar="datos" aviso={aviso} />
       </section>
 
       <div className="pantalla__pie">
-        {error && (
-          <p className="alerta" role="status" aria-live="polite">
-            {error}
-          </p>
-        )}
-        {mensaje && !error && (
-          <p className="menudo" role="status" aria-live="polite">
-            {mensaje}
-          </p>
-        )}
-        {guardado && !error && !mensaje && <p className="menudo">Listo, quedó guardado.</p>}
         <Link className="boton-principal" to="/">
           Volver al principio
         </Link>

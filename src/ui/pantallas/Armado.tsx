@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { ambientePorId, objetoPorId, objetosDeAmbiente, tareasDeAmbiente } from '../../domain/catalogo'
 import { nuevoId } from '../id'
@@ -7,6 +7,7 @@ import { consultarIa, FalloDeIa, leerImagen } from '../../data/iaCliente'
 import type { Sugerencia } from '../../domain/ia'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
@@ -30,7 +31,18 @@ export default function Armado() {
   const [incluidas, setIncluidas] = useState<string[]>([])
   const [siguiente, setSiguiente] = useState<Ambiente | null>(null)
   const [propia, setPropia] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  /*
+    Dos errores, y no uno: el del campo «Agregar algo mío» va pegado al campo, y el
+    de tildar va junto a la lista. Con uno solo, un fallo al tildar aparecía debajo
+    del campo de texto y parecía culpa de lo que la persona había escrito.
+  */
+  const [errorPropia, setErrorPropia] = useState<string | null>(null)
+  const [errorCambio, setErrorCambio] = useState<string | null>(null)
+  const [cargando, setCargando] = useState(true)
+  const [falloLaCarga, setFalloLaCarga] = useState(false)
+  const [intento, setIntento] = useState(0)
+  const [agregando, setAgregando] = useState(false)
+  const campoPropia = useRef<HTMLInputElement>(null)
   const [iaTexto, setIaTexto] = useState('')
   const [iaFoto, setIaFoto] = useState<File | null>(null)
   const [sugerencias, setSugerencias] = useState<Sugerencia[]>([])
@@ -80,11 +92,26 @@ export default function Armado() {
       if (vigente) setSiguiente(pendientes[0] ?? null)
     }
 
-    void cargar()
+    cargar()
+      .then(() => {
+        if (vigente) setCargando(false)
+      })
+      .catch(() => {
+        if (vigente) {
+          setFalloLaCarga(true)
+          setCargando(false)
+        }
+      })
     return () => {
       vigente = false
     }
-  }, [ambienteId, ambiente, repositorio])
+  }, [ambienteId, ambiente, repositorio, intento])
+
+  function reintentar(): void {
+    setFalloLaCarga(false)
+    setCargando(true)
+    setIntento((previo) => previo + 1)
+  }
 
   const grupos = useMemo(() => {
     const ordenDeObjetos = new Map(objetosDeAmbiente(ambienteId).map((objeto, indice) => [objeto.id, indice]))
@@ -127,7 +154,7 @@ export default function Armado() {
       setIncluidas((previas) =>
         incluida ? [...previas, tarea.id] : previas.filter((id) => id !== tarea.id),
       )
-      setError('No pudimos guardar el cambio. Probá de nuevo.')
+      setErrorCambio('No pudimos guardar el cambio. Probá de nuevo.')
     }
   }
 
@@ -139,6 +166,8 @@ export default function Armado() {
     toca «Agregar las elegidas» se convierten en tareas.
   */
   async function pedirIdeas(): Promise<void> {
+    // Un segundo toque mientras piensa mandaría otro pedido y gastaría cuota de la clave.
+    if (pensando) return
     setIaError(null)
     setPensando(true)
     try {
@@ -174,6 +203,33 @@ export default function Armado() {
   }
 
   async function agregarSugerencias(): Promise<void> {
+    if (agregando) return
+    setAgregando(true)
+    setIaError(null)
+    // Las que ya se guardaron salen de la lista aunque falle una del medio, para que
+    // un reintento no las duplique.
+    const guardadas = new Set<number>()
+    try {
+      await guardarSugerencias(guardadas)
+    } catch {
+      const quedan = sugerencias
+        .map((sugerencia, indice) => ({ sugerencia, elegida: elegidas.includes(indice), indice }))
+        .filter((cada) => !guardadas.has(cada.indice))
+      setSugerencias(quedan.map((cada) => cada.sugerencia))
+      setElegidas(quedan.flatMap((cada, nuevo) => (cada.elegida ? [nuevo] : [])))
+      setIaError('No pudimos agregar todas las ideas. Las que siguen acá no se guardaron: probá de nuevo.')
+      return
+    } finally {
+      setAgregando(false)
+    }
+
+    setSugerencias([])
+    setElegidas([])
+    setIaTexto('')
+    setIaFoto(null)
+  }
+
+  async function guardarSugerencias(guardadas: Set<number>): Promise<void> {
     for (const indice of elegidas) {
       const sugerencia = sugerencias[indice]
       if (!sugerencia) continue
@@ -200,18 +256,16 @@ export default function Armado() {
       await repositorio.guardarTarea(tarea)
       setConocidas((previas) => [...previas, tarea])
       setIncluidas((previas) => [...previas, tarea.id])
+      guardadas.add(indice)
     }
-
-    setSugerencias([])
-    setElegidas([])
-    setIaTexto('')
-    setIaFoto(null)
   }
 
   async function agregar(): Promise<void> {
+    if (agregando) return
     const texto = propia.trim()
     if (texto === '') {
-      setError('Escribí qué hay que hacer.')
+      setErrorPropia('Escribí qué hay que hacer.')
+      campoPropia.current?.focus()
       return
     }
 
@@ -234,11 +288,38 @@ export default function Armado() {
       notas: null,
     }
 
-    await repositorio.guardarTarea(tarea)
+    setAgregando(true)
+    try {
+      await repositorio.guardarTarea(tarea)
+    } catch {
+      // Lo escrito se queda en el campo: perderlo por un fallo del disco sería peor
+      // que el fallo mismo.
+      setErrorPropia('No pudimos guardar la tarea. Probá de nuevo.')
+      campoPropia.current?.focus()
+      return
+    } finally {
+      setAgregando(false)
+    }
+
     setConocidas((previas) => [...previas, tarea])
     setIncluidas((previas) => [...previas, tarea.id])
     setPropia('')
-    setError(null)
+    setErrorPropia(null)
+  }
+
+  if (falloLaCarga) {
+    return <ErrorDeCarga titulo={ambiente?.nombre ?? 'Armar el ambiente'} alReintentar={reintentar} />
+  }
+
+  if (cargando) {
+    return (
+      <main className="pantalla">
+        <h1 className="pantalla__titulo">{ambiente?.nombre ?? 'Ambiente'}</h1>
+        <p className="menudo" role="status" aria-live="polite">
+          Cargando las tareas…
+        </p>
+      </main>
+    )
   }
 
   return (
@@ -272,25 +353,56 @@ export default function Armado() {
         </section>
       ))}
 
+      {errorCambio && (
+        <p className="alerta" role="status" aria-live="polite">
+          {errorCambio}
+        </p>
+      )}
+
       <div className="pantalla__pie">
-        <label className="campo__etiqueta" htmlFor="tarea-propia">
-          Agregar algo mío
-        </label>
-        <input
-          id="tarea-propia"
-          className="campo__entrada"
-          value={propia}
-          placeholder="regar las plantas…"
-          onChange={(evento) => {
-            setPropia(evento.target.value)
-            setError(null)
+        {/*
+          Campo y botón juntos, en un formulario: Enter agrega, como en cualquier
+          campo. Antes el botón quedaba después de toda la sección de IA, a una
+          pantalla de distancia de lo que la persona acababa de escribir.
+        */}
+        <form
+          className="campo"
+          noValidate
+          onSubmit={(evento) => {
+            evento.preventDefault()
+            void agregar()
           }}
-        />
-        {error && (
-          <p className="alerta" role="status" aria-live="polite">
-            {error}
-          </p>
-        )}
+        >
+          <label className="campo__etiqueta" htmlFor="tarea-propia">
+            Agregar algo mío
+          </label>
+          <div className="campo__fila">
+            <input
+              ref={campoPropia}
+              id="tarea-propia"
+              name="tarea-propia"
+              className="campo__entrada"
+              autoComplete="off"
+              value={propia}
+              placeholder="regar las plantas…"
+              aria-invalid={errorPropia !== null}
+              aria-describedby={errorPropia ? 'tarea-propia-error' : undefined}
+              onChange={(evento) => {
+                setPropia(evento.target.value)
+                setErrorPropia(null)
+              }}
+            />
+            <button type="submit" className="boton-secundario" disabled={agregando} aria-busy={agregando}>
+              Agregar
+            </button>
+          </div>
+          {errorPropia && (
+            <p id="tarea-propia-error" className="alerta" role="status" aria-live="polite">
+              {errorPropia}
+            </p>
+          )}
+        </form>
+
         <section className="grupo">
           <h2 className="pantalla__titulo">¿No sabés por dónde empezar?</h2>
           <p className="menudo">
@@ -358,7 +470,13 @@ export default function Armado() {
           )}
 
           {sugerencias.length > 0 && (
-            <button type="button" className="boton-secundario" onClick={() => void agregarSugerencias()}>
+            <button
+              type="button"
+              className="boton-secundario"
+              onClick={() => void agregarSugerencias()}
+              disabled={agregando}
+              aria-busy={agregando}
+            >
               Agregar las elegidas
             </button>
           )}
@@ -367,10 +485,6 @@ export default function Armado() {
             Configurar la IA
           </Link>
         </section>
-
-        <button type="button" className="boton-secundario" onClick={() => void agregar()}>
-          Agregar
-        </button>
 
         {/*
           Sin estos botones el flujo queda cortado: se puede armar el ambiente pero
