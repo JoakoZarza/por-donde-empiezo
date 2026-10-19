@@ -92,6 +92,12 @@ test('el resultado anterior es el de la tarea que se acaba de cerrar', () => {
   expect(anterior?.diferenciaSegundos).toBe(120)
 })
 
+test('un paso salteado no tiene resultado: no se terminó', () => {
+  // Antes la tarjeta decía «Terminaste la anterior en 00:05» después de saltear.
+  const pasos = [paso('a', 'salteado', 5), paso('b', 'pendiente')]
+  expect(resultadoAnterior(pasos, 1, MINUTOS)).toBeNull()
+})
+
 test('en el primer paso no hay resultado anterior que mostrar', () => {
   expect(resultadoAnterior([paso('a', 'pendiente')], 0, MINUTOS)).toBeNull()
 })

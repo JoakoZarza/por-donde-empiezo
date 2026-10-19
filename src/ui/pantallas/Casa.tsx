@@ -5,6 +5,7 @@ import { armarLaCasa } from '../../domain/casa'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
+import Esqueleto from '../componentes/Esqueleto'
 import type { Cuarto, EstadoDelAmbiente } from '../../domain/casa'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
@@ -79,7 +80,7 @@ export default function Casa() {
     return (
       <main className="pantalla">
         <h1 className="pantalla__titulo">Tu casa</h1>
-        <p className="menudo">Cargando…</p>
+        <Esqueleto forma="cuartos" />
       </main>
     )
   }

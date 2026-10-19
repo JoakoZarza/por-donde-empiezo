@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import Bienvenida from '../componentes/Bienvenida'
 import { CATALOGO } from '../../domain/catalogo'
@@ -15,14 +15,39 @@ import { useTitulo } from '../estado/useTitulo'
 */
 export default function PrimeraVez() {
   const navegar = useNavigate()
+  const repositorio = useSesion((estado) => estado.repositorio)
   const elegirAmbientes = useSesion((estado) => estado.elegirAmbientes)
   const [elegidos, setElegidos] = useState<string[]>([])
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** Si la persona ya tocó una ficha, lo que llegue del teléfono no la pisa. */
+  const tocado = useRef(false)
 
   useTitulo('¿Qué querés ordenar?')
 
+  /*
+    Quien vuelve encuentra tildados los ambientes que ya había elegido. Antes la
+    pantalla arrancaba siempre vacía, justo debajo de un saludo que decía «Está todo
+    donde lo dejaste»: la app se contradecía en la primera pantalla.
+
+    Si no se puede leer, se arranca vacío como antes: no vale bloquear la pantalla
+    de entrada por una comodidad.
+  */
+  useEffect(() => {
+    let vigente = true
+    repositorio
+      .listarAmbientes()
+      .then((guardados) => {
+        if (vigente && !tocado.current) setElegidos(guardados.map((ambiente) => ambiente.id))
+      })
+      .catch(() => {})
+    return () => {
+      vigente = false
+    }
+  }, [repositorio])
+
   function alternar(ambienteId: string): void {
+    tocado.current = true
     setElegidos((previos) =>
       previos.includes(ambienteId) ? previos.filter((id) => id !== ambienteId) : [...previos, ambienteId],
     )

@@ -111,6 +111,8 @@ export function resultadoAnterior(
 ): ResultadoDeUnaTarea | null {
   if (indice <= 0) return null
   const anterior = pasos[indice - 1]
-  if (!anterior || anterior.estado === 'pendiente') return null
+  // Solo un paso hecho tiene resultado. Uno salteado no se terminó: decir
+  // «Terminaste la anterior en 00:05» de algo que se salteó es falso.
+  if (!anterior || anterior.estado !== 'hecho') return null
   return calcularResultados([anterior], minutosPorTarea).tareas[0] ?? null
 }

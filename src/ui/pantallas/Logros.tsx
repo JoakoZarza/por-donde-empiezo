@@ -4,6 +4,7 @@ import { calcularLogros, calcularTotales, diasEntre } from '../../domain/logros'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
+import Esqueleto from '../componentes/Esqueleto'
 import type { Logro, Totales } from '../../domain/logros'
 
 /*
@@ -79,7 +80,7 @@ export default function Logros() {
     return (
       <main className="pantalla">
         <h1 className="pantalla__titulo">Lo que hiciste</h1>
-        <p className="menudo">Cargando…</p>
+        <Esqueleto forma="totales" />
       </main>
     )
   }

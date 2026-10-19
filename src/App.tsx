@@ -8,6 +8,7 @@ import Ajustes from './ui/pantallas/Ajustes'
 import Logros from './ui/pantallas/Logros'
 import Casa from './ui/pantallas/Casa'
 import NoEncontrada from './ui/pantallas/NoEncontrada'
+import Avisos from './ui/componentes/Avisos'
 
 /*
   Las rutas se declaran como datos para que los tests puedan montarlas con
@@ -33,11 +34,14 @@ export const RUTAS: RutaDeLaApp[] = [
 
 export function Rutas() {
   return (
-    <Routes>
-      {RUTAS.map((ruta) => (
-        <Route key={ruta.path} path={ruta.path} element={ruta.element} />
-      ))}
-    </Routes>
+    <>
+      <Routes>
+        {RUTAS.map((ruta) => (
+          <Route key={ruta.path} path={ruta.path} element={ruta.element} />
+        ))}
+      </Routes>
+      <Avisos />
+    </>
   )
 }
 

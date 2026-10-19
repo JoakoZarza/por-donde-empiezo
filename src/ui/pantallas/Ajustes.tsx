@@ -5,6 +5,9 @@ import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import { useAvisos } from '../estado/avisos'
+import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
+import Esqueleto from '../componentes/Esqueleto'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
@@ -51,7 +54,7 @@ function todasLasHerramientas(): string[] {
   la persona tocaba y no veía pasar nada. Ahora cada aviso aparece junto al control
   que lo causó.
 */
-type Lugar = 'herramientas' | 'modo' | 'playlist' | 'clave' | 'reloj' | 'datos'
+type Lugar = 'herramientas' | 'modo' | 'playlist' | 'clave' | 'reloj' | 'datos' | 'cero'
 
 interface Aviso {
   lugar: Lugar
@@ -76,6 +79,7 @@ export default function Ajustes() {
   const [playlist, setPlaylist] = useState('')
   const [aviso, setAviso] = useState<Aviso | null>(null)
   const campoClave = useRef<HTMLInputElement>(null)
+  const confirmar = useAvisos((estado) => estado.confirmar)
   const [clave, setClave] = useState('')
   const [probando, setProbando] = useState(false)
   const [falloLaCarga, setFalloLaCarga] = useState(false)
@@ -161,6 +165,14 @@ export default function Ajustes() {
   }
 
   async function borrarClave(): Promise<void> {
+    const confirmado = await confirmar({
+      titulo: '¿Borrar la clave?',
+      texto: 'Se borra de este teléfono y dejás de poder pedir ideas. Para volver a usarla vas a tener que pegarla de nuevo.',
+      confirmar: 'Borrar la clave',
+      destructiva: true,
+    })
+    if (!confirmado) return
+
     if (await guardar({ claveDeIa: null }, 'clave', 'Listo, borramos la clave de este teléfono.')) {
       setClave('')
     }
@@ -237,17 +249,21 @@ export default function Ajustes() {
   }
 
   async function empezarDeCero(): Promise<void> {
-    const confirmado = window.confirm(
-      'Se borra todo de este teléfono: los ambientes, las tareas y los totales. No se puede deshacer. ¿Seguro?',
-    )
+    const confirmado = await confirmar({
+      titulo: '¿Empezar de cero en este teléfono?',
+      texto:
+        'Se borra todo: los ambientes, las tareas y los totales de «Lo que hiciste». No se puede deshacer. Si querés conservarlo, primero guardá una copia.',
+      confirmar: 'Borrar todo',
+      destructiva: true,
+    })
     if (!confirmado) return
 
     setAviso(null)
     try {
       await repositorio.borrarTodo()
-      setAviso({ lugar: 'datos', tipo: 'listo', texto: 'Listo, este teléfono quedó en cero.' })
+      setAviso({ lugar: 'cero', tipo: 'listo', texto: 'Listo, este teléfono quedó en cero.' })
     } catch {
-      setAviso({ lugar: 'datos', tipo: 'error', texto: 'No pudimos borrar los datos. No se tocó nada: probá de nuevo.' })
+      setAviso({ lugar: 'cero', tipo: 'error', texto: 'No pudimos borrar los datos. No se tocó nada: probá de nuevo.' })
     }
   }
 
@@ -267,7 +283,7 @@ export default function Ajustes() {
     return (
       <main className="pantalla">
         <h1 className="pantalla__titulo">Ajustes</h1>
-        <p className="menudo">Cargando…</p>
+        <Esqueleto forma="ajustes" />
       </main>
     )
   }
@@ -354,6 +370,7 @@ export default function Ajustes() {
         <input
           id="playlist"
           name="playlist"
+          className="campo__entrada"
           type="url"
           inputMode="url"
           autoComplete="off"
@@ -401,12 +418,12 @@ export default function Ajustes() {
         </label>
 
         {preferencias.claveDeIa && (
-          <p className="menudo">
-            Hay una clave guardada en este teléfono.{' '}
+          <div className="campo">
+            <p className="menudo">Hay una clave guardada en este teléfono.</p>
             <button type="button" className="boton-secundario" onClick={() => void borrarClave()}>
-              Borrar la clave
+              Borrar la clave…
             </button>
-          </p>
+          </div>
         )}
 
         <form
@@ -430,6 +447,7 @@ export default function Ajustes() {
             ref={campoClave}
             id="clave-ia"
             name="clave-ia"
+            className="campo__entrada"
             aria-invalid={aviso?.lugar === 'clave' && aviso.tipo === 'error'}
             aria-describedby="clave-ia-aviso"
             type="password"
@@ -505,26 +523,26 @@ export default function Ajustes() {
           Guardar una copia
         </button>
 
-        <label className="menudo" htmlFor="copia">
-          Traer de otra copia
-        </label>
-        <input
+        <SelectorDeArchivo
           id="copia"
-          name="copia"
-          type="file"
+          etiqueta="Traer de otra copia…"
           accept="application/json,.json"
-          onChange={(evento) => {
-            const archivo = evento.target.files?.[0]
-            if (archivo) void traerCopia(archivo)
-            // Se limpia para que elegir el mismo archivo dos veces vuelva a disparar.
-            evento.target.value = ''
-          }}
+          alElegir={(archivo) => void traerCopia(archivo)}
         />
-
-        <button type="button" className="boton-secundario" onClick={() => void empezarDeCero()}>
-          Empezar de cero en este teléfono
-        </button>
         <AvisoEn lugar="datos" aviso={aviso} />
+      </section>
+
+      {/*
+        La acción más destructiva de la app, aparte y con su propio estilo: antes era
+        un botón más entre «Guardar una copia» y «Traer de otra copia».
+      */}
+      <section className="grupo zona-delicada">
+        <h2 className="grupo__titulo">Empezar de cero</h2>
+        <p className="menudo">Borra todo lo de este teléfono. Antes te pedimos que lo confirmes.</p>
+        <button type="button" className="boton-destructivo" onClick={() => void empezarDeCero()}>
+          Empezar de cero en este teléfono…
+        </button>
+        <AvisoEn lugar="cero" aviso={aviso} />
       </section>
 
       <div className="pantalla__pie">

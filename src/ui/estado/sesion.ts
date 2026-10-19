@@ -31,6 +31,11 @@ interface EstadoSesion {
   abrirPlan(plan: Plan): void
   avanzar(ahora: string): Promise<void>
   saltear(ahora: string): Promise<void>
+  /**
+   * Vuelve atrás un salteo: el paso anterior, si fue salteado, vuelve a ser el
+   * actual. Solo deshace salteos: un «Listo» ya quedó en el historial, que no baja.
+   */
+  deshacerSalteo(ahora: string): Promise<void>
   /** Rearma el plan con lo que quedó pendiente. Devuelve el id nuevo, o nulo. */
   reordenar(ahora: string): Promise<string | null>
 }
@@ -94,11 +99,23 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
 
     const yaGuardados = new Set((await repo.listarAmbientes()).map((ambiente) => ambiente.id))
 
+    /*
+      La primera pantalla viene con los ambientes de antes ya tildados, así que
+      destildar uno ahí es sacarlo del recorrido. Sale de la lista de ambientes, y
+      con eso de los planes; sus tareas y su historial quedan guardados, y vuelven
+      tal cual si lo elige otra vez.
+    */
+    for (const id of yaGuardados) {
+      if (!ids.includes(id)) await repo.eliminarAmbiente(id)
+    }
+
     for (const ambiente of elegidos) {
       await repo.guardarAmbiente(ambiente)
       // Solo se siembra la primera vez. Si la persona ya había destildado tareas de
-      // este ambiente, volver a elegirlo no puede resucitarlas.
+      // este ambiente —ahora o antes de sacarlo del recorrido—, volver a elegirlo no
+      // puede resucitarlas.
       if (yaGuardados.has(ambiente.id)) continue
+      if ((await repo.listarTareas(ambiente.id)).length > 0) continue
       for (const tarea of tareasDeAmbiente(ambiente.id)) {
         await repo.guardarTarea(tarea)
       }
@@ -137,6 +154,24 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
 
   async saltear(ahora) {
     await cerrarPaso(set, get, 'salteado', ahora)
+  },
+
+  async deshacerSalteo(ahora) {
+    const { planActual, pasoActual, repositorio: repo } = get()
+    const indice = pasoActual - 1
+    const paso = planActual?.pasos[indice]
+    if (!planActual || !paso || paso.estado !== 'salteado') return
+
+    // Vuelve pendiente y arranca a medir de nuevo desde ahora: el rato que estuvo
+    // salteado no es tiempo de trabajo en esa tarea.
+    const pasos = planActual.pasos.map((actual, cada) =>
+      cada === indice
+        ? { ...actual, estado: 'pendiente' as const, hechoEn: null, segundosReales: null, empezadoEn: ahora }
+        : actual,
+    )
+    const actualizado: Plan = { ...planActual, pasos }
+    await repo.guardarPlan(actualizado)
+    set({ planActual: actualizado, pasoActual: indice })
   },
 
   async reordenar(ahora) {

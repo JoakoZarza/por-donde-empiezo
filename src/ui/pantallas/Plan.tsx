@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import { useAvisos } from '../estado/avisos'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import {
   enReloj,
@@ -45,6 +46,8 @@ export default function Plan() {
   const indice = useSesion((estado) => estado.pasoActual)
   const avanzar = useSesion((estado) => estado.avanzar)
   const saltear = useSesion((estado) => estado.saltear)
+  const deshacerSalteo = useSesion((estado) => estado.deshacerSalteo)
+  const avisar = useAvisos((estado) => estado.avisar)
   const reordenar = useSesion((estado) => estado.reordenar)
 
   const [tareas, setTareas] = useState<Record<string, Tarea>>({})
@@ -212,7 +215,24 @@ export default function Plan() {
   }
 
   function alSaltear(): Promise<void> {
-    return unaPorVez(() => saltear(new Date().toISOString()), 'No pudimos saltear el paso. Probá de nuevo.')
+    const nombre = tarea ? `${tarea.accion} ${tarea.descripcion}`.trim() : 'el paso'
+    return unaPorVez(async () => {
+      await saltear(new Date().toISOString())
+      /*
+        Un toque con poca puntería en «Saltear» —que está justo debajo de «Listo»—
+        no puede costar una tarea sin vuelta. Nunca se pierde nada en silencio.
+      */
+      avisar(`Salteaste «${nombre}».`, {
+        etiqueta: 'Deshacer',
+        alTocar: async () => {
+          try {
+            await deshacerSalteo(new Date().toISOString())
+          } catch {
+            avisar('No pudimos deshacer el salteo. Probá de nuevo.')
+          }
+        },
+      })
+    }, 'No pudimos saltear el paso. Probá de nuevo.')
   }
 
   function alReordenar(): Promise<void> {

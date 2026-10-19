@@ -8,6 +8,9 @@ import type { Sugerencia } from '../../domain/ia'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
+import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
+import Esqueleto from '../componentes/Esqueleto'
+import { useAvisos } from '../estado/avisos'
 import type { Ambiente, Tarea } from '../../domain/tipos'
 
 /*
@@ -43,6 +46,7 @@ export default function Armado() {
   const [intento, setIntento] = useState(0)
   const [agregando, setAgregando] = useState(false)
   const campoPropia = useRef<HTMLInputElement>(null)
+  const avisar = useAvisos((estado) => estado.avisar)
   const [iaTexto, setIaTexto] = useState('')
   const [iaFoto, setIaFoto] = useState<File | null>(null)
   const [sugerencias, setSugerencias] = useState<Sugerencia[]>([])
@@ -227,6 +231,13 @@ export default function Armado() {
     setElegidas([])
     setIaTexto('')
     setIaFoto(null)
+    if (guardadas.size > 0) {
+      avisar(
+        guardadas.size === 1
+          ? 'Agregaste 1 idea a «Tus propias».'
+          : `Agregaste ${new Intl.NumberFormat('es-AR').format(guardadas.size)} ideas a «Tus propias».`,
+      )
+    }
   }
 
   async function guardarSugerencias(guardadas: Set<number>): Promise<void> {
@@ -305,6 +316,10 @@ export default function Armado() {
     setIncluidas((previas) => [...previas, tarea.id])
     setPropia('')
     setErrorPropia(null)
+    // La tarea nueva entra en «Tus propias», que muchas veces queda fuera de la
+    // vista: sin este aviso, tocar «Agregar» parecía no hacer nada más que vaciar
+    // el campo.
+    avisar(`Agregaste «${texto}» a «Tus propias».`)
   }
 
   if (falloLaCarga) {
@@ -315,9 +330,8 @@ export default function Armado() {
     return (
       <main className="pantalla">
         <h1 className="pantalla__titulo">{ambiente?.nombre ?? 'Ambiente'}</h1>
-        <p className="menudo" role="status" aria-live="polite">
-          Cargando las tareas…
-        </p>
+        <p className="menudo">Esto es lo que solemos hacer acá. Destildá lo que no quieras.</p>
+        <Esqueleto forma="tareas" />
       </main>
     )
   }
@@ -409,27 +423,25 @@ export default function Armado() {
             Contá lo que ves, o sacale una foto, y la IA te tira ideas. Vos elegís cuáles quedan.
           </p>
 
-          <label className="menudo" htmlFor="ia-texto">
+          <label className="campo__etiqueta" htmlFor="ia-texto">
             Contá lo que ves
           </label>
           <textarea
             id="ia-texto"
             name="ia-texto"
+            className="campo__entrada campo__entrada--varias-lineas"
             rows={3}
             value={iaTexto}
             placeholder="Ejemplo: hay ropa tirada y la mesada llena de cosas…"
             onChange={(evento) => setIaTexto(evento.target.value)}
           />
 
-          <label className="menudo" htmlFor="ia-foto">
-            O sacale una foto
-          </label>
-          <input
+          <SelectorDeArchivo
             id="ia-foto"
-            name="ia-foto"
-            type="file"
+            etiqueta={iaFoto ? 'Cambiar la foto…' : 'O sacale una foto…'}
             accept="image/*"
-            onChange={(evento) => setIaFoto(evento.target.files?.[0] ?? null)}
+            elegido={iaFoto?.name ?? null}
+            alElegir={setIaFoto}
           />
 
           <button type="button" className="boton-secundario" onClick={() => void pedirIdeas()} aria-busy={pensando}>

@@ -16,10 +16,10 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   Pasa en `Casa.tsx:38`, `Logros.tsx:163`, `Ajustes.tsx:62`, `Plan.tsx:369`, `Armado.tsx:203`,
   `ArranqueSesion.tsx:72` y `Bienvenida.tsx:127`. Hacer un estado `error` con mensaje y botón
   «Probá de nuevo», igual en todas.
-- [ ] 🔴 **Armado no tiene estado de carga.** Mientras lee el teléfono se ve el título y una
+- [x] 🔴 **Armado no tiene estado de carga.** Mientras lee el teléfono se ve el título y una
   lista vacía, y los botones «Listo, ¿cuánto tiempo tengo?» ya funcionan (`Armado.tsx:400`).
   Mostrar un skeleton de 2–3 grupos de tareas y deshabilitar el avance hasta que cargue.
-- [ ] 🟠 **Reemplazar los «Cargando…» de texto por skeletons que imiten la pantalla final**
+- [x] 🟠 **Reemplazar los «Cargando…» de texto por skeletons que imiten la pantalla final**
   (`Casa.tsx:64`, `Logros.tsx:177`, `Ajustes.tsx:198`). Hoy el contenido aparece de golpe y
   todo salta (CLS). Casa: grilla de cuartos apagados; Logros: tres tarjetas de totales vacías.
 - [ ] 🟠 **«¿Cuánto tiempo tenés?» no explica por qué el botón está deshabilitado mientras carga**
@@ -43,7 +43,7 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   fichas y «Elegí al menos un ambiente.» (`PrimeraVez.tsx:46`). Sumar una línea de propuesta
   de valor arriba («No tenés que ordenar todo, solo lo siguiente.» ya existe en `index.html`) y
   sacar el aviso de «Elegí al menos…» hasta que la persona intente avanzar.
-- [ ] 🔴 **Quien vuelve encuentra la selección vacía**, aunque ya haya elegido ambientes antes
+- [x] 🔴 **Quien vuelve encuentra la selección vacía**, aunque ya haya elegido ambientes antes
   (`PrimeraVez.tsx:19`, `useState([])`). La bienvenida dice «Está todo donde lo dejaste» y la
   pantalla dice lo contrario. Precargar los ambientes guardados, o para quien vuelve mostrar
   directo «Seguí donde quedaste» con el plan o la casa.
@@ -88,31 +88,31 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   (con la animación `aparecer-el-paso`), pero nada dice «esto quedó hecho». Sumar un check menta
   de ~400&nbsp;ms sobre la tarjeta saliente antes del viaje de la luz, respetando
   `prefers-reduced-motion`.
-- [ ] 🔴 **«Saltear» no tiene deshacer** (`Plan.tsx:686`). Un toque con poca puntería saltea una
+- [x] 🔴 **«Saltear» no tiene deshacer** (`Plan.tsx:686`). Un toque con poca puntería saltea una
   tarea sin vuelta. Toast «Salteaste X · Deshacer» de 5&nbsp;s con `aria-live="polite"`.
-- [ ] 🟠 **Agregar una tarea propia o las ideas de la IA no da ninguna señal** más que un renglón
+- [x] 🟠 **Agregar una tarea propia o las ideas de la IA no da ninguna señal** más que un renglón
   nuevo, muchas veces fuera de la vista (va al grupo «Tus propias», arriba). Hacer scroll al
   ítem nuevo y resaltarlo, o toast «Agregaste “regar las plantas”».
-- [ ] 🔴 **Confirmaciones destructivas con `window.confirm`** (`Ajustes.tsx:183`): se ve como
+- [x] 🔴 **Confirmaciones destructivas con `window.confirm`** (`Ajustes.tsx:183`): se ve como
   una alerta del sistema, rompe el diseño, y en una PWA instalada en iOS puede quedar bloqueada.
   Hacer un diálogo propio (`<dialog>` con foco atrapado y `overscroll-behavior: contain`).
-- [ ] 🟠 **«Empezar de cero» se ve igual que «Guardar una copia»** (`Ajustes.tsx:438`). La acción
+- [x] 🟠 **«Empezar de cero» se ve igual que «Guardar una copia»** (`Ajustes.tsx:438`). La acción
   más destructiva de la app tiene que distinguirse: separarla al final, con estilo propio.
-- [ ] 🟠 **«Borrar la clave» y «Arrancar de nuevo» no confirman ni tienen deshacer**
+- [x] 🟠 **«Borrar la clave» y «Arrancar de nuevo» no confirman ni tienen deshacer**
   (`Ajustes.tsx:325`, `ArranqueSesion.tsx:254`). Regla del producto: nada se borra en silencio.
-- [ ] 🟠 **Los botones no tienen `:hover`, `:active` ni `:disabled` en el secundario**
+- [x] 🟠 **Los botones no tienen `:hover`, `:active` ni `:disabled` en el secundario**
   (`pantallas.css:222`). `button` declara transición de `opacity`/`transform` pero nada cambia
   nunca. Sumar `:active { transform: scale(.98) }`, más contraste en hover y estilo de
   deshabilitado para `.boton-secundario` (hoy los de la clave de IA se ven activos y no andan).
-- [ ] 🟢 «Listo, quedó guardado.» en Ajustes no tiene `aria-live` (`Ajustes.tsx:454`) y no
+- [x] 🟢 «Listo, quedó guardado.» en Ajustes no tiene `aria-live` (`Ajustes.tsx:454`) y no
   desaparece nunca. Usar el mismo toast que el resto.
 
 ## 5. Consistencia
 
-- [ ] 🔴 **Hay campos sin estilo**: el `<textarea>` de IA, la playlist y la clave
+- [x] 🔴 **Hay campos sin estilo**: el `<textarea>` de IA, la playlist y la clave
   (`Armado.tsx:459`, `Ajustes.tsx:280`, `:348`) no usan `.campo__entrada`; se ven nativos al
   lado del campo «Agregar algo mío» que sí está estilado. Igualar todos.
-- [ ] 🔴 **Los selectores de archivo son nativos** (`input[type='file']`, `pantallas.css:670`):
+- [x] 🔴 **Los selectores de archivo son nativos** (`input[type='file']`, `pantallas.css:670`):
   «Elegir archivo / Ningún archivo seleccionado» en gris es la señal más clara de «prototipo».
   Usar un `<label>` con estilo de `.boton-secundario` que envuelva el input visualmente oculto,
   conservando el foco con `:has(:focus-visible)` (el mismo patrón que ya usan las fichas).
@@ -132,7 +132,7 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   botones al pie de la primera pantalla, compitiendo con el botón principal; dentro de cada una,
   la única salida es un botón al pie. Una barra superior mínima (atrás + título) o una barra de
   pestañas inferior para las cuatro secciones.
-- [ ] 🟢 **Botón dentro de un párrafo**: «Borrar la clave» está dentro de un `<p>`
+- [x] 🟢 **Botón dentro de un párrafo**: «Borrar la clave» está dentro de un `<p>`
   (`Ajustes.tsx:323`) y hereda el renglón; queda mal alineado.
 - [ ] 🟢 **La safe area de abajo se suma dos veces**: `body` ya la tiene de padding
   (`base.css:77`) y `.pantalla` la vuelve a sumar (`pantallas.css:18`). En iPhone queda un hueco

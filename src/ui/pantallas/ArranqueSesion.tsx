@@ -5,6 +5,7 @@ import { opcionesDeMusica } from '../musica'
 import { nuevoId } from '../id'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import { useAvisos } from '../estado/avisos'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Modo, Tarea } from '../../domain/tipos'
 
@@ -52,6 +53,7 @@ export default function ArranqueSesion() {
   const navegar = useNavigate()
   const repositorio = useSesion((estado) => estado.repositorio)
   const abrirPlan = useSesion((estado) => estado.abrirPlan)
+  const confirmar = useAvisos((estado) => estado.confirmar)
 
   const [tiempo, setTiempo] = useState<string>('20')
   const [modo, setModo] = useState<Modo>('arrancarYa')
@@ -115,6 +117,14 @@ export default function ArranqueSesion() {
    * sin forma de volver a empezar, y en una app instalada no hay botón Atrás.
    */
   async function empezarDeNuevo(): Promise<void> {
+    const confirmado = await confirmar({
+      titulo: '¿Arrancar de nuevo?',
+      texto:
+        'Todas las tareas de tus ambientes vuelven a quedar pendientes. Lo que hiciste sigue anotado en «Lo que hiciste»: los totales no bajan.',
+      confirmar: 'Arrancar de nuevo',
+    })
+    if (!confirmado) return
+
     setEstadoDeTareas('cargando')
     setError(null)
     try {

@@ -694,15 +694,255 @@
   font-weight: 400;
 }
 
+/* --- Selector de archivo --- */
+
 /*
-  El selector de archivos para traer una copia. Se deja visible y nativo, sin
-  disfrazarlo: en un teléfono la persona reconoce «Elegir archivo», y esconderlo
-  detrás de una etiqueta deja el control sin foco visible para quien navega con
-  teclado. Necesita el área táctil y los 16 px de siempre, o iOS hace zoom al
-  tocarlo.
+  El selector se ve como un botón secundario. El `<input>` sigue ahí —recibe el foco
+  y el toque— pero visualmente oculto, y el anillo de foco pasa a la etiqueta que lo
+  envuelve. Antes era el nativo, «Seleccionar archivo» en gris: la señal más clara de
+  prototipo, y lo que obligaba a dejarlo sin disfrazar era justamente el foco.
 */
-input[type='file'] {
-  min-height: var(--toque-minimo);
-  font-size: 1rem;
+.selector-archivo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.selector-archivo__boton {
+  position: relative;
+  cursor: pointer;
+}
+
+.selector-archivo__boton:has(.selector-archivo__entrada:focus-visible) {
+  outline: 2px solid var(--color-velador);
+  outline-offset: 2px;
+}
+
+.selector-archivo__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selector-archivo__elegido {
+  overflow-wrap: anywhere;
+}
+
+/* --- Estados de los botones --- */
+
+/*
+  Antes los botones declaraban una transición de opacidad y escala que nunca
+  ocurría: no había ningún estado que cambiara. El toque se hunde apenas, el
+  puntero fino sube el contraste, y lo deshabilitado se ve deshabilitado.
+*/
+.boton-principal:active:not(:disabled),
+.boton-secundario:active:not(:disabled),
+.boton-destructivo:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .boton-secundario:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--color-hueso) 40%, transparent);
+    background-color: color-mix(in oklab, var(--color-hueso) 6%, transparent);
+  }
+
+  .boton-principal:hover:not(:disabled) {
+    background-color: color-mix(in oklab, var(--color-velador) 88%, var(--color-hueso));
+  }
+}
+
+.boton-secundario:disabled {
   color: var(--color-humo);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+/*
+  Lo destructivo no usa rojo —es una regla del producto—, pero tampoco se parece a
+  los demás: borde y texto de ámbar sobre fondo vacío, y siempre detrás de una
+  confirmación.
+*/
+.boton-destructivo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--toque-minimo);
+  padding: 0 1rem;
+  border: 1px solid var(--color-velador);
+  border-radius: var(--radio-control);
+  background-color: transparent;
+  color: var(--color-velador);
+  font-size: var(--texto-cuerpo);
+  font-weight: 600;
+}
+
+.zona-delicada {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+/* --- Campo de varias líneas --- */
+
+.campo__entrada--varias-lineas {
+  min-height: 6rem;
+  padding: 0.75rem 1rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* --- Esqueletos de carga --- */
+
+@keyframes esqueleto-latido {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.esqueleto__formas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: esqueleto-latido 900ms ease-in-out infinite alternate;
+}
+
+.esqueleto__bloque {
+  border-color: transparent;
+  background-color: var(--color-pared);
+}
+
+.esqueleto__barra {
+  display: block;
+  height: 0.875rem;
+  border-radius: 999px;
+  background-color: color-mix(in oklab, var(--color-hueso) 10%, transparent);
+}
+
+/* Sin movimiento, el esqueleto queda quieto: la forma sola ya dice que algo carga. */
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto__formas {
+    animation: none;
+  }
+}
+
+/* --- Aviso flotante --- */
+
+/*
+  Arriba y no abajo: abajo tapaba «Listo», que es justo lo que se va a tocar
+  después de saltear. Respeta el notch.
+*/
+.aviso-flotante {
+  position: fixed;
+  top: calc(var(--safe-arriba) + 0.75rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 0 calc(var(--safe-derecha) + 1rem) 0 calc(var(--safe-izquierda) + 1rem);
+  pointer-events: none;
+}
+
+@keyframes aviso-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.aviso-flotante__caja {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  max-width: 480px;
+  padding: 0.25rem 0.25rem 0.25rem 1rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-control);
+  background-color: var(--color-pared);
+  box-shadow: var(--sombra-tarjeta);
+  pointer-events: auto;
+  animation: aviso-entra 200ms ease-out;
+}
+
+.aviso-flotante__texto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--texto-menudo);
+  overflow-wrap: anywhere;
+}
+
+.aviso-flotante__accion,
+.aviso-flotante__cerrar {
+  min-width: var(--toque-minimo);
+  min-height: var(--toque-minimo);
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: calc(var(--radio-control) - 4px);
+  background-color: transparent;
+}
+
+.aviso-flotante__accion {
+  color: var(--color-velador);
+  font-weight: 600;
+}
+
+.aviso-flotante__cerrar {
+  padding: 0;
+  color: var(--color-humo);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* --- Diálogo de confirmación --- */
+
+.dialogo {
+  /* El reset de Tailwind le saca al `<dialog>` el margen automático que lo centra. */
+  margin: auto;
+  width: min(100% - 2rem, 420px);
+  max-height: calc(100dvh - var(--safe-arriba) - var(--safe-abajo) - 2rem);
+  padding: 1.5rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background-color: var(--color-pared);
+  color: var(--color-hueso);
+  box-shadow: var(--sombra-tarjeta);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.dialogo::backdrop {
+  background-color: rgb(9 8 24 / 0.7);
+}
+
+.dialogo[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dialogo__titulo {
+  font-size: 1.375rem;
+}
+
+.dialogo__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.dialogo__acciones > * {
+  flex: 1 1 10rem;
 }
