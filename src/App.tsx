@@ -9,6 +9,7 @@ import Logros from './ui/pantallas/Logros'
 import Casa from './ui/pantallas/Casa'
 import NoEncontrada from './ui/pantallas/NoEncontrada'
 import Avisos from './ui/componentes/Avisos'
+import BarraDePestanas from './ui/componentes/BarraDePestanas'
 
 /*
   Las rutas se declaran como datos para que los tests puedan montarlas con
@@ -40,6 +41,7 @@ export function Rutas() {
           <Route key={ruta.path} path={ruta.path} element={ruta.element} />
         ))}
       </Routes>
+      <BarraDePestanas />
       <Avisos />
     </>
   )

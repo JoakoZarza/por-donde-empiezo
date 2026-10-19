@@ -120,7 +120,7 @@ export default function Casa() {
 
       <div className="pantalla__pie">
         <Link className="boton-principal" to="/">
-          Elegir ambientes
+          Elegí ambientes
         </Link>
       </div>
     </main>

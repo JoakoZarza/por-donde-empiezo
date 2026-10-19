@@ -96,7 +96,7 @@ export default function Logros() {
         </p>
         <div className="pantalla__pie">
           <Link className="boton-principal" to="/">
-            Elegir ambientes
+            Elegí ambientes
           </Link>
         </div>
       </main>
@@ -164,7 +164,7 @@ export default function Logros() {
 
       <div className="pantalla__pie">
         <Link className="boton-principal" to="/sesion/nueva">
-          Ponerme con algo
+          Seguí un rato más
         </Link>
       </div>
     </main>

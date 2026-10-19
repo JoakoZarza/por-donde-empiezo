@@ -54,7 +54,7 @@ test.each([
   montar(ruta)
 
   expect(await screen.findByRole('alert')).toHaveTextContent(/no pudimos leer tus datos/i)
-  expect(screen.getByRole('link', { name: /volver al principio/i })).toHaveAttribute('href', '/')
+  expect(screen.getByRole('link', { name: /volvé al principio/i })).toHaveAttribute('href', '/')
   expect(screen.getByRole('button', { name: /probá de nuevo/i })).toBeInTheDocument()
 })
 
@@ -144,7 +144,7 @@ test('el campo vacío se explica junto al campo y recibe el foco', async () => {
   montar('/armar/cocina')
   const campo = await screen.findByLabelText(/agregar algo mío/i)
 
-  await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
+  await usuario.click(screen.getByRole('button', { name: /^agregá$/i }))
 
   expect(campo).toHaveAccessibleDescription(/escribí qué hay que hacer/i)
   expect(campo).toHaveFocus()
@@ -155,7 +155,7 @@ test('en Ajustes, el aviso de la clave aparece junto al campo de la clave', asyn
   await repo.guardarPreferencias({ ...(await repo.preferencias()), avisoDePrivacidadAceptado: true })
   montar('/ajustes')
 
-  await usuario.click(await screen.findByRole('button', { name: /guardar la clave/i }))
+  await usuario.click(await screen.findByRole('button', { name: /guardá la clave/i }))
 
   const campo = screen.getByLabelText(/tu clave de google/i)
   expect(campo).toHaveAccessibleDescription(/pegá una clave primero/i)

@@ -19,7 +19,7 @@ export default function NoEncontrada() {
       <p className="menudo">Puede que el enlace esté viejo.</p>
       <div className="pantalla__pie">
         <Link className="boton-principal" to="/">
-          Volver al principio
+          Volvé al principio
         </Link>
       </div>
     </main>

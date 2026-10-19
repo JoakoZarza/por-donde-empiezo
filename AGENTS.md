@@ -230,6 +230,23 @@ una SPA. Las demás aplican todas.
 - Espacio duro para que las unidades no se corten: `10&nbsp;min`, `44&nbsp;px`.
 - Los botones dicen exactamente lo que pasa ("Armá el plan", no "Continuar"). Una acción
   conserva su nombre en todo el flujo.
+- **Los botones van en imperativo con voseo**: «Elegí ambientes», «Guardá la clave»,
+  «Salteá». Nunca infinitivo («Elegir ambientes») ni primera persona («Ponerme con algo»).
+  Las excepciones son las respuestas cortas que no son una orden: «Listo», «Listo por
+  hoy», «No puedo ahora», «Cancelar».
+- **Glosario de acciones.** Si una acción ya tiene nombre, se usa ese:
+
+  | Acción | Nombre |
+  |---|---|
+  | Ir a elegir qué ordenar | Elegí ambientes |
+  | Ir a armar una sesión, desde cualquier pantalla | Seguí un rato más |
+  | Generar el plan con el tiempo elegido | Armá el plan |
+  | Volver a la primera pantalla desde una salida sin pestañas | Volvé al principio |
+  | Reabrir el ciclo de todos los ambientes | Arrancá de nuevo |
+  | Reintentar después de un error | Probá de nuevo |
+
+- Los botones que abren una confirmación terminan en `…` («Borrá la clave…»), y el botón
+  que confirma repite la acción sin `…` («Borrá la clave»), nunca «Aceptar».
 
 ## Reglas de producto que la interfaz debe respetar
 
@@ -241,7 +258,7 @@ una SPA. Las demás aplican todas.
 
 ## Interfaz, específico de este proyecto
 
-- **Área táctil mínima de 44&nbsp;px**, incluidos los controles secundarios (*Saltear*, *No puedo
+- **Área táctil mínima de 44&nbsp;px**, incluidos los controles secundarios (*Salteá*, *No puedo
   ahora*), que son los que más se van a tocar con el pulgar y con poca puntería.
 - **Toda entrada de texto con `font-size` ≥ 16&nbsp;px**, o iOS hace zoom solo al escribir. El zoom
   del navegador **nunca** se deshabilita.

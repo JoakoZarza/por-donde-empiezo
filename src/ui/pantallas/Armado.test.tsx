@@ -85,7 +85,7 @@ test('agrega una tarea propia y la guarda', async () => {
   await screen.findByRole('heading', { name: /mesada/i })
 
   await usuario.type(screen.getByLabelText(/agregar algo mío/i), 'Regar las plantas')
-  await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
+  await usuario.click(screen.getByRole('button', { name: /^agregá$/i }))
 
   expect(await screen.findByText(/regar las plantas/i)).toBeInTheDocument()
   await waitFor(async () => {
@@ -103,7 +103,7 @@ test('no guarda una tarea propia con el nombre vacío, y lo explica', async () =
   await screen.findByRole('heading', { name: /mesada/i })
 
   await usuario.type(screen.getByLabelText(/agregar algo mío/i), '    ')
-  await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
+  await usuario.click(screen.getByRole('button', { name: /^agregá$/i }))
 
   expect(await screen.findByRole('status')).toBeInTheDocument()
   const guardadas = await repo.listarTareas('cocina')
@@ -129,7 +129,7 @@ test('un nombre de 150 caracteres se guarda completo: el recorte es solo visual'
   expect(largo.length).toBeGreaterThan(100)
 
   await usuario.type(screen.getByLabelText(/agregar algo mío/i), largo)
-  await usuario.click(screen.getByRole('button', { name: /^agregar$/i }))
+  await usuario.click(screen.getByRole('button', { name: /^agregá$/i }))
 
   await waitFor(async () => {
     const guardada = (await repo.listarTareas('cocina')).find((t) => t.accion === largo)

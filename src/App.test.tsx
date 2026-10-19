@@ -81,7 +81,7 @@ test('la ruta del plan muestra la pantalla del plan', () => {
 test('una ruta desconocida no deja a la persona sin salida', () => {
   renderEn('/no-existe-esta-pantalla')
   expect(screen.getByRole('heading', { name: /no encontramos/i })).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: /volver al principio/i })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: /volvé al principio/i })).toBeInTheDocument()
 })
 
 test('cada ruta cambia el título del documento', () => {

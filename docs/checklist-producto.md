@@ -124,17 +124,17 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   `Seccion` con título visible igual en todas las pantallas.
 - [ ] 🟠 **Las etiquetas de campos usan tres clases distintas**: `campo__etiqueta`, `menudo` y
   ninguna. Unificar en `campo__etiqueta`.
-- [ ] 🟠 **Los botones cambian de persona gramatical y de nombre**: «Armá las tareas», «Armá el
+- [x] 🟠 **Los botones cambian de persona gramatical y de nombre**: «Armá las tareas», «Armá el
   plan» (imperativo) vs «Elegir ambientes», «Volver al principio» (infinitivo) vs «Ponerme con
   algo» (primera persona). La misma acción se llama «Seguir un rato más», «Seguir con más
   tiempo» y «Ponerme con algo». Fijar un glosario de acciones y un modo verbal.
-- [ ] 🟠 **No hay navegación estable.** Casa, Logros y Ajustes solo se alcanzan desde tres
+- [x] 🟠 **No hay navegación estable.** Casa, Logros y Ajustes solo se alcanzan desde tres
   botones al pie de la primera pantalla, compitiendo con el botón principal; dentro de cada una,
   la única salida es un botón al pie. Una barra superior mínima (atrás + título) o una barra de
   pestañas inferior para las cuatro secciones.
 - [x] 🟢 **Botón dentro de un párrafo**: «Borrar la clave» está dentro de un `<p>`
   (`Ajustes.tsx:323`) y hereda el renglón; queda mal alineado.
-- [ ] 🟢 **La safe area de abajo se suma dos veces**: `body` ya la tiene de padding
+- [x] 🟢 **La safe area de abajo se suma dos veces**: `body` ya la tiene de padding
   (`base.css:77`) y `.pantalla` la vuelve a sumar (`pantallas.css:18`). En iPhone queda un hueco
   de más debajo del «Listo».
 - [ ] 🟢 Sumar a `docs/` una página de componentes (botones, campos, alertas, toast, skeleton,

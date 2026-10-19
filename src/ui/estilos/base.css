@@ -21,7 +21,12 @@ body {
   color: var(--color-hueso);
   background-color: var(--color-noche);
   -webkit-font-smoothing: antialiased;
-  padding: var(--safe-arriba) var(--safe-derecha) var(--safe-abajo) var(--safe-izquierda);
+  /*
+    Sin la safe area de abajo: la suma cada pantalla en su pie, y la barra de
+    pestañas en la suya. Acá se sumaba dos veces y dejaba un hueco de más debajo
+    de «Listo».
+  */
+  padding: var(--safe-arriba) var(--safe-derecha) 0 var(--safe-izquierda);
 }
 
 h1,

@@ -137,7 +137,7 @@ test('«Saltear» deja el paso como salteado y avanza', async () => {
   montar(plan.id)
   await screen.findByRole('article')
 
-  await usuario.click(screen.getByRole('button', { name: 'Saltear' }))
+  await usuario.click(screen.getByRole('button', { name: 'Salteá' }))
 
   await waitFor(async () => {
     const guardado = await repo.obtenerPlan(plan.id)
@@ -165,7 +165,7 @@ test('al terminar el último paso muestra el cierre, y no un error', async () =>
 
   expect(await screen.findByText(/terminaste lo que te propusiste/i)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /listo por hoy/i })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /seguir un rato más/i })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /seguí un rato más/i })).toBeInTheDocument()
 })
 
 test('si el plan quedó vacío explica por qué y ofrece seguir', async () => {
@@ -177,7 +177,7 @@ test('si el plan quedó vacío explica por qué y ofrece seguir', async () => {
   // cualquier cosa que dijera «minutos» en cualquier parte de la pantalla, incluida
   // la duración de una tarea.
   expect(await screen.findByText(/no entra ninguna tarea/i)).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /seguir con más tiempo/i })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /seguí un rato más/i })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Listo' })).not.toBeInTheDocument()
 })
 
@@ -187,7 +187,7 @@ test('«Reordenar» arma un plan nuevo con lo que queda', async () => {
   montar(plan.id)
   await screen.findByRole('article')
 
-  await usuario.click(screen.getByRole('button', { name: 'Reordenar' }))
+  await usuario.click(screen.getByRole('button', { name: 'Reordená' }))
 
   await waitFor(async () => {
     const ultimo = await repo.ultimoPlan()

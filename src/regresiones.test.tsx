@@ -53,7 +53,7 @@ test('C1: con todas las tareas ya hechas, la pantalla ofrece una salida de verda
   for (const tarea of tareas) await repo.marcarHecha(tarea.id, '2026-10-10T21:00:00.000Z')
 
   montar()
-  const salida = await screen.findByRole('link', { name: /volver al principio/i })
+  const salida = await screen.findByRole('link', { name: /volvé al principio/i })
   expect(salida).toHaveAttribute('href', '/')
   // Y no puede culpar a la persona de algo que no hizo.
   expect(screen.queryByText(/revisá las tareas incluidas/i)).not.toBeInTheDocument()
@@ -79,14 +79,14 @@ test('C1: el plan vacío por tener todo hecho tampoco es un callejón sin salida
   await repo.guardarPlan(plan)
 
   montar('/plan/plan-vacio')
-  expect(await screen.findByRole('link', { name: /volver al principio/i })).toBeInTheDocument()
+  expect(await screen.findByRole('link', { name: /volvé al principio/i })).toBeInTheDocument()
 })
 
 test('C2: sin ninguna tarea tildada, la pantalla ofrece volver y no queda muerta', async () => {
   // El ambiente está guardado pero sin tareas: es el caso 2 de Review Focus.
   montar()
   expect(await screen.findByText(/no hay ninguna tarea/i)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: /elegir ambientes/i })).toHaveAttribute('href', '/')
+  expect(screen.getByRole('link', { name: /elegí ambientes/i })).toHaveAttribute('href', '/')
 })
 
 test('I1: al recargar, el plan arranca en el primer paso pendiente', async () => {

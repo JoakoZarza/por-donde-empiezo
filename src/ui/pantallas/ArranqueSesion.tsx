@@ -121,7 +121,7 @@ export default function ArranqueSesion() {
       titulo: '¿Arrancar de nuevo?',
       texto:
         'Todas las tareas de tus ambientes vuelven a quedar pendientes. Lo que hiciste sigue anotado en «Lo que hiciste»: los totales no bajan.',
-      confirmar: 'Arrancar de nuevo',
+      confirmar: 'Arrancá de nuevo',
     })
     if (!confirmado) return
 
@@ -272,7 +272,7 @@ export default function ArranqueSesion() {
           <>
             <p className="menudo">No hay ninguna tarea para hacer.</p>
             <Link className="boton-secundario" to="/">
-              Elegir ambientes
+              Elegí ambientes
             </Link>
           </>
         )}
@@ -281,10 +281,10 @@ export default function ArranqueSesion() {
           <>
             <p className="menudo">Ya hiciste todo lo de estos ambientes. ¿Arrancamos de nuevo?</p>
             <button type="button" className="boton-secundario" onClick={() => void empezarDeNuevo()}>
-              Arrancar de nuevo
+              Arrancá de nuevo
             </button>
             <Link className="boton-secundario" to="/">
-              Volver al principio
+              Volvé al principio
             </Link>
           </>
         )}

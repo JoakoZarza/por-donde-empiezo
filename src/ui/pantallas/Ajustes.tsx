@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router'
 import { CATALOGO } from '../../domain/catalogo'
 import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
@@ -151,7 +150,7 @@ export default function Ajustes() {
       setAviso({
         lugar: 'clave',
         tipo: 'error',
-        texto: 'Pegá una clave primero. Si ya no querés usar la IA, tocá «Borrar la clave».',
+        texto: 'Pegá una clave primero. Si ya no querés usar la IA, tocá «Borrá la clave».',
       })
       campoClave.current?.focus()
       return
@@ -168,7 +167,7 @@ export default function Ajustes() {
     const confirmado = await confirmar({
       titulo: '¿Borrar la clave?',
       texto: 'Se borra de este teléfono y dejás de poder pedir ideas. Para volver a usarla vas a tener que pegarla de nuevo.',
-      confirmar: 'Borrar la clave',
+      confirmar: 'Borrá la clave',
       destructiva: true,
     })
     if (!confirmado) return
@@ -185,7 +184,7 @@ export default function Ajustes() {
       setAviso({
         lugar: 'clave',
         tipo: 'error',
-        texto: 'Escribí la clave en el campo de arriba y después tocá «Probar».',
+        texto: 'Escribí la clave en el campo de arriba y después tocá «Probá la clave».',
       })
       campoClave.current?.focus()
       return
@@ -253,7 +252,7 @@ export default function Ajustes() {
       titulo: '¿Empezar de cero en este teléfono?',
       texto:
         'Se borra todo: los ambientes, las tareas y los totales de «Lo que hiciste». No se puede deshacer. Si querés conservarlo, primero guardá una copia.',
-      confirmar: 'Borrar todo',
+      confirmar: 'Borrá todo',
       destructiva: true,
     })
     if (!confirmado) return
@@ -380,7 +379,7 @@ export default function Ajustes() {
           onChange={(evento) => setPlaylist(evento.target.value)}
         />
         <button type="submit" className="boton-secundario">
-          Guardar la playlist
+          Guardá la playlist
         </button>
         <AvisoEn lugar="playlist" aviso={aviso} />
       </form>
@@ -421,7 +420,7 @@ export default function Ajustes() {
           <div className="campo">
             <p className="menudo">Hay una clave guardada en este teléfono.</p>
             <button type="button" className="boton-secundario" onClick={() => void borrarClave()}>
-              Borrar la clave…
+              Borrá la clave…
             </button>
           </div>
         )}
@@ -464,7 +463,7 @@ export default function Ajustes() {
               className="boton-secundario"
               disabled={!preferencias.avisoDePrivacidadAceptado}
             >
-              Guardar la clave
+              Guardá la clave
             </button>
             <button
               type="button"
@@ -473,7 +472,7 @@ export default function Ajustes() {
               disabled={!preferencias.avisoDePrivacidadAceptado || probando}
               aria-busy={probando}
             >
-              {probando ? 'Probando…' : 'Probar'}
+              {probando ? 'Probando…' : 'Probá la clave'}
             </button>
           </div>
           <AvisoEn lugar="clave" aviso={aviso} id="clave-ia-aviso" />
@@ -520,12 +519,12 @@ export default function Ajustes() {
         </p>
 
         <button type="button" className="boton-secundario" onClick={() => void guardarCopia()}>
-          Guardar una copia
+          Guardá una copia
         </button>
 
         <SelectorDeArchivo
           id="copia"
-          etiqueta="Traer de otra copia…"
+          etiqueta="Traé otra copia…"
           accept="application/json,.json"
           alElegir={(archivo) => void traerCopia(archivo)}
         />
@@ -540,16 +539,10 @@ export default function Ajustes() {
         <h2 className="grupo__titulo">Empezar de cero</h2>
         <p className="menudo">Borra todo lo de este teléfono. Antes te pedimos que lo confirmes.</p>
         <button type="button" className="boton-destructivo" onClick={() => void empezarDeCero()}>
-          Empezar de cero en este teléfono…
+          Empezá de cero en este teléfono…
         </button>
         <AvisoEn lugar="cero" aviso={aviso} />
       </section>
-
-      <div className="pantalla__pie">
-        <Link className="boton-principal" to="/">
-          Volver al principio
-        </Link>
-      </div>
     </main>
   )
 }

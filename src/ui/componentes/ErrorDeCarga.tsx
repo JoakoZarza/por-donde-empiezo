@@ -24,7 +24,7 @@ export default function ErrorDeCarga({ titulo, alReintentar }: Props) {
       </p>
       <div className="pantalla__pie">
         <Link className="boton-secundario" to="/">
-          Volver al principio
+          Volvé al principio
         </Link>
         <button type="button" className="boton-principal" onClick={alReintentar}>
           Probá de nuevo

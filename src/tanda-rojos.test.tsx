@@ -105,7 +105,7 @@ test('«Saltear» ofrece deshacer, y deshacer vuelve a la misma tarea', async ()
 
   await screen.findByRole('article')
   const titulo = screen.getByRole('heading', { level: 2 }).textContent ?? ''
-  await usuario.click(screen.getByRole('button', { name: 'Saltear' }))
+  await usuario.click(screen.getByRole('button', { name: 'Salteá' }))
 
   expect(await screen.findByText(/^Salteaste/, {}, { timeout: 3000 })).toBeInTheDocument()
   await usuario.click(screen.getByRole('button', { name: 'Deshacer' }))
@@ -122,7 +122,7 @@ test('«Empezar de cero» pide confirmar en un diálogo propio, y cancelar no bo
   await sembrar('cocina')
   montar('/ajustes')
 
-  await usuario.click(await screen.findByRole('button', { name: /empezar de cero en este teléfono/i }))
+  await usuario.click(await screen.findByRole('button', { name: /empezá de cero en este teléfono/i }))
 
   const dialogo = await screen.findByRole('dialog', { name: /empezar de cero/i })
   // El foco arranca en la opción segura.
@@ -138,9 +138,9 @@ test('confirmar «Borrar todo» sí borra, y lo dice junto a la sección', async
   await sembrar('cocina')
   montar('/ajustes')
 
-  await usuario.click(await screen.findByRole('button', { name: /empezar de cero en este teléfono/i }))
+  await usuario.click(await screen.findByRole('button', { name: /empezá de cero en este teléfono/i }))
   const dialogo = await screen.findByRole('dialog', { name: /empezar de cero/i })
-  await usuario.click(within(dialogo).getByRole('button', { name: 'Borrar todo' }))
+  await usuario.click(within(dialogo).getByRole('button', { name: 'Borrá todo' }))
 
   expect(await screen.findByText(/este teléfono quedó en cero/i)).toBeInTheDocument()
   expect(await repo.listarAmbientes()).toHaveLength(0)
@@ -152,7 +152,7 @@ test('«Arrancar de nuevo» pide confirmación antes de reabrir el ciclo', async
   for (const tarea of tareasDeAmbiente('cocina')) await repo.marcarHecha(tarea.id, '2026-10-10T21:00:00.000Z')
   montar('/sesion/nueva')
 
-  await usuario.click(await screen.findByRole('button', { name: /arrancar de nuevo/i }))
+  await usuario.click(await screen.findByRole('button', { name: /arrancá de nuevo/i }))
   const dialogo = await screen.findByRole('dialog', { name: /arrancar de nuevo/i })
   await usuario.click(within(dialogo).getByRole('button', { name: 'Cancelar' }))
 
@@ -171,7 +171,7 @@ test('agregar una tarea propia lo confirma con un aviso', async () => {
 test('los selectores de archivo tienen nombre y siguen siendo un input de archivo', async () => {
   montar('/ajustes')
 
-  const copia = await screen.findByLabelText(/traer de otra copia/i)
+  const copia = await screen.findByLabelText(/traé otra copia/i)
   expect(copia).toHaveAttribute('type', 'file')
   expect(copia).toHaveAttribute('accept', 'application/json,.json')
 })

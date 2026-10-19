@@ -946,3 +946,82 @@
 .dialogo__acciones > * {
   flex: 1 1 10rem;
 }
+
+/* --- Barra de pestañas --- */
+
+/*
+  Alto de la barra sin la safe area. Las pantallas que la tienen debajo suman este
+  alto a su margen inferior, para que el pie nunca quede tapado.
+*/
+:root {
+  --alto-pestanas: 4rem;
+}
+
+body:has(.pestanas) .pantalla {
+  padding-bottom: calc(var(--alto-pestanas) + var(--safe-abajo) + 1.5rem);
+}
+
+.pestanas {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 0 var(--safe-derecha) var(--safe-abajo) var(--safe-izquierda);
+  border-top: 1px solid var(--color-borde);
+  background-color: color-mix(in oklab, var(--color-noche) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.pestanas__lista {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.pestana {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  min-height: var(--alto-pestanas);
+  padding: 0.375rem 0.25rem;
+  color: var(--color-humo);
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.pestana__texto {
+  max-width: 100%;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/*
+  La pestaña activa se marca con color Y con peso, y con una línea arriba: nunca
+  solo por color. El ámbar es escaso a propósito, así que acá va el hueso.
+*/
+.pestana[aria-current='page'] {
+  color: var(--color-hueso);
+  box-shadow: inset 0 2px 0 var(--color-velador);
+}
+
+.pestana[aria-current='page'] .pestana__texto {
+  font-weight: 600;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pestana:hover {
+    color: var(--color-hueso);
+  }
+}
+
+.pestana:focus-visible {
+  outline-offset: -4px;
+}

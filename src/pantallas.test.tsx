@@ -1,8 +1,8 @@
 import 'fake-indexeddb/auto'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test } from 'vitest'
-import { RUTAS } from './App'
+import { RUTAS, Rutas } from './App'
 import { useSesion } from './ui/estado/sesion'
 import { crearRepositorioLocal } from './data/repositorioLocal'
 
@@ -69,28 +69,44 @@ test('la pantalla de un plan que no existe ofrece una salida y no queda inerte',
   )
 
   expect(await screen.findByText(/no encontramos ese plan/i)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: /volver al principio/i })).toHaveAttribute('href', '/')
-  expect(screen.getByRole('link', { name: /armar una sesión nueva/i })).toHaveAttribute('href', '/sesion/nueva')
+  expect(screen.getByRole('link', { name: /volvé al principio/i })).toHaveAttribute('href', '/')
+  expect(screen.getByRole('link', { name: /armá una sesión nueva/i })).toHaveAttribute('href', '/sesion/nueva')
 })
 
 test('las pantallas nuevas son alcanzables desde la primera', async () => {
+  // Con `Rutas` entero: los enlaces viven en la barra de pestañas, fuera de las pantallas.
   render(
     <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        {RUTAS.map((cada) => (
-          <Route key={cada.path} path={cada.path} element={cada.element} />
-        ))}
-      </Routes>
+      <Rutas />
     </MemoryRouter>,
   )
 
   await screen.findByRole('heading', { level: 1 })
+  const pestanas = screen.getByRole('navigation', { name: 'Secciones' })
   // Si un enlace se rompe, la función queda existiendo pero sin puerta de entrada:
   // es el defecto que ya apareció dos veces en esta rama.
   for (const destino of ['/casa', '/logros', '/ajustes']) {
-    expect(screen.getByRole('link', { name: new RegExp(nombreDe(destino), 'i') })).toHaveAttribute('href', destino)
+    expect(within(pestanas).getByRole('link', { name: new RegExp(nombreDe(destino), 'i') })).toHaveAttribute(
+      'href',
+      destino,
+    )
   }
+  // Y la sección actual se anuncia como tal, no solo por color.
+  expect(within(pestanas).getByRole('link', { name: 'Ordenar' })).toHaveAttribute('aria-current', 'page')
 })
+
+test.each(['/armar/cocina', '/sesion/nueva', '/plan/cualquiera'])(
+  'en el recorrido (%s) no hay barra de pestañas que distraiga',
+  async (ruta) => {
+    render(
+      <MemoryRouter initialEntries={[ruta]}>
+        <Rutas />
+      </MemoryRouter>,
+    )
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.queryByRole('navigation', { name: 'Secciones' })).not.toBeInTheDocument()
+  },
+)
 
 function nombreDe(destino: string): string {
   if (destino === '/casa') return 'tu casa'

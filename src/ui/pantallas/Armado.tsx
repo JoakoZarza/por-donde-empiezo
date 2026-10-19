@@ -167,7 +167,7 @@ export default function Armado() {
 
     Nada de lo que devuelve el modelo entra en la lista por su cuenta: se muestra con
     una tilde puesta —porque si pidió ideas es porque las quiere— y recién cuando
-    toca «Agregar las elegidas» se convierten en tareas.
+    toca «Agregá las elegidas» se convierten en tareas.
   */
   async function pedirIdeas(): Promise<void> {
     // Un segundo toque mientras piensa mandaría otro pedido y gastaría cuota de la clave.
@@ -317,7 +317,7 @@ export default function Armado() {
     setPropia('')
     setErrorPropia(null)
     // La tarea nueva entra en «Tus propias», que muchas veces queda fuera de la
-    // vista: sin este aviso, tocar «Agregar» parecía no hacer nada más que vaciar
+    // vista: sin este aviso, tocar «Agregá» parecía no hacer nada más que vaciar
     // el campo.
     avisar(`Agregaste «${texto}» a «Tus propias».`)
   }
@@ -407,7 +407,7 @@ export default function Armado() {
               }}
             />
             <button type="submit" className="boton-secundario" disabled={agregando} aria-busy={agregando}>
-              Agregar
+              Agregá
             </button>
           </div>
           {errorPropia && (
@@ -445,7 +445,7 @@ export default function Armado() {
           />
 
           <button type="button" className="boton-secundario" onClick={() => void pedirIdeas()} aria-busy={pensando}>
-            {pensando ? 'Pensando…' : 'Pedir ideas'}
+            {pensando ? 'Pensando…' : 'Pedí ideas'}
           </button>
 
           {iaError && (
@@ -489,7 +489,7 @@ export default function Armado() {
               disabled={agregando}
               aria-busy={agregando}
             >
-              Agregar las elegidas
+              Agregá las elegidas
             </button>
           )}
 
@@ -513,7 +513,7 @@ export default function Armado() {
               className="boton-principal"
               onClick={() => navegar(`/armar/${siguiente.id}`)}
             >
-              Seguir con {siguiente.nombre.toLowerCase()}
+              Seguí con {siguiente.nombre.toLowerCase()}
             </button>
           </>
         ) : (

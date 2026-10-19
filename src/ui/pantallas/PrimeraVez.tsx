@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import Bienvenida from '../componentes/Bienvenida'
 import { CATALOGO } from '../../domain/catalogo'
 import { useSesion } from '../estado/sesion'
@@ -94,17 +94,6 @@ export default function PrimeraVez() {
 
       <div className="pantalla__pie">
         <Bienvenida />
-        <div className="acciones">
-          <Link className="boton-secundario" to="/casa">
-            Tu casa
-          </Link>
-          <Link className="boton-secundario" to="/logros">
-            Lo que hiciste
-          </Link>
-          <Link className="boton-secundario" to="/ajustes">
-            Ajustes
-          </Link>
-        </div>
         {elegidos.length === 0 && <p className="menudo">Elegí al menos un ambiente.</p>}
         {error && (
           <p className="alerta" role="status" aria-live="polite">

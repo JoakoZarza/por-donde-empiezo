@@ -267,10 +267,10 @@ export default function Plan() {
         </p>
         <div className="pantalla__pie">
           <Link className="boton-secundario" to="/">
-            Volver al principio
+            Volvé al principio
           </Link>
           <Link className="boton-principal" to="/sesion/nueva">
-            Armar una sesión nueva
+            Armá una sesión nueva
           </Link>
         </div>
       </main>
@@ -289,10 +289,10 @@ export default function Plan() {
         ))}
         <div className="pantalla__pie">
           <Link className="boton-secundario" to="/">
-            Volver al principio
+            Volvé al principio
           </Link>
           <button type="button" className="boton-principal" onClick={() => navegar('/sesion/nueva')}>
-            Seguir con más tiempo
+            Seguí un rato más
           </button>
         </div>
       </main>
@@ -352,7 +352,7 @@ export default function Plan() {
 
         <div className="pantalla__pie">
           <button type="button" className="boton-principal" onClick={() => navegar('/sesion/nueva')}>
-            Seguir un rato más
+            Seguí un rato más
           </button>
           <button type="button" className="boton-secundario" onClick={() => navegar('/')}>
             Listo por hoy
@@ -458,13 +458,13 @@ export default function Plan() {
         </button>
         <div className="acciones">
           <button type="button" className="boton-secundario" onClick={() => void alSaltear()}>
-            Saltear
+            Salteá
           </button>
           <button type="button" className="boton-secundario" onClick={() => setCortado(true)}>
             No puedo ahora
           </button>
           <button type="button" className="boton-secundario" onClick={() => void alReordenar()}>
-            Reordenar
+            Reordená
           </button>
         </div>
       </div>
