@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { CATALOGO, tareasDeAmbiente } from '../../domain/catalogo'
 import { generarPlan } from '../../domain/motor/generarPlan'
 import { crearRepositorioLocal } from '../../data/repositorioLocal'
+import { pedirAlmacenamientoPersistente } from '../../data/almacenamiento'
 import { nuevoId } from '../id'
 import type { Repositorio } from '../../data/repositorio'
 import type { Ambiente, Plan, Tarea } from '../../domain/tipos'
@@ -122,6 +123,12 @@ export const useSesion = create<EstadoSesion>((set, get) => ({
     }
 
     set({ ambientes: await repo.listarAmbientes() })
+
+    // Es el primer momento en que hay algo de la persona guardado, y viene de un
+    // toque suyo: el navegador concede (o pregunta) mejor en respuesta a una acción.
+    // No se espera: si tarda o no se concede, el flujo sigue igual.
+    void pedirAlmacenamientoPersistente()
+
     return elegidos[0]?.id ?? null
   },
 

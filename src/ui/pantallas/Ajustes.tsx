@@ -9,6 +9,7 @@ import { useAvisos } from '../estado/avisos'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
 import { esPlaylistValida } from '../musica'
+import { almacenamientoEsPersistente } from '../../data/almacenamiento'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
@@ -85,6 +86,19 @@ export default function Ajustes() {
   const [clave, setClave] = useState('')
   const [probando, setProbando] = useState(false)
   const [copiando, setCopiando] = useState(false)
+  const [persistente, setPersistente] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let vigente = true
+    // Solo se consulta: pedirlo acá, sin un toque de la persona, haría que Firefox
+    // muestre una pregunta de la nada. Se pide al elegir ambientes.
+    void almacenamientoEsPersistente().then((valor) => {
+      if (vigente) setPersistente(valor)
+    })
+    return () => {
+      vigente = false
+    }
+  }, [])
   const [falloLaCarga, setFalloLaCarga] = useState(false)
   const [intento, setIntento] = useState(0)
 
@@ -424,11 +438,36 @@ export default function Ajustes() {
           empezar con un ambiente.
         </p>
 
+        {/*
+          El texto de la especificación, sección 9.3, tal cual: es la advertencia
+          obligatoria antes de activar la IA y antes de mandar una foto. La versión
+          anterior hablaba solo de la clave, y callaba lo que más importa —que en el
+          plan gratuito personas de Google pueden leer las fotos de tu casa— y que hay
+          que ser mayor de edad (sección 1.1). No se resume ni se suaviza.
+        */}
+        <aside className="aviso-ia" aria-labelledby="aviso-ia-titulo">
+          <h3 id="aviso-ia-titulo" className="aviso-ia__titulo">
+            Antes de usar la IA, leé esto.
+          </h3>
+          <p>
+            Vas a usar tu propia clave de Google. Lo que le mandes —textos y <strong>fotos de tu casa</strong>— viaja a
+            los servidores de Google. En el plan gratuito, Google puede usar ese contenido para mejorar sus productos{' '}
+            <strong>y personas revisoras pueden leerlo</strong>. No mandes fotos donde aparezcan documentos, pantallas,
+            personas ni nada que no quieras compartir.
+          </p>
+          <p>
+            Tu clave se guarda <strong>solo en este teléfono</strong> y nunca pasa por nuestros servidores.
+          </p>
+          <p>Podés usar la app completa sin activar esto.</p>
+          <p className="menudo">Si perdés el teléfono, revocá la clave desde tu cuenta de Google.</p>
+        </aside>
+
         <label className="ficha" htmlFor="acepto-ia">
           <input
             id="acepto-ia"
             type="checkbox"
             className="ficha__entrada"
+            aria-describedby="aviso-ia-titulo"
             checked={preferencias.avisoDePrivacidadAceptado}
             onChange={(evento) =>
               void guardar(
@@ -440,12 +479,8 @@ export default function Ajustes() {
           />
           <span className="ficha__marca" aria-hidden="true" />
           <span className="ficha__texto">
-            Entiendo y quiero usarla
-            <span className="menudo">
-              Tu clave se guarda solo en este teléfono y se manda únicamente a Google, cuando vos pedís una idea. No
-              pasa por ningún servidor nuestro, porque no tenemos. Si perdés el teléfono, revocá la clave desde tu
-              cuenta de Google.
-            </span>
+            Tengo 18 años o más, leí el aviso y quiero usar la IA
+            <span className="menudo">Lo podés destildar cuando quieras: la IA se apaga y la app sigue igual.</span>
           </span>
         </label>
 
@@ -548,6 +583,17 @@ export default function Ajustes() {
           Todo esto vive solo en este teléfono. Para pasar tu trabajo a otro, bajá una copia y llevala como cualquier
           archivo: al traerla se suma a lo que ese teléfono ya tenga. Nunca lo reemplaza.
         </p>
+        {/*
+          Solo cuando el navegador dijo que NO protege los datos. Si no se puede saber
+          (nulo), no se asusta a nadie con una advertencia que quizá no aplica.
+        */}
+        {persistente === false && (
+          <p className="alerta">
+            Este navegador puede borrar tus datos si pasás varios días sin abrir la app. Para que no pase, instalala
+            en la pantalla de inicio (en el menú del navegador, «Agregar a la pantalla de inicio») o guardá una copia
+            de vez en cuando.
+          </p>
+        )}
 
         <BotonConCarga onClick={() => void guardarCopia()} cargando={copiando}>
           Guardá una copia

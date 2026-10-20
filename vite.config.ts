@@ -21,5 +21,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    /*
+      El mismo techo que las esperas de Testing Library en `src/test/setup.ts`. Con
+      los 5 s por defecto, un test se cortaba antes de que sus propias esperas se
+      rindieran: los flujos largos, que solos tardan menos de un segundo, fallaban
+      por reloj cuando la suite entera corría en paralelo.
+    */
+    testTimeout: 15000,
   },
 })

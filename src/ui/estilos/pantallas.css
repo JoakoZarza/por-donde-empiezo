@@ -1111,3 +1111,34 @@ body:has(.pestanas) .pantalla {
   color: var(--color-humo);
   opacity: 0.8;
 }
+
+/* --- Aviso de privacidad de la IA --- */
+
+/*
+  La advertencia de la sección 9.3 de la especificación. Se lee como un aviso y no
+  como letra chica: fondo propio, texto en hueso a tamaño de cuerpo, y lo importante
+  en negrita. Es lo único que la persona tiene que leer antes de mandar fotos de su
+  casa a un tercero.
+*/
+.aviso-ia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--color-borde);
+  border-left: 3px solid var(--color-velador);
+  border-radius: 0 var(--radio-control) var(--radio-control) 0;
+  background-color: var(--color-pared);
+}
+
+.aviso-ia p {
+  margin: 0;
+}
+
+.aviso-ia strong {
+  font-weight: 600;
+}
+
+.aviso-ia__titulo {
+  font-size: 1.0625rem;
+}

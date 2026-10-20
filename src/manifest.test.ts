@@ -51,3 +51,18 @@ test('el html alinea el color del navegador, respeta el notch y no deshabilita e
   expect(html).toMatch(/<link rel="manifest"/)
   expect(html).not.toMatch(/maximum-scale|user-scalable\s*=\s*no/)
 })
+
+/*
+  Es una SPA: `/plan/abc` o `/ajustes` no existen como archivos, y es React Router el
+  que las resuelve. Sin esta regla, Vercel devolvía 404 al abrir un enlace directo o
+  recargar cualquier pantalla que no fuera la primera —justo en el plan en curso—.
+  Pasó de verdad: la regla de Cloudflare (`_redirects`) se borró al migrar a Vercel y
+  no se reemplazó. Vercel sirve primero los archivos que existen, así que la regla no
+  tapa los recursos, el service worker ni el manifiesto.
+*/
+test('Vercel manda toda ruta desconocida a index.html', () => {
+  const config = JSON.parse(leer('vercel.json') || '{}') as {
+    rewrites?: { source: string; destination: string }[]
+  }
+  expect(config.rewrites).toContainEqual({ source: '/(.*)', destination: '/index.html' })
+})

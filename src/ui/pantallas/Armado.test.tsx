@@ -139,7 +139,6 @@ test('un nombre de 150 caracteres se guarda completo: el recorte es solo visual'
 
   // Y la pantalla sigue entera: el grupo no se perdió al entrar el nombre largo.
   expect(screen.getByRole('heading', { name: /mesada/i })).toBeInTheDocument()
-  // Escribe más de cien teclas una por una: con la suite entera corriendo en
-  // paralelo, los cinco segundos por defecto no alcanzan. Falla por reloj, no por
-  // comportamiento.
+  // Escribe más de cien teclas una por una: es el test más lento de la suite, y
+  // lleva un margen por encima del general de `vite.config.ts`.
 }, 20000)
