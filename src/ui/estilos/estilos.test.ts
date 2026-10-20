@@ -102,7 +102,9 @@ test('un nombre largo escrito por la persona no puede romper la pantalla del pas
     flexible se niega a encogerse y empuja el botón fuera de la pantalla igual—.
   */
   const hoja = todaLaHoja()
-  expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*-webkit-line-clamp:\s*3/)
+  // Queda un recorte como red de seguridad; el tamaño según el largo es lo que hace
+  // que una consigna normal entre entera (ver `tamanoDelPaso.test.ts`).
+  expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*-webkit-line-clamp:\s*\d+/)
   expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*overflow-wrap:\s*anywhere/)
   expect(hoja).toMatch(/\.paso__accion\s*\{[^}]*overflow:\s*hidden/)
   expect(hoja).toMatch(/min-width:\s*0/)

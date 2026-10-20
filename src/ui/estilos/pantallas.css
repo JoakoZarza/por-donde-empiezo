@@ -186,16 +186,16 @@ legend.grupo__titulo {
 }
 
 /*
-  Los nombres largos se recortan a dos líneas. `min-width: 0` es lo que permite
-  que un hijo flexible se encoja en vez de desbordar el contenedor.
+  El texto de la tarea va entero, en las líneas que haga falta. Antes se recortaba a
+  dos, y una tarea propia larga quedaba cortada en la lista donde se decide si
+  entra o no al plan: no se puede tildar lo que no se termina de leer. Como el
+  campo tiene tope de 200 caracteres, una lista no crece sin límite.
+  `min-width: 0` es lo que permite que un hijo flexible se encoja en vez de
+  desbordar el contenedor.
 */
 .tarea__texto {
   flex: 1 1 auto;
   min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   overflow-wrap: anywhere;
 }
 
@@ -515,13 +515,49 @@ legend.grupo__titulo {
   font-weight: 600;
   line-height: 1;
   color: var(--color-hueso);
-  /* Un nombre largo escrito por la persona no puede empujar «Listo» fuera de la
-     pantalla ni desbordar en horizontal. Se recorta a tres líneas. */
+  /*
+    La consigna entra entera: el tamaño baja de escalón según el largo
+    (`tamanoDelPaso`), y cada escalón tiene líneas de sobra para su largo máximo a
+    360 px. El recorte queda solo como red de seguridad —una tarea vieja, de antes
+    de los topes de largo— para que nada empuje «Listo» fuera de la pantalla.
+  */
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
+  hyphens: manual;
+  /*
+    Con un interlineado tan justo, las colas de la «p», la «g» o la «j» bajan unos
+    píxeles por debajo de la caja, y `overflow: hidden` las cortaba. El margen de
+    abajo les hace lugar; el negativo devuelve el espacio, así el resto no se mueve.
+  */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+
+/* Hasta 18 caracteres: la letra enorme del plan visual. */
+.paso__accion--grande {
+  font-size: var(--texto-paso);
+}
+
+/* Hasta 32: «Despejá la mesada», «Limpiá el filtro del lavarropas». */
+.paso__accion--mediano {
+  font-size: clamp(2rem, 9.5vw, 3.5rem);
+  line-height: 1.05;
+}
+
+/* Hasta 60: lo más largo del catálogo, y casi todas las tareas propias. */
+.paso__accion--chico {
+  font-size: clamp(1.625rem, 7.5vw, 2.75rem);
+  line-height: 1.1;
+}
+
+/* Más de 60: una tarea propia larga. Se sigue leyendo de un vistazo, en más líneas. */
+.paso__accion--minimo {
+  font-size: clamp(1.375rem, 6vw, 2.25rem);
+  line-height: 1.15;
+  -webkit-line-clamp: 12;
 }
 
 /*

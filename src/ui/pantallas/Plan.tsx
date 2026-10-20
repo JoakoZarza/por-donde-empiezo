@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import { useAvisos } from '../estado/avisos'
+import { tamanoDelPaso } from '../tamanoDelPaso'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import LamparaApagada from '../componentes/LamparaApagada'
 import {
@@ -457,7 +458,9 @@ export default function Plan() {
               la instrucción que son. La jerarquía se mantiene por tamaño y color,
               no partiendo la frase.
             */}
-            <h2 className="paso__accion">
+            <h2
+              className={`paso__accion paso__accion--${tamanoDelPaso(`${tarea.accion} ${tarea.descripcion}`)}`}
+            >
               {tarea.accion}
               {tarea.descripcion && <span className="paso__objeto"> {tarea.descripcion}</span>}
             </h2>
