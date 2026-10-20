@@ -1211,3 +1211,76 @@ blockquote.aviso-ia {
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+
+/* --- Bancá el proyecto --- */
+
+/*
+  Se tiene que ver sin gritar. Es la única tarjeta de Ajustes con calidez propia: un
+  dejo de ámbar en el fondo y en el borde, como la luz del velador sobre la mesa,
+  y la taza en ámbar. El botón NO es ámbar lleno: ese lugar es de la acción
+  principal de cada pantalla, y un aporte voluntario no puede parecer el paso
+  obligatorio de Ajustes.
+*/
+.bancar {
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--color-velador) 35%, transparent);
+  border-radius: var(--radio-tarjeta);
+  background-color: var(--color-pared);
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-velador) 12%, transparent) 0%,
+    transparent 65%
+  );
+  box-shadow: var(--sombra-tarjeta);
+}
+
+.bancar__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bancar__icono {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--color-velador) 14%, transparent);
+  color: var(--color-velador);
+}
+
+.boton-cafecito {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--color-velador) 55%, transparent);
+  border-radius: var(--radio-control);
+  background-color: var(--color-noche);
+  color: var(--color-hueso);
+  font-size: var(--texto-cuerpo);
+  font-weight: 600;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.boton-cafecito .taza-de-cafe {
+  color: var(--color-velador);
+}
+
+/* Más contraste al tocar o al pasar el puntero, solo con color. */
+.boton-cafecito:active {
+  background-color: color-mix(in oklab, var(--color-velador) 14%, var(--color-noche));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .boton-cafecito:hover {
+    border-color: var(--color-velador);
+    background-color: color-mix(in oklab, var(--color-velador) 10%, var(--color-noche));
+  }
+}

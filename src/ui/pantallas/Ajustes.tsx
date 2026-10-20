@@ -9,6 +9,7 @@ import BotonConCarga from '../componentes/BotonConCarga'
 import { useAvisos } from '../estado/avisos'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
+import TazaDeCafe from '../componentes/TazaDeCafe'
 import { esPlaylistValida } from '../musica'
 import { almacenamientoEsPersistente } from '../../data/almacenamiento'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
@@ -633,18 +634,21 @@ export default function Ajustes() {
         una tarea sería justo la presión que esta app promete no hacer, y no se
         bloquea ni se recorta nada para quien no aporta.
       */}
-      <section className="grupo">
-        <h2 className="grupo__titulo">Bancá el proyecto</h2>
+      <section className="grupo bancar" aria-labelledby="bancar-titulo">
+        <div className="bancar__cabecera">
+          <span className="bancar__icono">
+            <TazaDeCafe tamano={28} />
+          </span>
+          <h2 id="bancar-titulo" className="grupo__titulo">
+            Bancá el proyecto
+          </h2>
+        </div>
         <p className="menudo">
           La app es gratis y va a seguir siéndolo entera, sin publicidad. Si te sirve y querés ayudar a que siga
           creciendo, podés invitarme un cafecito.
         </p>
-        <a
-          className="boton-secundario"
-          href="https://cafecito.app/joakozarza"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a className="boton-cafecito" href="https://cafecito.app/joakozarza" target="_blank" rel="noopener noreferrer">
+          <TazaDeCafe tamano={20} />
           Invitame un cafecito
           <span className="sr-only"> (se abre en Cafecito, en otra pestaña)</span>
         </a>
