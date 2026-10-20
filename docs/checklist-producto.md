@@ -22,19 +22,19 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
 - [x] 🟠 **Reemplazar los «Cargando…» de texto por skeletons que imiten la pantalla final**
   (`Casa.tsx:64`, `Logros.tsx:177`, `Ajustes.tsx:198`). Hoy el contenido aparece de golpe y
   todo salta (CLS). Casa: grilla de cuartos apagados; Logros: tres tarjetas de totales vacías.
-- [ ] 🟠 **«¿Cuánto tiempo tenés?» no explica por qué el botón está deshabilitado mientras carga**
+- [x] 🟠 **«¿Cuánto tiempo tenés?» no explica por qué el botón está deshabilitado mientras carga**
   (`ArranqueSesion.tsx:273`). Además, al terminar de cargar pisa el modo que la persona ya haya
   tocado (`setModo` en la línea 89 no tiene la guarda que sí tiene el tiempo). Agregar
   `modoTocado` y un skeleton o texto «Mirando tus tareas…».
-- [ ] 🟠 **No hay un solo spinner en la app.** Los botones usan `aria-busy` pero no cambia nada
+- [x] 🟠 **No hay un solo spinner en la app.** Los botones usan `aria-busy` pero no cambia nada
   visible (`PrimeraVez.tsx:93`, `ArranqueSesion.tsx:274`). Crear un componente
   `<BotonConCarga>` con spinner que **conserva la etiqueta** (regla de `AGENTS.md`).
-- [ ] 🟠 **«Pedir ideas» y «Probar» cambian la etiqueta a «Pensando…» / «Probando…» y no se
+- [x] 🟠 **«Pedir ideas» y «Probar» cambian la etiqueta a «Pensando…» / «Probando…» y no se
   deshabilitan** (`Armado.tsx:479`, `Ajustes.tsx:374`): se puede disparar el pedido dos veces y
   gastar cuota de la clave. Usar el mismo `<BotonConCarga>`.
 - [x] 🔴 **Doble toque en «Listo» anotaba dos veces el mismo paso en el historial** (`Plan.tsx:682`): no hay guarda mientras se
   guarda. Lo mismo en «Armá las tareas» (`PrimeraVez.tsx:88`, no se deshabilita con `guardando`).
-- [ ] 🟢 «Guardar una copia» y «Traer de otra copia» no muestran nada mientras trabajan
+- [x] 🟢 «Guardar una copia» y «Traer de otra copia» no muestran nada mientras trabajan
   (`Ajustes.tsx:149`, `:168`); con un historial grande se nota.
 
 ## 2. Estados vacíos
@@ -116,13 +116,13 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   «Elegir archivo / Ningún archivo seleccionado» en gris es la señal más clara de «prototipo».
   Usar un `<label>` con estilo de `.boton-secundario` que envuelva el input visualmente oculto,
   conservando el foco con `:has(:focus-visible)` (el mismo patrón que ya usan las fichas).
-- [ ] 🟠 **Jerarquía tipográfica plana**: los `h2` usan `.pantalla__titulo`, el mismo tamaño
+- [x] 🟠 **Jerarquía tipográfica plana**: los `h2` usan `.pantalla__titulo`, el mismo tamaño
   que el `h1` (Armado «¿No sabés por dónde empezar?», Ajustes, Logros, cierre del plan). Ya
   existe `.grupo__titulo` para eso: usarlo en todos los `h2`.
-- [ ] 🟠 **Los títulos de sección son de dos tipos**: unos son `h2.grupo__titulo` y otros
+- [x] 🟠 **Los títulos de sección son de dos tipos**: unos son `h2.grupo__titulo` y otros
   `legend.menudo` en gris chico (Ajustes, ¿Cuánto tiempo tenés?). Un mismo componente
   `Seccion` con título visible igual en todas las pantallas.
-- [ ] 🟠 **Las etiquetas de campos usan tres clases distintas**: `campo__etiqueta`, `menudo` y
+- [x] 🟠 **Las etiquetas de campos usan tres clases distintas**: `campo__etiqueta`, `menudo` y
   ninguna. Unificar en `campo__etiqueta`.
 - [x] 🟠 **Los botones cambian de persona gramatical y de nombre**: «Armá las tareas», «Armá el
   plan» (imperativo) vs «Elegir ambientes», «Volver al principio» (infinitivo) vs «Ponerme con

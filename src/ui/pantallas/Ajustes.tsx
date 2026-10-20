@@ -4,6 +4,7 @@ import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import BotonConCarga from '../componentes/BotonConCarga'
 import { useAvisos } from '../estado/avisos'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
@@ -81,6 +82,7 @@ export default function Ajustes() {
   const confirmar = useAvisos((estado) => estado.confirmar)
   const [clave, setClave] = useState('')
   const [probando, setProbando] = useState(false)
+  const [copiando, setCopiando] = useState(false)
   const [falloLaCarga, setFalloLaCarga] = useState(false)
   const [intento, setIntento] = useState(0)
 
@@ -209,6 +211,8 @@ export default function Ajustes() {
   }
 
   async function guardarCopia(): Promise<void> {
+    if (copiando) return
+    setCopiando(true)
     setAviso(null)
     try {
       const respaldo = await repositorio.exportar()
@@ -223,6 +227,8 @@ export default function Ajustes() {
       setAviso({ lugar: 'datos', tipo: 'listo', texto: 'Listo, la copia se bajó a tu teléfono.' })
     } catch {
       setAviso({ lugar: 'datos', tipo: 'error', texto: 'No pudimos armar la copia. Probá de nuevo.' })
+    } finally {
+      setCopiando(false)
     }
   }
 
@@ -292,7 +298,7 @@ export default function Ajustes() {
       <h1 className="pantalla__titulo">Ajustes</h1>
 
       <fieldset className="grupo">
-        <legend className="menudo">Qué tenés en casa</legend>
+        <legend className="grupo__titulo">Qué tenés en casa</legend>
         <p className="menudo">
           Si no tenés algo, no te lo vamos a pedir: las tareas que lo necesitan quedan afuera del plan.
         </p>
@@ -300,7 +306,7 @@ export default function Ajustes() {
           {todasLasHerramientas().map((herramienta) => {
             const tiene = preferencias.herramientasDisponibles.includes(herramienta)
             return (
-              <li key={herramienta} className="tarea">
+              <li key={herramienta}>
                 <label
                   htmlFor={`herramienta-${herramienta}`}
                   className={tiene ? 'ficha ficha--elegida' : 'ficha'}
@@ -323,7 +329,7 @@ export default function Ajustes() {
       </fieldset>
 
       <fieldset className="grupo">
-        <legend className="menudo">Cómo querés que ordene</legend>
+        <legend className="grupo__titulo">Cómo querés que ordene</legend>
         <ul className="fichas fichas--una-columna">
           {MODOS.map((opcion) => (
             <li key={opcion.valor}>
@@ -360,7 +366,7 @@ export default function Ajustes() {
           )
         }}
       >
-        <label className="menudo" htmlFor="playlist">
+        <label className="campo__etiqueta" htmlFor="playlist">
           Tu música, si querés
         </label>
         <p className="menudo">
@@ -385,7 +391,7 @@ export default function Ajustes() {
       </form>
 
       <section className="grupo">
-        <h2 className="pantalla__titulo">Ideas con IA</h2>
+        <h2 className="grupo__titulo">Ideas con IA</h2>
         <p className="menudo">
           Es opcional, y la app funciona entera sin esto: la IA sirve para tirarte ideas cuando no sabés por dónde
           empezar con un ambiente.
@@ -431,7 +437,7 @@ export default function Ajustes() {
             void guardarClave()
           }}
         >
-          <label className="menudo" htmlFor="clave-ia">
+          <label className="campo__etiqueta" htmlFor="clave-ia">
             Tu clave de Google
           </label>
           {/*
@@ -465,22 +471,20 @@ export default function Ajustes() {
             >
               Guardá la clave
             </button>
-            <button
-              type="button"
-              className="boton-secundario"
+            <BotonConCarga
               onClick={() => void probarClave()}
-              disabled={!preferencias.avisoDePrivacidadAceptado || probando}
-              aria-busy={probando}
+              disabled={!preferencias.avisoDePrivacidadAceptado}
+              cargando={probando}
             >
-              {probando ? 'Probando…' : 'Probá la clave'}
-            </button>
+              Probá la clave
+            </BotonConCarga>
           </div>
           <AvisoEn lugar="clave" aviso={aviso} id="clave-ia-aviso" />
         </form>
       </section>
 
       <fieldset className="grupo">
-        <legend className="menudo">Cómo medimos el tiempo</legend>
+        <legend className="grupo__titulo">Cómo medimos el tiempo</legend>
         <p className="menudo">
           La cuenta atrás baja hasta cero y se siente como una carrera contra el reloj. La carrera sube y te va
           mostrando cuántos segundos ganás o perdés contra lo que estaba estimado: terminás antes y ganás, terminás
@@ -512,15 +516,15 @@ export default function Ajustes() {
       </fieldset>
 
       <section className="grupo">
-        <h2 className="pantalla__titulo">Tus datos</h2>
+        <h2 className="grupo__titulo">Tus datos</h2>
         <p className="menudo">
           Todo esto vive solo en este teléfono. Para pasar tu trabajo a otro, bajá una copia y llevala como cualquier
           archivo: al traerla se suma a lo que ese teléfono ya tenga. Nunca lo reemplaza.
         </p>
 
-        <button type="button" className="boton-secundario" onClick={() => void guardarCopia()}>
+        <BotonConCarga onClick={() => void guardarCopia()} cargando={copiando}>
           Guardá una copia
-        </button>
+        </BotonConCarga>
 
         <SelectorDeArchivo
           id="copia"

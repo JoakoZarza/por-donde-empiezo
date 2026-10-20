@@ -142,6 +142,17 @@
   color: var(--color-hueso);
 }
 
+/*
+  Los títulos de sección son siempre este, sea un `<h2>` o la `<legend>` de un grupo
+  de opciones. Antes había tres: unos `h2` del mismo tamaño que el título de la
+  pantalla —la jerarquía quedaba plana— y unas leyendas grises y chicas que se
+  leían como notas al pie.
+*/
+legend.grupo__titulo {
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+
 .tareas {
   display: flex;
   flex-direction: column;
@@ -194,9 +205,14 @@
   color: var(--color-humo);
 }
 
+/*
+  La etiqueta de un campo se lee antes que el campo, así que va en hueso y no en
+  gris: el gris queda para las ayudas que la acompañan.
+*/
 .campo__etiqueta {
   font-size: var(--texto-menudo);
-  color: var(--color-humo);
+  font-weight: 500;
+  color: var(--color-hueso);
 }
 
 .campo__entrada {
@@ -1024,4 +1040,48 @@ body:has(.pestanas) .pantalla {
 
 .pestana:focus-visible {
   outline-offset: -4px;
+}
+
+/* --- Botón con carga --- */
+
+.boton-con-carga {
+  gap: 0.5rem;
+}
+
+.boton-con-carga[aria-busy='true'] {
+  cursor: progress;
+}
+
+/* Trabajando no es lo mismo que no disponible: el principal conserva su ámbar. */
+.boton-principal.boton-con-carga[aria-busy='true']:disabled {
+  background-color: var(--color-velador);
+  color: var(--color-noche);
+  opacity: 0.85;
+}
+
+@keyframes spinner-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+  El spinner toma el color del texto del botón, así sirve igual en el principal y
+  en el secundario. Con movimiento reducido queda quieto: el anillo abierto y el
+  botón deshabilitado ya dicen que algo está pasando.
+*/
+.spinner {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-gira 700ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
 }

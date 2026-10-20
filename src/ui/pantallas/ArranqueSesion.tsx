@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { generarPlan } from '../../domain/motor/generarPlan'
 import { opcionesDeMusica } from '../musica'
 import { nuevoId } from '../id'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import BotonConCarga from '../componentes/BotonConCarga'
 import { useAvisos } from '../estado/avisos'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import type { Modo, Tarea } from '../../domain/tipos'
@@ -60,6 +61,8 @@ export default function ArranqueSesion() {
   const [playlist, setPlaylist] = useState<string | null>(null)
   /** Si la persona tocó el tiempo a mano, la preferencia ya no manda. */
   const [tiempoTocado, setTiempoTocado] = useState(false)
+  /** Igual con el modo: lo que llega del teléfono no pisa lo que la persona tocó. */
+  const modoTocado = useRef(false)
   const [estadoDeTareas, setEstadoDeTareas] = useState<EstadoDeTareas>('cargando')
   const [armando, setArmando] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -89,7 +92,7 @@ export default function ArranqueSesion() {
       if (!vigente) return
       // Las preferencias se aplican acá: son las tres que hasta ahora existían sin que
       // ninguna pantalla las leyera.
-      setModo(modoPorDefecto)
+      if (!modoTocado.current) setModo(modoPorDefecto)
       setPlaylist(playlistPropia)
 
       // La duración preferida viene marcada, salvo que la persona ya haya elegido otra
@@ -197,7 +200,7 @@ export default function ArranqueSesion() {
       <h1 className="pantalla__titulo">¿Cuánto tiempo tenés?</h1>
 
       <fieldset className="grupo">
-        <legend className="menudo">Tiempo disponible</legend>
+        <legend className="grupo__titulo">Tiempo disponible</legend>
         <ul className="fichas">
           {TIEMPOS.map((opcion) => (
             <li key={opcion.valor}>
@@ -239,7 +242,7 @@ export default function ArranqueSesion() {
       </div>
 
       <fieldset className="grupo">
-        <legend className="menudo">Cómo lo ordenamos</legend>
+        <legend className="grupo__titulo">Cómo lo ordenamos</legend>
         <ul className="fichas fichas--una-columna">
           {MODOS.map((opcion) => (
             <li key={opcion.valor}>
@@ -254,7 +257,10 @@ export default function ArranqueSesion() {
                   value={opcion.valor}
                   className="ficha__entrada"
                   checked={modo === opcion.valor}
-                  onChange={() => setModo(opcion.valor)}
+                  onChange={() => {
+                    modoTocado.current = true
+                    setModo(opcion.valor)
+                  }}
                 />
                 <span className="ficha__marca" aria-hidden="true" />
                 <span className="ficha__texto">
@@ -295,15 +301,19 @@ export default function ArranqueSesion() {
           </p>
         )}
 
-        <button
-          type="button"
+        {/*
+          Mientras se miran las tareas, el botón espera con su spinner en vez de
+          aparecer deshabilitado sin explicación: antes no había forma de saber si
+          estaba cargando o si no se podía armar nada.
+        */}
+        <BotonConCarga
           className="boton-principal"
           onClick={() => void armar()}
-          disabled={estadoDeTareas !== 'hayTareas' || armando}
-          aria-busy={armando}
+          disabled={estadoDeTareas !== 'hayTareas'}
+          cargando={armando || estadoDeTareas === 'cargando'}
         >
           Armá el plan
-        </button>
+        </BotonConCarga>
       </div>
     </main>
   )

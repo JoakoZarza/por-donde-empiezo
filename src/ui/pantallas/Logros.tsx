@@ -137,7 +137,7 @@ export default function Logros() {
 
       {conseguidos.length > 0 && (
         <section className="grupo">
-          <h2 className="pantalla__titulo">Lo que ya te ganaste</h2>
+          <h2 className="grupo__titulo">Lo que ya te ganaste</h2>
           <ul className="fichas fichas--una-columna">
             {conseguidos.map((cada) => (
               <li key={cada.id} className="logro">

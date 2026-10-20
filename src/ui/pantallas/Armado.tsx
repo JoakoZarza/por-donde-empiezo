@@ -7,6 +7,7 @@ import { consultarIa, FalloDeIa, leerImagen } from '../../data/iaCliente'
 import type { Sugerencia } from '../../domain/ia'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import BotonConCarga from '../componentes/BotonConCarga'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
@@ -406,9 +407,9 @@ export default function Armado() {
                 setErrorPropia(null)
               }}
             />
-            <button type="submit" className="boton-secundario" disabled={agregando} aria-busy={agregando}>
+            <BotonConCarga type="submit" cargando={agregando}>
               Agregá
-            </button>
+            </BotonConCarga>
           </div>
           {errorPropia && (
             <p id="tarea-propia-error" className="alerta" role="status" aria-live="polite">
@@ -418,7 +419,7 @@ export default function Armado() {
         </form>
 
         <section className="grupo">
-          <h2 className="pantalla__titulo">¿No sabés por dónde empezar?</h2>
+          <h2 className="grupo__titulo">¿No sabés por dónde empezar?</h2>
           <p className="menudo">
             Contá lo que ves, o sacale una foto, y la IA te tira ideas. Vos elegís cuáles quedan.
           </p>
@@ -444,9 +445,9 @@ export default function Armado() {
             alElegir={setIaFoto}
           />
 
-          <button type="button" className="boton-secundario" onClick={() => void pedirIdeas()} aria-busy={pensando}>
-            {pensando ? 'Pensando…' : 'Pedí ideas'}
-          </button>
+          <BotonConCarga onClick={() => void pedirIdeas()} cargando={pensando}>
+            Pedí ideas
+          </BotonConCarga>
 
           {iaError && (
             <p className="alerta" role="status" aria-live="polite">
@@ -457,7 +458,7 @@ export default function Armado() {
           {sugerencias.length > 0 && (
             <ul className="fichas fichas--una-columna">
               {sugerencias.map((sugerencia, indice) => (
-                <li key={`${sugerencia.accion}-${indice}`} className="tarea">
+                <li key={`${sugerencia.accion}-${indice}`}>
                   <label className="ficha" htmlFor={`idea-${indice}`}>
                     <input
                       id={`idea-${indice}`}
@@ -482,15 +483,9 @@ export default function Armado() {
           )}
 
           {sugerencias.length > 0 && (
-            <button
-              type="button"
-              className="boton-secundario"
-              onClick={() => void agregarSugerencias()}
-              disabled={agregando}
-              aria-busy={agregando}
-            >
+            <BotonConCarga onClick={() => void agregarSugerencias()} cargando={agregando}>
               Agregá las elegidas
-            </button>
+            </BotonConCarga>
           )}
 
           <Link className="menudo" to="/ajustes">

@@ -312,7 +312,7 @@ export default function Plan() {
 
         {planilla.realSegundos > 0 && (
           <section className="grupo">
-            <h2 className="pantalla__titulo">Cómo te fue</h2>
+            <h2 className="grupo__titulo">Cómo te fue</h2>
             <p className="resultado">
               {planilla.diferenciaSegundos >= 0
                 ? `Le ganaste a la estimación por ${enPalabras(planilla.diferenciaSegundos)}.`

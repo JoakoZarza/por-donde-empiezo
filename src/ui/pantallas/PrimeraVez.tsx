@@ -4,6 +4,7 @@ import Bienvenida from '../componentes/Bienvenida'
 import { CATALOGO } from '../../domain/catalogo'
 import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
+import BotonConCarga from '../componentes/BotonConCarga'
 
 /*
   La primera pantalla. Sin registro, sin tutorial, sin carrusel de bienvenida:
@@ -100,15 +101,14 @@ export default function PrimeraVez() {
             {error}
           </p>
         )}
-        <button
-          type="button"
+        <BotonConCarga
           className="boton-principal"
-          onClick={avanzar}
-          disabled={elegidos.length === 0 || guardando}
-          aria-busy={guardando}
+          onClick={() => void avanzar()}
+          disabled={elegidos.length === 0}
+          cargando={guardando}
         >
           Armá las tareas
-        </button>
+        </BotonConCarga>
       </div>
     </main>
   )
