@@ -171,6 +171,7 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         playlistPropia: fila.playlistPropia ?? null,
         claveDeIa: fila.claveDeIa ?? null,
         avisoDePrivacidadAceptado: fila.avisoDePrivacidadAceptado ?? false,
+        versionAvisoIa: fila.versionAvisoIa ?? 0,
       }
     },
 
@@ -250,6 +251,8 @@ export function crearRepositorioLocal(nombreBd = 'por-donde-empiezo'): Repositor
         // copia siempre trae null y pisarla sería borrarla.
         claveDeIa: actuales.claveDeIa,
         avisoDePrivacidadAceptado: actuales.avisoDePrivacidadAceptado || venidas.avisoDePrivacidadAceptado,
+        // Una copia de antes de que existiera el campo no lo trae: cuenta como cero.
+        versionAvisoIa: Math.max(actuales.versionAvisoIa ?? 0, venidas.versionAvisoIa ?? 0),
       }
 
       const yaHay = {

@@ -152,7 +152,7 @@ test('el campo vacío se explica junto al campo y recibe el foco', async () => {
 
 test('en Ajustes, el aviso de la clave aparece junto al campo de la clave', async () => {
   const usuario = userEvent.setup()
-  await repo.guardarPreferencias({ ...(await repo.preferencias()), avisoDePrivacidadAceptado: true })
+  await repo.guardarPreferencias({ ...(await repo.preferencias()), avisoDePrivacidadAceptado: true, versionAvisoIa: 2 })
   montar('/ajustes')
 
   await usuario.click(await screen.findByRole('button', { name: /guardá la clave/i }))

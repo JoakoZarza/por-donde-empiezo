@@ -8,6 +8,7 @@ import Ajustes from './ui/pantallas/Ajustes'
 import Logros from './ui/pantallas/Logros'
 import Casa from './ui/pantallas/Casa'
 import NoEncontrada from './ui/pantallas/NoEncontrada'
+import Privacidad from './ui/pantallas/Privacidad'
 import Avisos from './ui/componentes/Avisos'
 import BarraDePestanas from './ui/componentes/BarraDePestanas'
 
@@ -30,6 +31,7 @@ export const RUTAS: RutaDeLaApp[] = [
   { path: '/ajustes', element: <Ajustes /> },
   { path: '/logros', element: <Logros /> },
   { path: '/casa', element: <Casa /> },
+  { path: '/privacidad', element: <Privacidad /> },
   { path: '*', element: <NoEncontrada /> },
 ]
 

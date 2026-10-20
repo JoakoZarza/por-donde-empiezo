@@ -66,3 +66,28 @@ test('Vercel manda toda ruta desconocida a index.html', () => {
   }
   expect(config.rewrites).toContainEqual({ source: '/(.*)', destination: '/index.html' })
 })
+
+test('las cabeceras de seguridad dejan pasar solo lo que la app usa', () => {
+  const config = JSON.parse(leer('vercel.json') || '{}') as {
+    headers?: { source: string; headers: { key: string; value: string }[] }[]
+  }
+  const todas = config.headers?.find((regla) => regla.source === '/(.*)')?.headers ?? []
+  const csp = todas.find((cabecera) => cabecera.key === 'Content-Security-Policy')?.value ?? ''
+
+  // Scripts solo propios: no hay scripts en línea ni de terceros.
+  expect(csp).toMatch(/script-src 'self'(;|$)/)
+  // La única conexión externa es la IA, y solo si la persona la activó.
+  expect(csp).toMatch(/connect-src 'self' https:\/\/generativelanguage\.googleapis\.com(;|$)/)
+  expect(csp).toMatch(/frame-ancestors 'none'/)
+  expect(todas.map((cabecera) => cabecera.key)).toEqual(
+    expect.arrayContaining(['X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy']),
+  )
+})
+
+test('el enlace se ve bien al compartirlo', () => {
+  const html = leer('index.html')
+  expect(html).toMatch(/<meta property="og:title" content="Por dónde empiezo"/)
+  expect(html).toMatch(/<meta property="og:description" content="[^"]+"/)
+  expect(html).toMatch(/<meta property="og:image" content="https:\/\/[^"]+\.png"/)
+  expect(html).toMatch(/<meta property="og:locale" content="es_AR"/)
+})

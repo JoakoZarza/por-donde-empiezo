@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { ambientePorId, objetoPorId, objetosDeAmbiente, tareasDeAmbiente } from '../../domain/catalogo'
 import { nuevoId } from '../id'
-import { armarPedido, leerSugerencias } from '../../domain/ia'
+import { armarPedido, avisoIaAceptado, leerSugerencias } from '../../domain/ia'
 import { consultarIa, FalloDeIa, leerImagen } from '../../data/iaCliente'
 import type { Sugerencia } from '../../domain/ia'
 import { useSesion } from '../estado/sesion'
@@ -185,8 +185,9 @@ export default function Armado() {
     setIaError(null)
     setPensando(true)
     try {
-      const { claveDeIa, avisoDePrivacidadAceptado } = await repositorio.preferencias()
-      if (!claveDeIa || !avisoDePrivacidadAceptado) {
+      const preferencias = await repositorio.preferencias()
+      const { claveDeIa } = preferencias
+      if (!claveDeIa || !avisoIaAceptado(preferencias)) {
         setIaError('Para pedir ideas primero hay que configurar la clave y aceptar el aviso, en Ajustes.')
         return
       }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { CATALOGO } from '../../domain/catalogo'
 import { comparar } from '../../domain/orden'
 import { HERRAMIENTAS_POR_DEFECTO } from '../../domain/tipos'
@@ -13,6 +14,7 @@ import { almacenamientoEsPersistente } from '../../data/almacenamiento'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
+import { avisoIaAceptado, VERSION_AVISO_IA } from '../../domain/ia'
 import type { EstiloDeReloj, Modo, Preferencias } from '../../domain/tipos'
 
 /*
@@ -328,6 +330,7 @@ export default function Ajustes() {
       </main>
     )
   }
+  const iaAceptada = avisoIaAceptado(preferencias)
 
   return (
     <main className="pantalla">
@@ -459,8 +462,22 @@ export default function Ajustes() {
             Tu clave se guarda <strong>solo en este teléfono</strong> y nunca pasa por nuestros servidores.
           </p>
           <p>Podés usar la app completa sin activar esto.</p>
-          <p className="menudo">Si perdés el teléfono, revocá la clave desde tu cuenta de Google.</p>
+          <p className="menudo">
+            Si perdés el teléfono, revocá la clave desde tu cuenta de Google. Más detalles en la{' '}
+            <Link to="/privacidad">política de privacidad</Link>.
+          </p>
         </aside>
+
+        {/*
+          Quien aceptó el aviso anterior lo ve destildado, y se le dice por qué: si no,
+          parecería que la app perdió su elección.
+        */}
+        {preferencias.avisoDePrivacidadAceptado && !iaAceptada && (
+          <p className="alerta" role="status">
+            El aviso cambió desde la última vez que lo aceptaste. Leelo y volvé a tildarlo para seguir usando la IA. Tu
+            clave sigue guardada.
+          </p>
+        )}
 
         <label className="ficha" htmlFor="acepto-ia">
           <input
@@ -468,10 +485,12 @@ export default function Ajustes() {
             type="checkbox"
             className="ficha__entrada"
             aria-describedby="aviso-ia-titulo"
-            checked={preferencias.avisoDePrivacidadAceptado}
+            checked={iaAceptada}
             onChange={(evento) =>
               void guardar(
-                { avisoDePrivacidadAceptado: evento.target.checked },
+                evento.target.checked
+                  ? { avisoDePrivacidadAceptado: true, versionAvisoIa: VERSION_AVISO_IA }
+                  : { avisoDePrivacidadAceptado: false },
                 'clave',
                 evento.target.checked ? 'Listo, ya podés cargar tu clave.' : 'Listo, la IA quedó apagada.',
               )
@@ -507,7 +526,7 @@ export default function Ajustes() {
             Antes aparecía recién al aceptarlo, así que tocar el tilde parecía no
             hacer nada: la pantalla cambiaba abajo, fuera de la vista.
           */}
-          {!preferencias.avisoDePrivacidadAceptado && (
+          {!iaAceptada && (
             <p className="menudo">Aceptá el aviso de arriba para poder cargarla.</p>
           )}
           <input
@@ -522,20 +541,20 @@ export default function Ajustes() {
             spellCheck={false}
             placeholder="Pegá tu clave acá…"
             value={clave}
-            disabled={!preferencias.avisoDePrivacidadAceptado}
+            disabled={!iaAceptada}
             onChange={(evento) => setClave(evento.target.value)}
           />
           <div className="acciones">
             <button
               type="submit"
               className="boton-secundario"
-              disabled={!preferencias.avisoDePrivacidadAceptado}
+              disabled={!iaAceptada}
             >
               Guardá la clave
             </button>
             <BotonConCarga
               onClick={() => void probarClave()}
-              disabled={!preferencias.avisoDePrivacidadAceptado}
+              disabled={!iaAceptada}
               cargando={probando}
             >
               Probá la clave
@@ -606,6 +625,36 @@ export default function Ajustes() {
           alElegir={(archivo) => void traerCopia(archivo)}
         />
         <AvisoEn lugar="datos" aviso={aviso} />
+      </section>
+
+      {/*
+        El aporte voluntario. Está acá, en Ajustes, y en ningún otro lado: no aparece
+        en el plan, ni al terminar una sesión, ni como aviso. Pedir plata en medio de
+        una tarea sería justo la presión que esta app promete no hacer, y no se
+        bloquea ni se recorta nada para quien no aporta.
+      */}
+      <section className="grupo">
+        <h2 className="grupo__titulo">Bancá el proyecto</h2>
+        <p className="menudo">
+          La app es gratis y va a seguir siéndolo entera, sin publicidad. Si te sirve y querés ayudar a que siga
+          creciendo, podés invitarme un cafecito.
+        </p>
+        <a
+          className="boton-secundario"
+          href="https://cafecito.app/joakozarza"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Invitame un cafecito
+          <span className="sr-only"> (se abre en Cafecito, en otra pestaña)</span>
+        </a>
+      </section>
+
+      <section className="grupo">
+        <h2 className="grupo__titulo">Sobre la app</h2>
+        <Link className="boton-secundario" to="/privacidad">
+          Leé la política de privacidad
+        </Link>
       </section>
 
       {/*

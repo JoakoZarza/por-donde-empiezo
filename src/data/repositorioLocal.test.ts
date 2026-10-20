@@ -173,6 +173,7 @@ test('guarda y recupera las preferencias', async () => {
     playlistPropia: null,
     claveDeIa: null,
     avisoDePrivacidadAceptado: false,
+    versionAvisoIa: 0,
     estiloDeReloj: 'carrera',
   })
   const preferencias = await repo.preferencias()
@@ -194,6 +195,7 @@ test('borrarTodo deja el repositorio vacío', async () => {
     playlistPropia: null,
     claveDeIa: null,
     avisoDePrivacidadAceptado: false,
+    versionAvisoIa: 0,
     estiloDeReloj: 'carrera',
   })
 

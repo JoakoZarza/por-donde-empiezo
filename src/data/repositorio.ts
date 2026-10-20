@@ -71,4 +71,5 @@ export const PREFERENCIAS_POR_DEFECTO: Preferencias = {
   playlistPropia: null,
   claveDeIa: null,
   avisoDePrivacidadAceptado: false,
+  versionAvisoIa: 0,
 }

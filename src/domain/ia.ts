@@ -1,5 +1,5 @@
 import { VERBOS } from './tipos'
-import type { Verbo } from './tipos'
+import type { Preferencias, Verbo } from './tipos'
 
 /*
   La IA propone, la persona decide.
@@ -124,4 +124,17 @@ export function leerSugerencias(texto: string): Sugerencia[] {
   }
 
   return sugerencias
+}
+
+/**
+ * La versión vigente del aviso de IA. La 1 hablaba solo de la clave; la 2 es el texto
+ * de la sección 9.3 de la especificación —que personas de Google pueden leer las
+ * fotos— más la declaración de mayoría de edad. Se sube cada vez que el aviso cambia
+ * en algo que la persona tiene que volver a aceptar.
+ */
+export const VERSION_AVISO_IA = 2
+
+/** Si la persona aceptó el aviso VIGENTE. Aceptar uno anterior no alcanza. */
+export function avisoIaAceptado(preferencias: Pick<Preferencias, 'avisoDePrivacidadAceptado' | 'versionAvisoIa'>): boolean {
+  return preferencias.avisoDePrivacidadAceptado && preferencias.versionAvisoIa >= VERSION_AVISO_IA
 }

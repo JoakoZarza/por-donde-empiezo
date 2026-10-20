@@ -60,6 +60,11 @@ npm run build
 ## Demo en vivo
 
 - Demo: [https://por-donde-empiezo.vercel.app/](https://por-donde-empiezo.vercel.app/)
+- Privacidad: [https://por-donde-empiezo.vercel.app/privacidad](https://por-donde-empiezo.vercel.app/privacidad). Los datos viven solo en el teléfono: sin cuentas, sin analítica y sin publicidad.
+
+## Bancá el proyecto
+
+La app es gratis y va a seguir siéndolo entera. Si te sirve, podés [invitarme un cafecito](https://cafecito.app/joakozarza).
 
 ## Decisiones de diseño y arquitectura
 

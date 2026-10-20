@@ -168,6 +168,13 @@ export interface Preferencias {
    * hace ni un pedido: la IA se activa solo después de un sí explícito.
    */
   avisoDePrivacidadAceptado: boolean
+  /**
+   * Qué versión del aviso de IA aceptó. Cuando el aviso cambia en algo que importa,
+   * se sube `VERSION_AVISO_IA` y quien aceptó una versión anterior tiene que leer y
+   * aceptar la nueva antes de seguir usando la IA: aceptar un texto no es aceptar
+   * otro. Cero significa que nunca aceptó ninguna con versión.
+   */
+  versionAvisoIa: number
 }
 
 /** Las herramientas que la app asume si la persona no dijo nada. */

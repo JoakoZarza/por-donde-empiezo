@@ -79,7 +79,7 @@ test('el modo elegido a mano no lo pisa la preferencia que llega tarde', async (
 
 test('«Probá la clave» conserva su nombre mientras prueba', async () => {
   const usuario = userEvent.setup()
-  await repo.guardarPreferencias({ ...(await repo.preferencias()), avisoDePrivacidadAceptado: true })
+  await repo.guardarPreferencias({ ...(await repo.preferencias()), avisoDePrivacidadAceptado: true, versionAvisoIa: 2 })
   // La red no responde: el botón tiene que quedar esperando, no cambiar de nombre.
   const fetchOriginal = globalThis.fetch
   globalThis.fetch = () => new Promise(() => {})
