@@ -8,6 +8,7 @@ import BotonConCarga from '../componentes/BotonConCarga'
 import { useAvisos } from '../estado/avisos'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
+import { esPlaylistValida } from '../musica'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import { leerRespaldo, nombreDelArchivo, RespaldoInvalido } from '../../domain/respaldo'
 import { consultarIa, FalloDeIa } from '../../data/iaCliente'
@@ -79,6 +80,7 @@ export default function Ajustes() {
   const [playlist, setPlaylist] = useState('')
   const [aviso, setAviso] = useState<Aviso | null>(null)
   const campoClave = useRef<HTMLInputElement>(null)
+  const campoPlaylist = useRef<HTMLInputElement>(null)
   const confirmar = useAvisos((estado) => estado.confirmar)
   const [clave, setClave] = useState('')
   const [probando, setProbando] = useState(false)
@@ -140,6 +142,26 @@ export default function Ajustes() {
       ? preferencias.herramientasDisponibles.filter((cada) => cada !== herramienta)
       : [...preferencias.herramientasDisponibles, herramienta]
     await guardar({ herramientasDisponibles: lista }, 'herramientas')
+  }
+
+  async function guardarPlaylist(): Promise<void> {
+    const limpia = playlist.trim()
+    if (limpia === '') {
+      await guardar({ playlistPropia: null }, 'playlist', 'Listo, sacamos tu playlist.')
+      return
+    }
+    if (!esPlaylistValida(limpia)) {
+      setAviso({
+        lugar: 'playlist',
+        tipo: 'error',
+        texto: 'Tiene que ser un enlace de Spotify o YouTube que empiece con https://. Copialo desde «Compartir» en la app.',
+      })
+      campoPlaylist.current?.focus()
+      return
+    }
+    if (await guardar({ playlistPropia: limpia }, 'playlist', 'Listo, la playlist quedó guardada.')) {
+      setPlaylist(limpia)
+    }
   }
 
   async function guardarClave(): Promise<void> {
@@ -355,24 +377,26 @@ export default function Ajustes() {
         <AvisoEn lugar="modo" aviso={aviso} />
       </fieldset>
 
+      {/*
+        `noValidate`: la validación es nuestra, no la burbuja del navegador, que sale
+        en el idioma y el estilo del sistema y acepta cualquier dirección.
+      */}
       <form
         className="grupo"
+        noValidate
         onSubmit={(evento) => {
           evento.preventDefault()
-          void guardar(
-            { playlistPropia: playlist.trim() === '' ? null : playlist.trim() },
-            'playlist',
-            playlist.trim() === '' ? 'Listo, sacamos tu playlist.' : 'Listo, la playlist quedó guardada.',
-          )
+          void guardarPlaylist()
         }}
       >
         <label className="campo__etiqueta" htmlFor="playlist">
           Tu música, si querés
         </label>
-        <p className="menudo">
+        <p className="menudo" id="playlist-ayuda">
           Pegá la dirección de una playlist de Spotify o YouTube y te la ofrecemos al arrancar.
         </p>
         <input
+          ref={campoPlaylist}
           id="playlist"
           name="playlist"
           className="campo__entrada"
@@ -380,14 +404,17 @@ export default function Ajustes() {
           inputMode="url"
           autoComplete="off"
           spellCheck={false}
+          maxLength={500}
           placeholder="https://open.spotify.com/playlist/…"
+          aria-invalid={aviso?.lugar === 'playlist' && aviso.tipo === 'error'}
+          aria-describedby="playlist-ayuda playlist-aviso"
           value={playlist}
           onChange={(evento) => setPlaylist(evento.target.value)}
         />
         <button type="submit" className="boton-secundario">
           Guardá la playlist
         </button>
-        <AvisoEn lugar="playlist" aviso={aviso} />
+        <AvisoEn lugar="playlist" aviso={aviso} id="playlist-aviso" />
       </form>
 
       <section className="grupo">

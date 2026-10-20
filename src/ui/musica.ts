@@ -32,7 +32,37 @@ export function opcionesDeMusica(minutos: number | null, playlistPropia: string 
   // Si la persona pegó su playlist, va primero: es la que quiere escuchar. Las
   // búsquedas quedan al lado, porque puede querer otra cosa ese día.
   const propia = playlistPropia?.trim()
-  if (propia) return [{ nombre: 'Tu playlist', url: propia }, ...busquedas]
+  if (propia && esPlaylistValida(propia)) return [{ nombre: 'Tu playlist', url: propia }, ...busquedas]
 
   return busquedas
+}
+
+/** Los sitios que se ofrecen: los dos que la pantalla de Ajustes nombra. */
+const SITIOS_DE_MUSICA = new Set([
+  'open.spotify.com',
+  'spotify.com',
+  'www.spotify.com',
+  'spotify.link',
+  'youtube.com',
+  'www.youtube.com',
+  'm.youtube.com',
+  'music.youtube.com',
+  'youtu.be',
+])
+
+/**
+ * Si una dirección sirve como playlist: `https` y de Spotify o YouTube.
+ *
+ * No es solo prolijidad. La dirección termina como `href` de un enlace, así que sin
+ * esto un `javascript:` pegado —o llegado en una copia importada de otro teléfono—
+ * se ejecutaría al tocar «Tu playlist». Por eso se valida al guardar y también al
+ * mostrar.
+ */
+export function esPlaylistValida(direccion: string): boolean {
+  try {
+    const url = new URL(direccion.trim())
+    return url.protocol === 'https:' && SITIOS_DE_MUSICA.has(url.hostname.toLowerCase())
+  } catch {
+    return false
+  }
 }

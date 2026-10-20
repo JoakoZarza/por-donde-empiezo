@@ -5,6 +5,7 @@ import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
 import Esqueleto from '../componentes/Esqueleto'
+import LamparaApagada from '../componentes/LamparaApagada'
 import type { Logro, Totales } from '../../domain/logros'
 
 /*
@@ -89,6 +90,7 @@ export default function Logros() {
   if (totales.tareas === 0) {
     return (
       <main className="pantalla">
+        <LamparaApagada />
         <h1 className="pantalla__titulo">Lo que hiciste</h1>
         <p className="menudo">
           Acá va a quedar todo lo que hagas, y no se borra nunca: ni aunque dejes de entrar, ni aunque reinicies un

@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { useTitulo } from '../estado/useTitulo'
+import LamparaApagada from '../componentes/LamparaApagada'
 
 /*
   Ninguna pantalla deja a la persona sin salida: siempre hay un paso siguiente o
@@ -15,6 +16,7 @@ export default function NoEncontrada() {
 
   return (
     <main className="pantalla">
+      <LamparaApagada />
       <h1 className="pantalla__titulo">No encontramos esa pantalla</h1>
       <p className="menudo">Puede que el enlace esté viejo.</p>
       <div className="pantalla__pie">

@@ -23,6 +23,8 @@ export default function PrimeraVez() {
   const [error, setError] = useState<string | null>(null)
   /** Si la persona ya tocó una ficha, lo que llegue del teléfono no la pisa. */
   const tocado = useRef(false)
+  /** Nadie eligió nada todavía en este teléfono: es la primera vez. */
+  const [esNueva, setEsNueva] = useState(false)
 
   useTitulo('¿Qué querés ordenar?')
 
@@ -39,7 +41,9 @@ export default function PrimeraVez() {
     repositorio
       .listarAmbientes()
       .then((guardados) => {
-        if (vigente && !tocado.current) setElegidos(guardados.map((ambiente) => ambiente.id))
+        if (!vigente) return
+        setEsNueva(guardados.length === 0)
+        if (!tocado.current) setElegidos(guardados.map((ambiente) => ambiente.id))
       })
       .catch(() => {})
     return () => {
@@ -72,6 +76,17 @@ export default function PrimeraVez() {
   return (
     <main className="pantalla">
       <h1 className="pantalla__titulo">¿Qué querés ordenar?</h1>
+      {/*
+        Para quien llega por primera vez, una línea que diga qué es esto. Antes la
+        pantalla era un título y ocho fichas, sin ninguna pista de qué pasaba al
+        elegir. Quien vuelve ya lo sabe, y no se la repetimos.
+      */}
+      {esNueva && (
+        <p className="menudo">
+          No tenés que ordenar todo, solo lo siguiente. Elegí uno o más ambientes y te armamos un plan corto, al
+          ritmo del tiempo que tengas.
+        </p>
+      )}
 
       <ul className="fichas">
         {CATALOGO.ambientes.map((ambiente) => {

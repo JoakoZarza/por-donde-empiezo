@@ -305,10 +305,36 @@ legend.grupo__titulo {
   gap: 0.5rem;
 }
 
-.progreso__barra {
+/*
+  Una marca por paso. Lo hecho queda en menta y no se borra; lo actual es la luz;
+  lo salteado queda apenas marcado, sin culpa; lo que falta, como borde. Quieta:
+  el plan visual reserva el movimiento para el viaje de la luz.
+*/
+.progreso__marcas {
+  display: flex;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progreso__marca {
+  flex: 1 1 0;
   height: 2px;
+  border-radius: 1px;
+  background-color: var(--color-borde);
+}
+
+.progreso__marca--hecho {
+  background-color: var(--color-menta);
+}
+
+.progreso__marca--actual {
   background-color: var(--color-velador);
-  transform-origin: left center;
+}
+
+.progreso__marca--salteado {
+  background-color: color-mix(in oklab, var(--color-humo) 45%, transparent);
 }
 
 .progreso__linea {
@@ -749,14 +775,17 @@ legend.grupo__titulo {
 /* --- Estados de los botones --- */
 
 /*
-  Antes los botones declaraban una transición de opacidad y escala que nunca
-  ocurría: no había ningún estado que cambiara. El toque se hunde apenas, el
-  puntero fino sube el contraste, y lo deshabilitado se ve deshabilitado.
+  Antes los botones no tenían ningún estado: tocar o pasar el puntero no cambiaba
+  nada. Ahora el toque y el puntero fino suben el contraste —solo color, sin
+  movimiento— y lo deshabilitado se ve deshabilitado.
 */
-.boton-principal:active:not(:disabled),
-.boton-secundario:active:not(:disabled),
-.boton-destructivo:active:not(:disabled) {
-  transform: scale(0.98);
+/* Al tocar, más contraste y no movimiento: el plan visual reserva el movimiento para la luz. */
+.boton-secundario:active:not(:disabled) {
+  background-color: color-mix(in oklab, var(--color-hueso) 10%, transparent);
+}
+
+.boton-principal:active:not(:disabled) {
+  background-color: color-mix(in oklab, var(--color-velador) 80%, var(--color-hueso));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -864,17 +893,6 @@ legend.grupo__titulo {
   pointer-events: none;
 }
 
-@keyframes aviso-entra {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .aviso-flotante__caja {
   display: flex;
   align-items: center;
@@ -887,7 +905,6 @@ legend.grupo__titulo {
   background-color: var(--color-pared);
   box-shadow: var(--sombra-tarjeta);
   pointer-events: auto;
-  animation: aviso-entra 200ms ease-out;
 }
 
 .aviso-flotante__texto {
@@ -1084,4 +1101,13 @@ body:has(.pestanas) .pantalla {
   .spinner {
     animation: none;
   }
+}
+
+/* --- Lámpara apagada --- */
+
+/* La imagen de los vacíos: en humo, sin ámbar. El ámbar es la luz, y acá está apagada. */
+.lampara-apagada {
+  flex: none;
+  color: var(--color-humo);
+  opacity: 0.8;
 }

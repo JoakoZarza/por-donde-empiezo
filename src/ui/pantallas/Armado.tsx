@@ -9,6 +9,7 @@ import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import BotonConCarga from '../componentes/BotonConCarga'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
+import LamparaApagada from '../componentes/LamparaApagada'
 import SelectorDeArchivo from '../componentes/SelectorDeArchivo'
 import Esqueleto from '../componentes/Esqueleto'
 import { useAvisos } from '../estado/avisos'
@@ -26,6 +27,14 @@ import type { Ambiente, Tarea } from '../../domain/tipos'
 */
 
 const GRUPO_PROPIAS = 'propias'
+
+/*
+  Topes de largo. Generosos —una tarea propia es una frase, no un párrafo— pero
+  existen: sin tope, pegar un texto entero rompía la tarjeta del paso, y la
+  descripción para la IA viaja en cada pedido y gasta cuota de la clave.
+*/
+const LARGO_MAXIMO_TAREA = 200
+const LARGO_MAXIMO_DESCRIPCION = 1000
 
 export default function Armado() {
   const { ambienteId = '' } = useParams()
@@ -56,7 +65,7 @@ export default function Armado() {
   const [iaError, setIaError] = useState<string | null>(null)
 
   const ambiente = ambientePorId(ambienteId)
-  useTitulo(ambiente?.nombre ?? 'Armar el ambiente')
+  useTitulo(ambiente?.nombre ?? 'No encontramos ese ambiente')
 
   useEffect(() => {
     let vigente = true
@@ -323,14 +332,34 @@ export default function Armado() {
     avisar(`Agregaste «${texto}» a «Tus propias».`)
   }
 
+  /*
+    Un ambiente que no está en el catálogo —una dirección vieja o mal escrita— se
+    dice como tal. Antes la pantalla mostraba «Ambiente» y una lista vacía, y los
+    botones de abajo seguían ahí como si hubiera algo para armar.
+  */
+  if (!ambiente) {
+    return (
+      <main className="pantalla">
+        <LamparaApagada />
+        <h1 className="pantalla__titulo">No encontramos ese ambiente</h1>
+        <p className="menudo">Puede que el enlace esté viejo. Tus ambientes y tus tareas siguen donde estaban.</p>
+        <div className="pantalla__pie">
+          <Link className="boton-principal" to="/">
+            Elegí ambientes
+          </Link>
+        </div>
+      </main>
+    )
+  }
+
   if (falloLaCarga) {
-    return <ErrorDeCarga titulo={ambiente?.nombre ?? 'Armar el ambiente'} alReintentar={reintentar} />
+    return <ErrorDeCarga titulo={ambiente.nombre} alReintentar={reintentar} />
   }
 
   if (cargando) {
     return (
       <main className="pantalla">
-        <h1 className="pantalla__titulo">{ambiente?.nombre ?? 'Ambiente'}</h1>
+        <h1 className="pantalla__titulo">{ambiente.nombre}</h1>
         <p className="menudo">Esto es lo que solemos hacer acá. Destildá lo que no quieras.</p>
         <Esqueleto forma="tareas" />
       </main>
@@ -339,7 +368,7 @@ export default function Armado() {
 
   return (
     <main className="pantalla">
-      <h1 className="pantalla__titulo">{ambiente?.nombre ?? 'Ambiente'}</h1>
+      <h1 className="pantalla__titulo">{ambiente.nombre}</h1>
       <p className="menudo">Esto es lo que solemos hacer acá. Destildá lo que no quieras.</p>
 
       {grupos.map((grupo) => (
@@ -367,6 +396,17 @@ export default function Armado() {
           </ul>
         </section>
       ))}
+
+      {/*
+        Con todo destildado no hay nada que este ambiente aporte al plan, y antes no
+        se decía: la persona seguía y descubría recién en el plan que faltaba.
+      */}
+      {incluidas.length === 0 && (
+        <p className="alerta" role="status">
+          No quedó nada tildado en {ambiente.nombre.toLowerCase()}, así que no va a entrar en el plan. Tildá algo, o
+          agregá algo tuyo abajo.
+        </p>
+      )}
 
       {errorCambio && (
         <p className="alerta" role="status" aria-live="polite">
@@ -398,6 +438,7 @@ export default function Armado() {
               name="tarea-propia"
               className="campo__entrada"
               autoComplete="off"
+              maxLength={LARGO_MAXIMO_TAREA}
               value={propia}
               placeholder="regar las plantas…"
               aria-invalid={errorPropia !== null}
@@ -432,9 +473,18 @@ export default function Armado() {
             name="ia-texto"
             className="campo__entrada campo__entrada--varias-lineas"
             rows={3}
+            maxLength={LARGO_MAXIMO_DESCRIPCION}
             value={iaTexto}
             placeholder="Ejemplo: hay ropa tirada y la mesada llena de cosas…"
             onChange={(evento) => setIaTexto(evento.target.value)}
+            onKeyDown={(evento) => {
+              // En un campo de varias líneas, Enter es un salto de línea: el envío
+              // va con Ctrl+Enter (⌘+Enter en Mac), como en cualquier editor.
+              if (evento.key === 'Enter' && (evento.ctrlKey || evento.metaKey)) {
+                evento.preventDefault()
+                void pedirIdeas()
+              }
+            }}
           />
 
           <SelectorDeArchivo

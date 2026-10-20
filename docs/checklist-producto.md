@@ -39,7 +39,7 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
 
 ## 2. Estados vacíos
 
-- [ ] 🟠 **La primera pantalla no le dice a una persona nueva qué es la app.** Es un título, ocho
+- [x] 🟠 **La primera pantalla no le dice a una persona nueva qué es la app.** Es un título, ocho
   fichas y «Elegí al menos un ambiente.» (`PrimeraVez.tsx:46`). Sumar una línea de propuesta
   de valor arriba («No tenés que ordenar todo, solo lo siguiente.» ya existe en `index.html`) y
   sacar el aviso de «Elegí al menos…» hasta que la persona intente avanzar.
@@ -47,11 +47,11 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
   (`PrimeraVez.tsx:19`, `useState([])`). La bienvenida dice «Está todo donde lo dejaste» y la
   pantalla dice lo contrario. Precargar los ambientes guardados, o para quien vuelve mostrar
   directo «Seguí donde quedaste» con el plan o la casa.
-- [ ] 🟠 **Armado con todas las tareas destildadas** no dice nada y deja avanzar
+- [x] 🟠 **Armado con todas las tareas destildadas** no dice nada y deja avanzar
   (`Armado.tsx:405`). Mostrar «No quedó nada en este ambiente. Tildá algo o agregá una tuya.»
-- [ ] 🟠 **Armado con un ambiente que no existe** (`/armar/lo-que-sea`) muestra «Ambiente» y una
+- [x] 🟠 **Armado con un ambiente que no existe** (`/armar/lo-que-sea`) muestra «Ambiente» y una
   lista vacía (`Armado.tsx:402`). Redirigir a `NoEncontrada` o mostrar un vacío con salida.
-- [ ] 🟢 Los vacíos que ya existen (Casa, Logros, plan sin pasos, plan no encontrado) están bien
+- [x] 🟢 Los vacíos que ya existen (Casa, Logros, plan sin pasos, plan no encontrado) están bien
   resueltos en texto; falta **una ilustración o la lámpara apagada** para que no parezcan
   pantallas de error. Reutilizar `.lampara` con opacidad baja como motivo de vacío.
 
@@ -70,13 +70,13 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
 - [x] 🟠 **`agregar()` y `agregarSugerencias()` no capturan errores** (`Armado.tsx:367`, `:332`):
   si el guardado falla, la promesa rechaza sin mensaje. Además el mismo `error` sirve para el
   campo y para fallos de tildar, así que un mensaje pisa al otro.
-- [ ] 🟠 **La URL de la playlist depende de la burbuja nativa del navegador** (`type="url"`,
+- [x] 🟠 **La URL de la playlist depende de la burbuja nativa del navegador** (`type="url"`,
   `Ajustes.tsx:283`): sale en el idioma y estilo del sistema, y acepta cualquier URL. Validar con
   mensaje propio («Tiene que ser un enlace de Spotify o YouTube») y `noValidate` en el form.
-- [ ] 🟠 **No hay límite de largo** en la tarea propia ni en «Contá lo que ves». Una frase muy
+- [x] 🟠 **No hay límite de largo** en la tarea propia ni en «Contá lo que ves». Una frase muy
   larga rompe la tarjeta del paso a `--texto-paso` (hasta 72&nbsp;px). Poner `maxLength` y
   `overflow-wrap: anywhere` en `.paso__accion`.
-- [ ] 🟢 El `<textarea>` de IA no envía con Ctrl/⌘+Enter (regla de `AGENTS.md`), y los campos
+- [x] 🟢 El `<textarea>` de IA no envía con Ctrl/⌘+Enter (regla de `AGENTS.md`), y los campos
   `tarea-propia` no tienen `name`/`autocomplete` (`Armado.tsx:435`).
 - [x] 🟢 `guardarClave()` muestra «Listo, la clave quedó guardada» aunque `guardar()` haya
   fallado (el error se traga adentro, `Ajustes.tsx:115`). Hoy lo tapa el `!error` del render;
@@ -84,7 +84,7 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
 
 ## 4. Feedback visual
 
-- [ ] 🟠 **Al tocar «Listo» no hay confirmación de lo hecho**: la tarjeta cambia por la siguiente
+- [x] 🟠 **Al tocar «Listo» no hay confirmación de lo hecho** (resuelto como lo pide el plan visual: una marca de menta por paso en la línea de progreso, sin animación nueva): la tarjeta cambia por la siguiente
   (con la animación `aparecer-el-paso`), pero nada dice «esto quedó hecho». Sumar un check menta
   de ~400&nbsp;ms sobre la tarjeta saliente antes del viaje de la luz, respetando
   `prefers-reduced-motion`.
@@ -137,7 +137,7 @@ Prioridad: 🔴 se nota roto · 🟠 se nota «hecho a las apuradas» · 🟢 pu
 - [x] 🟢 **La safe area de abajo se suma dos veces**: `body` ya la tiene de padding
   (`base.css:77`) y `.pantalla` la vuelve a sumar (`pantallas.css:18`). En iPhone queda un hueco
   de más debajo del «Listo».
-- [ ] 🟢 Sumar a `docs/` una página de componentes (botones, campos, alertas, toast, skeleton,
+- [x] 🟢 Sumar a `docs/` una página de componentes (botones, campos, alertas, toast, skeleton,
   diálogo) para que las próximas pantallas no inventen variantes.
 
 ---

@@ -4,6 +4,7 @@ import { useSesion } from '../estado/sesion'
 import { useTitulo } from '../estado/useTitulo'
 import { useAvisos } from '../estado/avisos'
 import ErrorDeCarga from '../componentes/ErrorDeCarga'
+import LamparaApagada from '../componentes/LamparaApagada'
 import {
   enReloj,
   enVentaja,
@@ -260,6 +261,7 @@ export default function Plan() {
   if (noEncontrado) {
     return (
       <main className="pantalla">
+        <LamparaApagada />
         <h1 className="pantalla__titulo">No encontramos ese plan</h1>
         <p className="menudo">
           Puede que la dirección esté vieja, o que el teléfono haya borrado los datos por falta de uso. No se
@@ -281,6 +283,7 @@ export default function Plan() {
   if (plan && total === 0) {
     return (
       <main className="pantalla">
+        <LamparaApagada />
         <h1 className="pantalla__titulo">El plan</h1>
         {plan.advertencias.map((advertencia) => (
           <p key={advertencia} className="menudo">
@@ -371,7 +374,23 @@ export default function Plan() {
       <h1 className="sr-only">El plan</h1>
 
       <div className="progreso">
-        <div className="progreso__barra" style={{ transform: `scaleX(${total === 0 ? 0 : indice / total})` }} />
+        {/*
+          La línea de progreso del plan visual aprobado (sección 5): lo que deja
+          «Listo» es una marca de menta que no se borra. Antes era una sola franja
+          ámbar que crecía, y nada distinguía lo hecho de lo salteado: tocar «Listo»
+          no dejaba ninguna confirmación de lo que se acababa de terminar.
+
+          Es decorativa para lectores de pantalla: el contador de al lado y el aviso
+          del paso nuevo ya dicen todo, en palabras.
+        */}
+        <ol className="progreso__marcas" aria-hidden="true">
+          {plan?.pasos.map((cada, posicion) => (
+            <li
+              key={`${cada.tareaId}-${posicion}`}
+              className={`progreso__marca progreso__marca--${posicion === indice ? 'actual' : cada.estado}`}
+            />
+          ))}
+        </ol>
         <div className="progreso__linea">
           <p className="menudo tabular">
             {Math.min(indice + 1, total)} de {total}
